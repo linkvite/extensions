@@ -1,22 +1,44 @@
-import { useState } from "react"
+import { settingStore } from "~stores";
+import { PageProvider } from "~components/wrapper";
+import { useSelector } from "@legendapp/state/react";
 
-function IndexOptions() {
-  const [data, setData] = useState("")
+function OptionsIndex() {
+    const store = useSelector(settingStore);
+    return (
+        <PageProvider noClose>
+            <div style={{ width: '100%' }}>
+                <h1>Linkvite</h1>
+                <p>Options Page</p>
+                <p>Theme: {store.theme}</p>
+                <p>Collection: {store.collection}</p>
+                <p>Auto Save: {store.autoSave ? "Yes" : "No"}</p>
 
-  return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        padding: 16
-      }}>
-      <h1>
-        Welcome to your <a href="https://www.plasmo.com">Plasmo</a> Extension!
-      </h1>
-      <input onChange={(e) => setData(e.target.value)} value={data} />
-      <footer>Crafted by @PlamoHQ</footer>{" "}
-    </div>
-  )
+                <p>Permissions</p>
+                <ul>
+                    {store.permissions.map((permission, index) => (
+                        <li key={index}>{permission}</li>
+                    ))}
+                </ul>
+
+                <p>Hot Keys</p>
+                <ul>
+                    {store.hotKeys.map((hotKey, index) => (
+                        <li key={index}>{hotKey}</li>
+                    ))}
+                </ul>
+
+                <p>Copied Link: {store.copiedLink}</p>
+
+                <p>
+                    <a href="/popup.html">Popup</a>
+                </p>
+
+                <p>
+                    The easiest way to save and organize your bookmarks.
+                </p>
+            </div >
+        </PageProvider>
+    )
 }
 
-export default IndexOptions
+export default OptionsIndex

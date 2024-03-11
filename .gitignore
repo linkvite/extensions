@@ -9,9 +9,6 @@
 # testing
 /coverage
 
-#cache
-.turbo
-
 # misc
 .DS_Store
 *.pem
@@ -23,17 +20,17 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # local env files
-.env*
+.env*.local
 
 out/
 build/
 dist/
 
-# plasmo - https://www.plasmo.com
+# plasmo
 .plasmo
-
-# bpp - http://bpp.browser.market/
-keys.json
 
 # typescript
 .tsbuildinfo
+
+# vscode
+.vscode
