@@ -1,9 +1,9 @@
-import { API_DOMAIN } from "~utils";
-import { type User } from "@linkvite/js";
-import { storage } from "~utils/storage";
+import { API_DOMAIN, NIL_OBJECT_ID } from "~utils";
+import type { Bookmark, ParsedLinkData } from "@linkvite/js";
 import type { AuthResponse, HTTPException } from "~types";
 import { authStore, userActions, userStore } from "~stores";
 import xior, { merge, XiorError, type XiorResponse } from "xior";
+import { persistAuthData, storage } from '~utils/storage';
 
 export const api = xior.create({
     timeout: 10000,
@@ -11,24 +11,25 @@ export const api = xior.create({
 });
 
 api.interceptors.response.use(resp => resp, async (error: XiorError) => {
-    if (error.response && error.response.status === 401) {
-        const originalRequest = error.request;;
+    const isInAuth = error.response.config.url?.includes("/auth");
+    if (error.response && error.response.status === 401 && !isInAuth) {
+        const originalRequest = error.request;
 
         if (!originalRequest['_retry']) {
             originalRequest['_retry'] = true;
 
-            // Attempt to refresh the token
-            return api.post(`${API_DOMAIN}/auth/token/refresh`, { refreshToken: authStore.refreshToken.get() })
-                .then(res => {
-                    const data = handleAuthSuccess(res.data);
-                    api.config.headers.Authorization = 'Bearer ' + data.accessToken;
-                    merge(originalRequest, { headers: { Authorization: `Bearer ${data.accessToken}` } });
-                    return api.request(originalRequest);
-                })
-                .catch(err => {
-                    handleLogout({ silent: true });
-                    return Promise.reject(err);
-                });
+            const refreshToken = authStore.refreshToken.get() || await storage.get("token");
+            const resp = await api.post(`${API_DOMAIN}/auth/token/refresh`, { refreshToken });
+            const data = resp.data.data as AuthResponse;
+            await persistAuthData(data);
+
+            const request = merge(originalRequest, {
+                headers: {
+                    Authorization: `Bearer ${data.accessToken}`
+                }
+            });
+
+            return api.request(request);
         }
     }
 
@@ -96,23 +97,22 @@ type HandleAuthProps = {
         identifier: string;
         password: string;
     };
-    onError: (err: string) => void;
-    onLogin: (user: User, token: string) => void;
 }
 
-export async function handleAuthentication({ body, onLogin, onError }: HandleAuthProps) {
+export async function handleAuthentication({ body }: HandleAuthProps) {
     if (body.password.length < 6) {
-        onError("Password must be at least 6 characters long");
         return;
     }
 
     function handleError(err: HTTPException) {
-        handleServerError(err, onError);
+        const error = handleServerError(err);
+        return Promise.reject(error);
     }
 
-    function handleSuccess(res: XiorResponse) {
-        const data = handleAuthSuccess(res);
-        onLogin(data.user, data.refreshToken);
+    async function handleSuccess(res: XiorResponse) {
+        const data = res.data.data as AuthResponse;
+        await persistAuthData(data);
+        return data;
     }
 
     const endpoint = `/auth/login`;
@@ -125,14 +125,15 @@ export async function handleAuthentication({ body, onLogin, onError }: HandleAut
 type HandleLogout = {
     token?: string;
     silent?: boolean;
-    callback?: () => void;
 }
 
-export async function handleLogout({ token, silent, callback }: HandleLogout = {}) {
+export async function handleLogout({ token, silent }: HandleLogout = {}) {
     userActions.clearData();
     authStore.accessToken.set("")
     authStore.refreshToken.set("");
-    callback?.();
+
+    await storage.remove("user");
+    await storage.remove("token");
 
     if (silent) return;
     const payload = { token, id: userStore.id.get() };
@@ -142,16 +143,159 @@ export async function handleLogout({ token, silent, callback }: HandleLogout = {
 
 }
 
-export function handleAuthSuccess(res: AuthResponse) {
-    const { accessToken, refreshToken, user } = res.data.data;
+export async function handleParseLink({ url }: { url: string }) {
+    const endpoint = `/parser?link=${url}`;
 
-    userActions.setData(user);
-    authStore.accessToken.set(accessToken);
-    authStore.refreshToken.set(refreshToken);
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data as ParsedLinkData;
+    }
 
-    storage.set("user", user);
-    storage.set("accessToken", accessToken);
-    storage.set("refreshToken", refreshToken);
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
 
-    return res.data.data;
+    return await api
+        .post(endpoint)
+        .then(handleSuccess)
+        .catch(handleError);
+}
+
+type BookmarkExistsResponse = {
+    exists: boolean;
+    bookmark: Bookmark;
+}
+
+export async function handleBookmarkExists({ url }: { url: string }): Promise<BookmarkExistsResponse> {
+    const endpoint = `/bookmarks/exists`;
+
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data as BookmarkExistsResponse;
+    }
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    return await api
+        .post(endpoint, { url })
+        .then(handleSuccess)
+        .catch(handleError);
+}
+
+export type CreateBookmarkProps = {
+    url: string;
+    title: string;
+    description?: string;
+    tags: string[];
+    favicon?: string;
+    cover: string;
+    coverType: "default" | "custom";
+    collection?: string;
+};
+
+export async function handleCreateBookmark({ tags, collection: c, cover, coverType, ...rest }: CreateBookmarkProps) {
+    const endpoint = `/bookmarks/manual`;
+    const collection = c !== NIL_OBJECT_ID ? c : undefined;
+
+    const formData = new FormData();
+    formData.append("cover", cover);
+    formData.append("tags", tags.join(","));
+    formData.append("coverType", coverType);
+
+    if (collection) {
+        formData.append("collection", collection);
+    }
+
+    if (coverType === "custom") {
+        const response = await fetch(cover);
+        const blob = await response.blob();
+        formData.append("file", blob, "cover.jpg");
+    }
+
+    Object.entries(rest).forEach(([key, value]) => {
+        formData.append(key, value);
+    });
+
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data as Bookmark;
+    }
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    return await api
+        .post(endpoint, formData)
+        .then(handleSuccess)
+        .catch(handleError);
+}
+
+export async function handleUpdateBookmark({ bookmark }: { bookmark: Bookmark }) {
+    const endpoint = `/bookmarks/${bookmark.id}`;
+    const { info, meta, config, assets, tags } = bookmark;
+    const collection = info.collection !== NIL_OBJECT_ID
+        ? info.collection
+        : undefined;
+
+    const body = {
+        collection,
+        name: info.name,
+        description: info.description,
+        tags: tags.join(","),
+        url: meta.url,
+        type: meta.type,
+        favIcon: assets.icon,
+        image: bookmark.assets.thumbnail,
+        allowComments: config.allowComments,
+    };
+
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data as Bookmark;
+    }
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    return await api
+        .patch(endpoint, body)
+        .then(handleSuccess)
+        .catch(handleError);
+}
+
+type CoverProps = {
+    id: string;
+    cover: string;
+    type: "default" | "custom";
+}
+
+export async function handleUpdateBookmarkCover({ id, cover, type }: CoverProps) {
+    const endpoint = `/bookmarks/${id}/cover`;
+    const formData = new FormData();
+    formData.append('type', type);
+    cover && formData.append('cover', cover);
+
+    if (type === "custom") {
+        const response = await fetch(cover);
+        const blob = await response.blob();
+        formData.append("file", blob, "cover.jpg");
+    }
+
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data as Bookmark;
+    }
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    return await api
+        .patch(endpoint, formData)
+        .then(handleSuccess)
+        .catch(handleError)
 }

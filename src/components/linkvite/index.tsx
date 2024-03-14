@@ -1,5 +1,5 @@
 import React from "react";
-import { closeWindow } from "~router";
+import { closeTab } from "~router";
 import { useAuth } from "~components/wrapper/auth";
 import {
     Favicon,
@@ -35,7 +35,11 @@ export function LogoAndTitle({ noClose }: { noClose?: boolean }) {
             <HeaderButton onClick={logout}>Logout</HeaderButton>
             {noClose
                 ? null
-                : <HeaderCloseButton onClick={closeWindow}>Close</HeaderCloseButton>
+                : <HeaderCloseButton
+                    onClick={() => closeTab(true)}
+                >
+                    Close
+                </HeaderCloseButton>
             }
         </div>
     )

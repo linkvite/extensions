@@ -1,6 +1,7 @@
 import "./styles.css";
 import { useTheme } from "~hooks";
 import { AuthProvider } from "./auth";
+import { Toaster } from 'react-hot-toast';
 import isPropValid from '@emotion/is-prop-valid';
 import { LogoAndTitle } from "~components/linkvite";
 import { persistStateObservers } from '~utils/storage';
@@ -38,6 +39,16 @@ export function RootProvider({ children, $isAuth = false }: RootProps) {
                     </MountedComponent>
                 </RootComponent>
             </ThemeProvider>
+
+            <Toaster
+                toastOptions={{
+                    style: {
+                        color: theme.text,
+                        background: theme.background_sub,
+                    }
+                }}
+                position="bottom-center"
+            />
         </StyleSheetManager>
     )
 }

@@ -1,5 +1,8 @@
+import { browser } from "~browser";
+import { getCurrentTab, normalize } from "~utils";
+import * as htmlparser from "htmlparser2";
+
 export type ParsedHTML = {
-    title: string;
     image: string;
     description: string;
 }
@@ -10,44 +13,35 @@ export type ParsedHTML = {
  * Use the meta tags to get the information.
  * But use the regular tags as fallback.
  */
-export function parse(html: string): ParsedHTML {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-
-    let title = "";
+export async function parseHTML(html: string): Promise<ParsedHTML> {
     let image = "";
     let description = "";
 
-    const titleTag = doc.querySelector('meta[property="og:title"]')?.getAttribute('content') || '';
-    if (titleTag) {
-        title = titleTag;
-    }
-
-    if (!title) {
-        title = doc.querySelector('title')?.textContent || '';
-    }
-
-    const imageTag = doc.querySelector('meta[property="og:image"]')?.getAttribute('content') || '';
-    if (imageTag) {
-        image = imageTag;
-    }
+    const parser = new htmlparser.Parser({
+        onopentag: (name, attrib) => {
+            if (name === 'meta') {
+                if (attrib?.property === 'og:image' || attrib?.name === 'og:image') {
+                    image = attrib?.content;
+                }
+                if (attrib?.property === 'og:description' || attrib?.name === 'og:description') {
+                    description = attrib?.content;
+                }
+                if (attrib?.name === 'description') {
+                    description = attrib?.content;
+                }
+            }
+        },
+    }, { decodeEntities: true });
+    parser.write(html);
+    parser.end();
 
     if (!image) {
-        image = doc.querySelector('img')?.getAttribute('src') || '';
-    }
-
-    const descriptionTag = doc.querySelector('meta[property="og:description"]')?.getAttribute('content') || '';
-    if (descriptionTag) {
-        description = descriptionTag;
-    }
-
-    if (!description) {
-        description = doc.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+        const tab = await getCurrentTab();
+        image = await browser.tabs.captureVisibleTab(tab.windowId, { format: "png" });
     }
 
     return {
-        title,
         image,
-        description
+        description: normalize(description),
     }
 }

@@ -17,11 +17,7 @@ export class HTTPException<T = HTTPError> extends XiorError {
 }
 
 export type AuthResponse = {
-    data: {
-        data: {
-            user: User;
-            accessToken: string;
-            refreshToken: string;
-        }
-    }
+    user: User;
+    accessToken: string;
+    refreshToken: string;
 }

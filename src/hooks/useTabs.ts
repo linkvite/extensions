@@ -1,5 +1,6 @@
 import { browser } from "~browser";
 import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 /**
  * Get all the tabs from the current window.
@@ -27,13 +28,15 @@ export function useTabs() {
                     ? { windowType: 'normal' }
                     : { currentWindow: true }
                 )
-                .catch(e => {
-                    console.error('Error querying tabs:', e);
+                .catch(err => {
+                    toast.error('Error loading tabs');
+                    console.error('Error loading tabs:', err);
                     return [];
                 });
 
             setTabs(filterValidTabs(tabs));
         } catch (error) {
+            toast.error('Error loading tabs');
             console.error('Error loading tabs:', error);
         }
     }, []);
@@ -54,7 +57,8 @@ export function useTabs() {
                 if (e?.message.includes('user input')) {
                     return;
                 }
-                console.error(e);
+                console.error('Error requesting tabs permission:', e);
+                toast.error('Error requesting tabs permission');
             }
         };
 

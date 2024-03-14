@@ -15,5 +15,7 @@
       ]
     },
     "baseUrl": "."
-  }
+  },
+  "strict": true,
+  "noImplicitAny": true,
 }

@@ -4,6 +4,7 @@ import React, {
     useContext,
     useState,
     createContext,
+    useEffect,
 } from "react";
 import { type User } from "@linkvite/js";
 import { observer } from "@legendapp/state/react";
@@ -13,6 +14,8 @@ import {
 } from "~stores";
 import { extLogout } from "~utils";
 import { Login } from "~components/auth";
+import { sendToBackground } from "@plasmohq/messaging";
+import type { InitResponse } from "~background/messages/init";
 
 type AuthCtx = {
     loggedIn: boolean;
@@ -42,6 +45,27 @@ type AuthProviderProps = {
 export const AuthProvider = observer(function AuthProvider({ children }: AuthProviderProps) {
     const _loggedIn = authStore.loggedIn.get();
     const [loggedIn, setLoggedIn] = useState(_loggedIn);
+
+    useEffect(() => {
+        async function init() {
+            const resp = await sendToBackground<null, InitResponse>({
+                name: "init",
+            });
+
+            if (resp.loggedIn) {
+                userActions.setData(resp.user);
+                authStore.refreshToken.set(resp.token);
+                setLoggedIn(true);
+                return;
+            }
+
+            userActions.clearData();
+            authStore.refreshToken.set("");
+            setLoggedIn(false);
+        }
+
+        init();
+    }, []);
 
     const onLogin = useCallback((user: User, token: string) => {
         setLoggedIn(true);

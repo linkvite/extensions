@@ -24,7 +24,7 @@ import {
     AuthSubmitButton,
     AuthTitle
 } from "./styles";
-import { Spinner } from "~components/Spinner";
+import { Spinner } from "~components/spinner";
 
 type OnLogin = (user: User, token: string) => void;
 
@@ -196,7 +196,7 @@ export function AuthComponent({ onLogin }: { onLogin: OnLogin }) {
 
             <AuthSignUpContainer>
                 <AuthSignUpText type="button">
-                    Don't have an account?
+                    Don&apos;t have an account?
                 </AuthSignUpText>
 
                 <AuthSignUpText type="button" $second

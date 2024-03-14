@@ -9,7 +9,8 @@ import {
     persistObservable,
     configureObservablePersistence
 } from '@legendapp/state/persist';
-import { authStore, settingStore, userStore } from "~stores";
+import { authStore, settingStore, userActions, userStore } from "~stores";
+import type { User } from "@linkvite/js";
 
 interface IPersistOptions {
     pluginLocal: ClassConstructor<ObservablePersistLocal, unknown[]> | undefined
@@ -24,7 +25,25 @@ export function persistStateObservers({ pluginLocal }: IPersistOptions = { plugi
         pluginLocal,
     });
 
-    persistObservable(userStore, { local: "user" });
     persistObservable(settingStore, { local: "settings" });
+    persistObservable(userStore, { local: "user" });
     persistObservable(authStore.refreshToken, { local: "refreshToken" });
+}
+
+type AuthData = {
+    user: User;
+    refreshToken: string;
+    accessToken?: string;
+}
+
+export async function persistAuthData(data: AuthData) {
+    await storage.set("user", data.user);
+    await storage.set("token", data.refreshToken);
+
+    userActions.setData(data.user);
+    authStore.refreshToken.set(data.refreshToken);
+
+    if (data.accessToken) {
+        authStore.accessToken.set(data.accessToken);
+    }
 }

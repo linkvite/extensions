@@ -1,5 +1,6 @@
 import { route } from "~router";
 import { browser } from "~browser";
+import { getCurrentTab } from "~utils";
 
 type Menu = {
     id: string
@@ -8,11 +9,9 @@ type Menu = {
 }
 
 const menus: Menu[] = [
-    { id: 'new:page', title: "Bookmark this page", contexts: ['page'] },
+    { id: 'new:bookmark', title: "Bookmark", contexts: ['page'] },
     { id: 'new:link', title: "Save link", contexts: ['link'] },
-    { id: 'new:video', title: "Save video", contexts: ['video'] },
     { id: 'new:image', title: "Save image", contexts: ['image'] },
-    { id: 'new:note', title: "Note", contexts: ['selection'] },
     { id: 'options', title: "Options", contexts: ['action'] },
     { id: 'save:tabs', title: "Save all tabs", contexts: ['action'] },
     { id: 'open:app', title: "Open Linkvite", contexts: ['action'] }
@@ -33,29 +32,30 @@ async function create() {
     }
 }
 
-async function handleClick({ pageUrl, linkUrl, srcUrl, selectionText, menuItemId }: browser.Menus.OnClickData) {
-    const base = 'tabs/new.html?link='
-    switch (menuItemId) {
-        case 'new:page':
-            return await route(`${base}${encodeURIComponent(pageUrl)}`)
-        case 'new:link':
-            return await route(`${base}${encodeURIComponent(linkUrl)}`)
-        case 'new:video':
-            return await route(`${base}${encodeURIComponent(srcUrl)}`)
-        case 'new:image':
-            return await route(`${base}${encodeURIComponent(srcUrl)}`)
-        case 'new:note':
-            if (!selectionText) {
-                return;
-            }
+async function handleClick({ pageUrl, linkUrl, srcUrl, menuItemId }: browser.Menus.OnClickData) {
+    const tab = await getCurrentTab();
 
-            return await route(`${base}${encodeURIComponent(pageUrl)}&note=${encodeURIComponent(selectionText)}`)
+    async function onNewBookmark() {
+        const base = 'tabs/create.html?url=';
+        if (!tab) return;
+        const { title, favIconUrl, id } = tab;
+        return await route(`${base}${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(title)}&favicon=${encodeURIComponent(favIconUrl)}&tabId=${id}`);
+    }
+
+    const base = 'tabs/new.html?url=';
+    switch (menuItemId) {
+        case 'new:link':
+            return await route(`${base}${encodeURIComponent(linkUrl)}&type=link&tabId=${tab?.id}`)
+        case 'new:image':
+            return await route(`${base}${encodeURIComponent(srcUrl)}&type=image`)
         case 'save:tabs':
             return await route('tabs/tabs.html')
         case 'options':
             return await route('options.html')
         case 'open:app':
             return await browser.tabs.create({ url: 'https://app.linkvite.io' })
+        case 'new:bookmark':
+            return onNewBookmark();
         default:
             break
     }
@@ -63,7 +63,7 @@ async function handleClick({ pageUrl, linkUrl, srcUrl, selectionText, menuItemId
 
 export async function setupContextMenus() {
     if (!browser.contextMenus) {
-        console.error('browser.contextMenus is not available')
+        console.error('browser.contextMenus is not available');
         return;
     }
 

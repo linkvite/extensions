@@ -4,10 +4,8 @@ import type { ITheme } from "~utils/styles";
 export const RootComponent = styled.div<{ theme: ITheme }>`
     width: 100dvw;
     height: 100dvh;
-    min-height: 400px;
-    min-width: 600px;
-    color: ${({ theme }) => theme.text};
-    background-color: ${({ theme }) => theme.background};
+    color: ${p => p.theme.text};
+    background-color: ${p => p.theme.background};
 `;
 
 export const MountedComponent = styled.div<{ theme: ITheme; $isAuth: boolean }>`

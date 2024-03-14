@@ -1,5 +1,4 @@
 import { browser } from "~browser";
-import { getCurrentWindow } from "~utils";
 
 const base = '/'
 
@@ -30,11 +29,12 @@ export async function route(path: string) {
 }
 
 /**
- * Close the current window.
+ * Close the current popup tab.
  * 
- * @return {Promise<void>} a Promise that resolves when the window is closed
+ * @return {Promise<void>} a Promise that resolves when the tab is closed.
  */
-export async function closeWindow() {
-    const window = await getCurrentWindow();
-    return await browser.windows.remove(window.id);
+export async function closeTab(now = false) {
+    setTimeout(() => {
+        window?.close();
+    }, now ? 0 : 1000);
 }

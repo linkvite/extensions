@@ -1,6 +1,7 @@
-import type { User } from "@linkvite/js";
 import { handleAuthentication } from "~api";
-import type { PlasmoMessaging } from "@plasmohq/messaging"
+import { persistAuthData } from "~utils/storage";
+import type { PlasmoMessaging } from "@plasmohq/messaging";
+import type { User } from "@linkvite/js";
 
 export type AuthMessageRequest = {
     password: string;
@@ -22,22 +23,17 @@ const handler: PlasmoMessaging.MessageHandler<
     AuthMessageRequest,
     AuthMessageResponse
 > = async (req, res) => {
-    await handleAuthentication({
-        body: req.body,
-        onLogin: (user, token) => {
-            return res.send({
-                user,
-                token
-            });
-        },
-        onError: (err: string) => {
-            return res.send({ error: err });
-        }
-    })
+    try {
+        const resp = await handleAuthentication({
+            body: req.body
+        });
 
-    res.send({
-        error: "An unknown error occurred"
-    })
+        await persistAuthData(resp);
+
+        return res.send({ user: resp.user, token: resp.refreshToken });
+    } catch (error) {
+        return res.send({ error })
+    }
 }
 
 export default handler
