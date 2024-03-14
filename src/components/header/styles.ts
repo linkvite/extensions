@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Colors, Fonts, type ITheme } from "~utils/styles";
+import { Colors, type ITheme } from "~utils/styles";
 
 export const LinkviteLogo = styled.div<{ theme: ITheme; $hasButtons?: boolean }>`
     width: 100%;
@@ -14,7 +14,7 @@ export const LinkviteLogo = styled.div<{ theme: ITheme; $hasButtons?: boolean }>
         font-weight: bold;
         text-decoration: none;
         color: ${p => p.theme.text};
-        font-size: ${Fonts.sm};
+        font-size: 1.15rem;
         display: flex;
         align-items: center;
     }
@@ -24,30 +24,31 @@ export const LinkviteLogo = styled.div<{ theme: ITheme; $hasButtons?: boolean }>
     }
 `;
 
+export const HeaderButtons = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
 export const HeaderButton = styled.button<{ theme: ITheme }>`
     border: none;
+    padding: 5px 10px;
     margin-left: 5px;
-    padding: .5rem 1rem;
-    border-radius: .5rem;
+    border-radius: .25rem;
     color: ${p => p.theme.text};
     transition: all .3s ease-in-out;
     background-color: transparent;
+    background-color: ${p => p.theme.trans_bg};
 
     &:hover {
         cursor: pointer;
-        opacity: .8;
+        background-color: ${Colors.primary};
     }
 `;
 
-export const HeaderCloseButton = styled(HeaderButton)`
-    padding: .4rem 1rem;
-    color: ${Colors.light};
-    background-color: ${Colors.primary};
-`;
-
 export const Favicon = styled.img`
-    width: 35px;
-    height: 35px;
+    width: 30px;
+    height: 30px;
     object-fit: cover;
     margin-right: 10px;
 `;

@@ -1,16 +1,24 @@
 import { settingStore } from "~stores";
 import { useSelector } from "@legendapp/state/react";
 import React from "react";
+import { useAuth } from "~components/wrapper/auth";
 
 export function OptionsPage() {
+    const { logout } = useAuth();
     const store = useSelector(settingStore);
     return (
-        <React.Fragment>
-            <h1>Linkvite</h1>
-            <p>Options Page</p>
+        <div style={{ width: "100%", height: "100%" }}>
+            <h3>Options Page</h3>
             <p>Theme: {store.theme}</p>
             <p>Collection: {store.collection}</p>
+
             <p>Auto Save: {store.autoSave ? "Yes" : "No"}</p>
+            <label htmlFor="autoSave">Auto Save</label>
+            <input type="checkbox" checked={store.autoSave} onChange={() => settingStore.autoSave.set(!store.autoSave)} id="autoSave" />
+
+            <p>Auto Close Popup: {store.autoClose ? "Yes" : "No"}</p>
+            <label htmlFor="autoClose">Auto Close Popup</label>
+            <input type="checkbox" checked={store.autoClose} onChange={() => settingStore.autoClose.set(!store.autoClose)} id="autoClose" />
 
             <p>Permissions</p>
             <ul>
@@ -28,13 +36,7 @@ export function OptionsPage() {
 
             <p>Copied Link: {store.copiedLink}</p>
 
-            <p>
-                <a href="/popup.html">Popup</a>
-            </p>
-
-            <p>
-                The easiest way to save and organize your bookmarks.
-            </p>
-        </React.Fragment >
+            <button onClick={logout}>Logout</button>
+        </div >
     )
 }

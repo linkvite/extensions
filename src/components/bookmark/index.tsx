@@ -177,6 +177,14 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, setBookmar
         closeTab();
     }, [bookmark, exists]);
 
+    const onImageError = useCallback(() => {
+        setBookmark(prev => {
+            return produce(prev, (draft) => {
+                draft.assets.thumbnail = defaultImage;
+            });
+        });
+    }, [defaultImage, setBookmark]);
+
     const onSubmit = useCallback(async () => {
         setLoading(true);
         exists
@@ -214,6 +222,7 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, setBookmar
 
             <BookmarkImageComponent
                 tabId={tabId}
+                onImageError={onImageError}
                 defaultImage={defaultImage}
                 onChangeImage={onChangeImage}
                 cover={bookmark.assets.thumbnail}
@@ -251,10 +260,11 @@ type BookmarkImageComponentProps = {
     cover: string;
     disabled?: boolean;
     defaultImage: string;
+    onImageError: () => void;
     onChangeImage: (src: string, type: "default" | "custom") => void;
 };
 
-export function BookmarkImageComponent({ disabled, tabId, cover, defaultImage, onChangeImage }: BookmarkImageComponentProps) {
+export function BookmarkImageComponent({ disabled, tabId, cover, defaultImage, onImageError, onChangeImage }: BookmarkImageComponentProps) {
     const [coverURL, setCoverURL] = useState("");
     const linkRef = useRef<HTMLButtonElement>(null);
     const mediaRef = useRef<HTMLInputElement>(null);
@@ -330,6 +340,7 @@ export function BookmarkImageComponent({ disabled, tabId, cover, defaultImage, o
                 <BookmarkNewImage
                     src={cover}
                     alt={"Cover Image"}
+                    onError={onImageError}
                 />
 
                 {disabled ? null : (

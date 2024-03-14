@@ -1,11 +1,10 @@
 import React from "react";
-import { closeTab } from "~router";
-import { useAuth } from "~components/wrapper/auth";
+import { closeTab, route } from "~router";
 import {
     Favicon,
     LinkviteLogo,
     HeaderButton,
-    HeaderCloseButton
+    HeaderButtons,
 } from "./styles";
 import { APP_DOMAIN, FAVICON_URL } from "~utils";
 
@@ -29,19 +28,24 @@ export function Logo({ body }: { body?: React.ReactNode }) {
 }
 
 export function LogoAndTitle({ noClose }: { noClose?: boolean }) {
-    const { logout } = useAuth();
+    function onSettings() {
+        route("tabs/index.html?type=options");
+        // closeTab();
+    }
     const body = (
-        <div>
-            <HeaderButton onClick={logout}>Logout</HeaderButton>
-            {noClose
-                ? null
-                : <HeaderCloseButton
+        <HeaderButtons>
+            <HeaderButton onClick={onSettings}>
+                Account
+            </HeaderButton>
+
+            {noClose ? null
+                : <HeaderButton
                     onClick={() => closeTab(true)}
                 >
                     Close
-                </HeaderCloseButton>
+                </HeaderButton>
             }
-        </div>
+        </HeaderButtons>
     )
     return (
         <Logo body={body} />

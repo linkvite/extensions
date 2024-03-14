@@ -3,7 +3,7 @@ import { useTheme } from "~hooks";
 import { AuthProvider } from "./auth";
 import { Toaster } from 'react-hot-toast';
 import isPropValid from '@emotion/is-prop-valid';
-import { LogoAndTitle } from "~components/linkvite";
+import { LogoAndTitle } from "~components/header";
 import { persistStateObservers } from '~utils/storage';
 import { GlobalStyle, MountedComponent, RootComponent } from "./styles";
 import { ThemeProvider, StyleSheetManager } from "styled-components";
@@ -55,11 +55,11 @@ export function RootProvider({ children, $isAuth = false }: RootProps) {
     )
 }
 
-export function PageProvider({ children, noClose }: { children: React.ReactNode, noClose?: boolean }) {
+export function PageProvider({ children }: { children: React.ReactNode }) {
     return (
         <RootProvider>
             <AuthProvider>
-                <LogoAndTitle noClose={noClose} />
+                <LogoAndTitle />
                 {children}
             </AuthProvider>
         </RootProvider>

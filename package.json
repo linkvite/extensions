@@ -13,7 +13,9 @@
         "build:safari": "plasmo build --target=safari-mv3",
         "build:all": "pnpm run build && pnpm run build:firefox && pnpm run build:safari",
         "package": "pnpm run build:all && plasmo package && plasmo package --target=firefox-mv3",
-        "package:safari": "pwd && pnpm run build:safari && xcrun safari-web-extension-converter build/safari-mv3-prod",
+        "package:chrome": "pnpm run build --zip",
+        "package:safari": "pnpm run build:safari --zip",
+        "test:safari": "pnpm run build:safari && xcrun safari-web-extension-converter build/safari-mv3-prod",
         "lint": "eslint . --ext .ts --ext .tsx"
     },
     "dependencies": {
@@ -57,6 +59,7 @@
         "omnibox": {
             "keyword": "lv"
         },
+        "options_page": "tabs/index.html?type=options",
         "permissions": [
             "contextMenus",
             "activeTab",

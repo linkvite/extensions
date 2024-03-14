@@ -188,7 +188,7 @@ export type CreateBookmarkProps = {
     url: string;
     title: string;
     description?: string;
-    tags: string[];
+    tags?: string[];
     favicon?: string;
     cover: string;
     coverType: "default" | "custom";
@@ -201,8 +201,11 @@ export async function handleCreateBookmark({ tags, collection: c, cover, coverTy
 
     const formData = new FormData();
     formData.append("cover", cover);
-    formData.append("tags", tags.join(","));
     formData.append("coverType", coverType);
+
+    if (tags) {
+        formData.append("tags", tags.join(","));
+    }
 
     if (collection) {
         formData.append("collection", collection);

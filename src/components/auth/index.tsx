@@ -2,7 +2,7 @@ import { useState } from "react";
 import { browser } from "~browser";
 import { FORGOT_PASSWORD_URL, SIGNUP_URL } from "~utils";
 import type { User } from "@linkvite/js";
-import { Logo } from "~components/linkvite";
+import { Logo } from "~components/header";
 import { RootProvider } from "~components/wrapper";
 import { sendToBackground } from "@plasmohq/messaging"
 import type {

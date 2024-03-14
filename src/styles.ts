@@ -2,12 +2,12 @@ import styled from "styled-components";
 import { AppText } from "~components/text";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
 
-export const PopupContainer = styled.div`
+export const PopupContainer = styled.div<{ $autoSave?: boolean }>`
     width: 100%;
     height: 100%;
-    min-width: 500px;
-    min-height: 600px;
     position: relative;
+    min-width: ${p => p.$autoSave ? 350 : 500}px;
+    min-height: ${p => p.$autoSave ? 150 : 600}px;
 `;
 
 export const PopupLoadingContainer = styled(PopupContainer)`
@@ -78,4 +78,12 @@ export const PageContainer = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
+`;
+
+export const AutoSaveContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 350px;
+    min-height: calc(150px - 70px);
 `;

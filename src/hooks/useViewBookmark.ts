@@ -18,12 +18,16 @@ import type {
     ParseMessageResponse
 } from "~background/messages/parse";
 import toast from "react-hot-toast";
+import { useSelector } from "@legendapp/state/react";
+import { settingStore } from "~stores";
 
 type Props = {
     tab: browser.Tabs.Tab;
+    isPopup?: boolean;
 }
 
-export function useViewBookmark({ tab }: Props) {
+export function useViewBookmark({ tab, isPopup }: Props) {
+    const { autoSave } = useSelector(settingStore);
     const _bookmark = useMemo(() => {
         const bookmark = makeBookmark();
         const draft = produce(bookmark, (draft) => {
@@ -102,8 +106,8 @@ export function useViewBookmark({ tab }: Props) {
             });
 
             if (resp.data) {
-                setAPIData(resp.data);
                 setAPIView(resp.data.description, resp.data.image);
+                setAPIData(() => produce(resp.data, (draft) => draft));
             }
         } catch (error) {
             console.error("Error extracting HTML: ", error);
@@ -119,7 +123,7 @@ export function useViewBookmark({ tab }: Props) {
     }, []);
 
     useEffect(() => {
-        if (!tab) return;
+        if (!tab || (autoSave && isPopup)) return;
         const fetchCurrentTab = async () => {
             const data = await checkExists(tab.url);
             if (!data.exists) {
@@ -138,11 +142,11 @@ export function useViewBookmark({ tab }: Props) {
         };
 
         fetchCurrentTab();
-    }, [checkExists, fetchFromAPI, fetchFromLocal, setAPIView, tab, updateView]);
+    }, [autoSave, isPopup, checkExists, fetchFromAPI, fetchFromLocal, setAPIView, tab, updateView]);
 
     return {
-        exists,
         view,
+        exists,
         updateView,
         loading: loading || !tab,
         defaultImage: _bookmark.assets.thumbnail,

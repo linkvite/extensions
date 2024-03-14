@@ -14,8 +14,15 @@ const handler: PlasmoMessaging.MessageHandler<
     ParseHTMLMessageResponse
 > = async (req, res) => {
     try {
+        const tab = await browser.tabs.get(req.body.id);
+        if (!tab) return res.send({ error: "Tab not found" });
+
+        if (tab.url && !tab.url.startsWith("http")) {
+            return res.send({ error: "Only HTTP(S) URLs are supported" });
+        }
+
         const result = await browser.scripting.executeScript({
-            target: { tabId: req.body.id },
+            target: { tabId: tab.id },
             func: () => document.documentElement.outerHTML,
         });
 

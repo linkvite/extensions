@@ -1,24 +1,34 @@
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { useViewBookmark } from "~hooks";
 import { Spinner } from "~components/spinner";
 import { PageProvider } from "~components/wrapper";
 import { BookmarkView } from "~components/bookmark";
 import {
+    AutoSaveContainer,
     PopupContainer,
     PopupLoadingContainer
 } from "~styles";
 import { getCurrentTab } from "~utils";
 import type { browser } from "~browser";
-import { useEffectOnce } from "@legendapp/state/react";
+import { useSelector } from "@legendapp/state/react";
 import { BookmarkViewControls } from "~components/controls";
+import { settingStore } from "~stores";
+import { AppText } from "~components/text";
+import { useAutoSave } from "~hooks/useAutoSave";
 
 function IndexPopup() {
     const [tab, setTab] = useState<browser.Tabs.Tab | null>(null);
-    useEffectOnce(() => {
-        (async () => {
+    const { message } = useAutoSave({ tab });
+    const { autoSave } = useSelector(settingStore);
+
+    useEffect(() => {
+        async function init() {
             setTab(await getCurrentTab());
-        })();
-    });
+        }
+
+        init();
+    }, []);
 
     const {
         bookmark,
@@ -28,12 +38,16 @@ function IndexPopup() {
         defaultImage,
         updateView,
         setBookmark,
-    } = useViewBookmark({ tab });
+    } = useViewBookmark({ tab, isPopup: true });
 
     return (
-        <PopupContainer>
-            <PageProvider noClose>
-                {loading ? (
+        <PopupContainer $autoSave={autoSave}>
+            <PageProvider>
+                {autoSave ? (
+                    <AutoSaveContainer>
+                        <AppText>{message}</AppText>
+                    </AutoSaveContainer>
+                ) : loading ? (
                     <PopupLoadingContainer>
                         <Spinner />
                     </PopupLoadingContainer>
