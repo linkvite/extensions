@@ -67,6 +67,10 @@ const menuItemStyles = `
 
 export const DropdownMenuTrigger = styled(RadixDropdownMenu.Trigger)`
     all: unset;
+
+    &:hover {
+        cursor: pointer;
+    }
 `;
 
 export const DropdownMenuContent = styled(RadixDropdownMenu.Content) <{ theme: ITheme }>`

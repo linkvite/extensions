@@ -25,6 +25,7 @@ import {
 import { Spinner } from "~components/spinner"
 import { COVER_URL } from "~utils"
 import { Colors } from "~utils/styles"
+import { produce } from "immer"
 
 export function NewLinkPage({ params }: { params: URL }) {
     const [exists, setExists] = useState(false);
@@ -111,10 +112,18 @@ type ParsedDataProps = {
     tabId: string
     loading: boolean
     data: ParsedLinkData
-    setData: (data: ParsedLinkData) => void
+    setData: React.Dispatch<React.SetStateAction<ParsedLinkData>>
 }
 
 function FromParsedData({ url, tabId, loading, data, setData }: ParsedDataProps) {
+    const onImageError = useCallback(() => {
+        setData(prev => {
+            return produce(prev, (draft) => {
+                draft.image = COVER_URL
+            });
+        });
+    }, [setData]);
+
     return (
         <React.Fragment>
             <InputContainer>
@@ -145,6 +154,7 @@ function FromParsedData({ url, tabId, loading, data, setData }: ParsedDataProps)
             <BookmarkImageComponent
                 tabId={Number(tabId)}
                 defaultImage={COVER_URL}
+                onImageError={onImageError}
                 cover={data.image || COVER_URL}
                 onChangeImage={(image) => setData({ ...data, image })}
             />

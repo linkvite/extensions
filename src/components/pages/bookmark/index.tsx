@@ -10,10 +10,11 @@ export function BookmarkPage({ params }: { params: URL }) {
     const [tab, setTab] = useState<browser.Tabs.Tab | null>(null);
     const tabId = decodeURIComponent(params.searchParams.get('tabId') || '');
     useEffect(() => {
-        (async () => {
-            const t = await browser.tabs.get(parseInt(tabId));
-            setTab(t);
-        })();
+        async function init() {
+            setTab(await browser.tabs.get(parseInt(tabId)));
+        }
+
+        init();
     }, [tabId]);
 
     const {

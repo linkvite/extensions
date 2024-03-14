@@ -13,14 +13,10 @@ export const PopoverContent = styled(RadixPopover.Content) <{ theme: ITheme }>`
     border-radius: 8px;
     font-size: ${Fonts.xxs};
     background-color: ${p => p.theme.background_sub};
-    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
+    will-change: transform, opacity;    
     animation-duration: 400ms;
     animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform, opacity;
-
-    &:focus {
-        box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px, 0 0 0 2px var(--violet-7);
-    }
+    box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
 `;
 
 export const PopoverTrigger = styled.button`

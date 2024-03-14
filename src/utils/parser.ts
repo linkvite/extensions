@@ -1,8 +1,8 @@
 import { browser } from "~browser";
-import { getCurrentTab, normalize } from "~utils";
+import { COVER_URL, normalize } from "~utils";
 import * as htmlparser from "htmlparser2";
 
-export type ParsedHTML = {
+type ParsedHTML = {
     image: string;
     description: string;
 }
@@ -13,7 +13,7 @@ export type ParsedHTML = {
  * Use the meta tags to get the information.
  * But use the regular tags as fallback.
  */
-export async function parseHTML(html: string): Promise<ParsedHTML> {
+export async function parseHTML(html: string, windowId: number): Promise<ParsedHTML> {
     let image = "";
     let description = "";
 
@@ -36,8 +36,12 @@ export async function parseHTML(html: string): Promise<ParsedHTML> {
     parser.end();
 
     if (!image) {
-        const tab = await getCurrentTab();
-        image = await browser.tabs.captureVisibleTab(tab.windowId, { format: "png" });
+        try {
+            image = await browser.tabs.captureVisibleTab(windowId, { format: "png" });
+        } catch (error) {
+            console.error("Error capturing visible tab: ", error);
+            image = COVER_URL;
+        }
     }
 
     return {

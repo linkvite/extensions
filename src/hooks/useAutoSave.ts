@@ -79,7 +79,7 @@ export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
             return;
         }
 
-        const parsed = await parseHTML(resp.data[0].result);
+        const parsed = await parseHTML(resp.data[0].result, tab.windowId);
         const bookmark = produce(makeBookmark(), (draft) => {
             draft.meta.url = tab.url;
             draft.info.name = tab.title;
