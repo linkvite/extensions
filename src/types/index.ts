@@ -3,7 +3,7 @@ import { XiorError, type XiorResponse } from "xior";
 
 export type Theme = "light" | "dark" | "system";
 
-export type HTTPError = {
+type HTTPError = {
     ok: boolean;
     error: string;
     errors?: unknown[];

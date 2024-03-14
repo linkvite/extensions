@@ -37,7 +37,7 @@ export function Login({ onLogin }: { onLogin: OnLogin }) {
     )
 }
 
-export function AuthComponent({ onLogin }: { onLogin: OnLogin }) {
+function AuthComponent({ onLogin }: { onLogin: OnLogin }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [password, setPassword] = useState('');

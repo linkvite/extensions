@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
 import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
 
-export const menuStyles = `
+const menuStyles = `
     width: 100%;
     min-width: 250px;
     overflow: hidden;
@@ -50,7 +50,7 @@ export const menuStyles = `
     }
 `;
 
-export const menuItemStyles = `
+const menuItemStyles = `
     line-height: 1.5;
     border-radius: 3px;
     display: flex;

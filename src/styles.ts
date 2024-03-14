@@ -68,3 +68,14 @@ export const PopupActionDescription = styled(AppText)`
     max-height: 200px;
     overflow-y: scroll;
 `;
+
+export const PageContainer = styled.div`
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+`;

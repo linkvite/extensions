@@ -35,4 +35,5 @@ const handler: PlasmoMessaging.MessageHandler<InitResponse> = async (req, res) =
     })
 }
 
+// eslint-disable-next-line import/no-unused-modules
 export default handler

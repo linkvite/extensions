@@ -34,24 +34,23 @@ async function create() {
 
 async function handleClick({ pageUrl, linkUrl, srcUrl, menuItemId }: browser.Menus.OnClickData) {
     const tab = await getCurrentTab();
+    const base = 'tabs/index.html?type';
 
     async function onNewBookmark() {
-        const base = 'tabs/create.html?url=';
         if (!tab) return;
         const { title, favIconUrl, id } = tab;
-        return await route(`${base}${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(title)}&favicon=${encodeURIComponent(favIconUrl)}&tabId=${id}`);
+        return await route(`${base}=bookmark&url=${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(title)}&favicon=${encodeURIComponent(favIconUrl)}&tabId=${id}`);
     }
 
-    const base = 'tabs/new.html?url=';
     switch (menuItemId) {
         case 'new:link':
-            return await route(`${base}${encodeURIComponent(linkUrl)}&type=link&tabId=${tab?.id}`)
+            return await route(`${base}=link&url=${encodeURIComponent(linkUrl)}&tabId=${tab?.id}`)
         case 'new:image':
-            return await route(`${base}${encodeURIComponent(srcUrl)}&type=image`)
+            return await route(`${base}=image&url=${encodeURIComponent(srcUrl)}`)
         case 'save:tabs':
-            return await route('tabs/tabs.html')
+            return await route(`${base}=tabs`)
         case 'options':
-            return await route('options.html')
+            return await route(`${base}=options`)
         case 'open:app':
             return await browser.tabs.create({ url: 'https://app.linkvite.io' })
         case 'new:bookmark':

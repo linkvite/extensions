@@ -57,7 +57,6 @@
         "omnibox": {
             "keyword": "lv"
         },
-        "options_page": "options.html",
         "permissions": [
             "contextMenus",
             "activeTab",

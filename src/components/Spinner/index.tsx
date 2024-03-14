@@ -8,7 +8,7 @@ interface ISpinnerProps {
     color?: string;
 }
 
-export const SpinnerContainer = styled.div`
+const SpinnerContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;

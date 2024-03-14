@@ -20,10 +20,6 @@ export async function getCurrentTab() {
     return tab;
 }
 
-export async function getCurrentWindow() {
-    return await browser.windows.getCurrent();
-}
-
 /**
  * Normalize a string.
  *
