@@ -45,25 +45,5 @@ export function useTabs() {
         loadTabs();
     }, [loadTabs]);
 
-    useEffect(() => {
-        const requestPermissionsAndLoadTabs = async () => {
-            try {
-                const hasTabsPermission = await browser.permissions.contains({ permissions: ['tabs'] });
-                if (!hasTabsPermission) {
-                    await browser.permissions.request({ permissions: ['tabs'] });
-                    await loadTabs();
-                }
-            } catch (e) {
-                if (e?.message.includes('user input')) {
-                    return;
-                }
-                console.error('Error requesting tabs permission:', e);
-                toast.error('Error requesting tabs permission');
-            }
-        };
-
-        requestPermissionsAndLoadTabs();
-    }, [loadTabs]);
-
     return [tabs, loadTabs] as const;
 }

@@ -11,11 +11,12 @@
         "dev:firefox": "plasmo dev --target=firefox-mv3",
         "build:firefox": "plasmo build --target=firefox-mv3",
         "build:safari": "plasmo build --target=safari-mv3",
+        "test:safari": "pnpm run build:safari && xcrun safari-web-extension-converter build/safari-mv3-prod",
         "build:all": "pnpm run build && pnpm run build:firefox && pnpm run build:safari",
-        "package": "pnpm run build:all && plasmo package && plasmo package --target=firefox-mv3",
         "package:chrome": "pnpm run build --zip",
         "package:safari": "pnpm run build:safari --zip",
-        "test:safari": "pnpm run build:safari && xcrun safari-web-extension-converter build/safari-mv3-prod",
+        "package:firefox": "pnpm run build:firefox --zip",
+        "package:all": "pnpm run package:chrome && pnpm run package:firefox && pnpm run package:safari",
         "lint": "eslint . --ext .ts --ext .tsx"
     },
     "dependencies": {
@@ -61,14 +62,13 @@
         },
         "options_page": "tabs/index.html?type=options",
         "permissions": [
-            "contextMenus",
+            "storage",
             "activeTab",
             "scripting",
-            "storage",
-            "tabs",
-            "bookmarks",
-            "clipboardRead",
-            "webNavigation"
+            "contextMenus"
+        ],
+        "optional_permissions": [
+            "tabs"
         ],
         "host_permissions": [
             "<all_urls>"

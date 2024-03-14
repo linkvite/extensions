@@ -14,6 +14,8 @@ export const PopupLoadingContainer = styled(PopupContainer)`
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 500px;
+    min-height: 500px;
 `;
 
 export const PopupActions = styled.div`
