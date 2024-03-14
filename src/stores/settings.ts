@@ -7,6 +7,7 @@ const defaultProps = {
     collection: "",
     permissions: [],
     autoSave: false,
+    autoClose: false,
     theme: "dark" as Theme,
 };
 

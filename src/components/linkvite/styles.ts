@@ -2,12 +2,13 @@ import styled from "styled-components";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
 
 export const LinkviteLogo = styled.div<{ theme: ITheme; $hasButtons?: boolean }>`
+    width: 100%;
     display: flex;
     z-index: 5;
-    margin: 0 10px;
+    margin: 0;
     align-items: center;
+    align-self: flex-start;
     justify-content: space-between;
-    width: ${p => p.$hasButtons ? "100%" : "540px"};
 
     a {
         font-weight: bold;

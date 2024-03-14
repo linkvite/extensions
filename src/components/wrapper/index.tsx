@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import isPropValid from '@emotion/is-prop-valid';
 import { LogoAndTitle } from "~components/linkvite";
 import { persistStateObservers } from '~utils/storage';
-import { MountedComponent, RootComponent } from "./styles";
+import { GlobalStyle, MountedComponent, RootComponent } from "./styles";
 import { ThemeProvider, StyleSheetManager } from "styled-components";
 import {
     ObservablePersistLocalStorage
@@ -49,6 +49,8 @@ export function RootProvider({ children, $isAuth = false }: RootProps) {
                 }}
                 position="bottom-center"
             />
+
+            <GlobalStyle bg={theme.background} />
         </StyleSheetManager>
     )
 }

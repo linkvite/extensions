@@ -103,7 +103,7 @@ export function AuthComponent({ onLogin }: { onLogin: OnLogin }) {
             onSubmit={handleSubmit}
         >
             <AuthTitle
-                fontSize="lg"
+                fontSize="md"
                 fontWeight="bold"
             >
                 Welcome back

@@ -9,8 +9,8 @@ const base = '/'
  * @return {Promise<browser.windows.Window>} a Promise that resolves to the newly created window
  */
 export async function route(path: string) {
-    const height = 600;
-    const width = 800;
+    const height = 800;
+    const width = 600;
     const origin = await browser.windows.getCurrent();
 
     const values = {

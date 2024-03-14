@@ -5,8 +5,8 @@ import { Colors, Fonts, type ITheme } from "~utils/styles";
 export const PopupContainer = styled.div`
     width: 100%;
     height: 100%;
-    min-width: 600px;
-    min-height: 400px;
+    min-width: 500px;
+    min-height: 600px;
     position: relative;
 `;
 
@@ -24,7 +24,7 @@ export const PopupActions = styled.div`
     left: 0;
     background-color: ${p => p.theme.background_sub};
     padding: 8px;
-    border-radius: 8px;
+    border-radius: .5rem;
     align-items: center;
     justify-content: center;
     align-self: center;
@@ -37,7 +37,7 @@ export const PopupAction = styled.button<{ $active: boolean; theme: ITheme }>`
     padding: 0;
     align-items: center;
     justify-content: center;
-    border-radius: 5px;
+    border-radius: .25rem;
     color: ${Colors.light};
     font-weight: 600;
     transition: all 0.2s ease-in-out;
@@ -53,6 +53,7 @@ export const PopupActionText = styled(AppText) <{ theme: ITheme }>`
     font-size: ${Fonts.xxs};
     color: ${p => p.theme.text_sub};
     transition: all 0.3s ease-in-out;
+    margin-top: 5px;
 
     &:hover {
         cursor: pointer;

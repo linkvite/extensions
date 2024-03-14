@@ -4,13 +4,13 @@ import { Colors, Fonts, type ITheme } from "~utils/styles";
 
 export const AuthContainer = styled.form`
     width: 100%;
-    max-width: 540px;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     align-self: center;
+    margin-top: 1.5rem;
 `;
 
 export const AuthTitle = styled(AppText)`
