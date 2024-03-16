@@ -1,3 +1,4 @@
+import { rgba } from "polished";
 import styled, { keyframes } from "styled-components";
 import { AppText } from "~components/text";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
@@ -62,7 +63,7 @@ export const AuthInputField = styled.input<{ $hasError?: boolean; theme: ITheme 
     outline: none;
     box-shadow: none;
     &:focus {
-        border: 1px solid ${Colors.primary};
+        border: 1px solid ${rgba(Colors.primary, 0.7)};
     }
 
     &::placeholder {

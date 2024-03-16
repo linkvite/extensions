@@ -1,3 +1,4 @@
+import { rgba } from "polished";
 import styled from "styled-components";
 import { AppText } from "~components/text";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
@@ -44,7 +45,7 @@ export const InputFieldLine = styled.div<{ theme: ITheme, $isName?: boolean }>`
     margin: ${p => p.$isName ? '5px 0 5px 0' : '0 0 0 auto'};
 `;
 
-export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme }>`
+export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme; $standalone?: boolean }>`
     width: 100%;
     height: auto;
     position: relative;
@@ -53,7 +54,7 @@ export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme }>`
     align-items: flex-start;
     justify-content: space-between;
     border-radius: 10px;
-    padding: 5px;
+    margin-top: ${p => p.$standalone ? '15px' : '0'};
     background-color: ${p => p.theme.background_sub};
 `;
 
@@ -168,7 +169,7 @@ export const BookmarkAction = styled.button<{ theme: ITheme }>`
 
     &:hover {
         cursor: pointer;
-        border: 1px solid ${p => p.theme.trans_bg};
+        border: 1px solid ${p => rgba(p.theme.trans_bg, 0.5)};
     }
 `;
 
@@ -176,18 +177,18 @@ export const BookmarkActionText = styled(AppText)`
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    margin-left: 10px;
 `;
 
 export const SelectCollectionImage = styled.img`
-    width: 35px;
-    height: 35px;
+    width: 30px;
+    height: 30px;
     border-radius: 8px;
     object-fit: cover;
 `;
 
-export const SectionOptionIcon = styled.div<{ bg?: string }>`
+export const BookmarkActionIcon = styled.div<{ bg?: string }>`
     margin-top: -2px;
-    margin-right: 10px;
     display: flex;
     align-items: center;
     justify-content: center;

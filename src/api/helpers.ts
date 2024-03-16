@@ -303,11 +303,42 @@ export async function handleUpdateBookmarkCover({ id, cover, type }: CoverProps)
         .catch(handleError)
 }
 
-export async function handleFindCollections({ query }: { query: string }) {
-    const endpoint = `/search?q=${query}&path=collection&limit=5000&sort=-date`;
+type SearchProps = {
+    query: string;
+    limit: number;
+    owner?: string;
+}
+
+export async function handleFindCollections({ query, limit, owner }: SearchProps) {
+    let endpoint = `/search?q=${query}`;
+    endpoint += `&sort=-date`;
+    endpoint += `&public=false`;
+    endpoint += `&limit=${limit}`;
+    endpoint += `&path=collections`;
+    if (owner) {
+        endpoint += `&owner=${owner}`;
+    }
 
     function handleSuccess(res: XiorResponse) {
-        return res.data.data as Collection[];
+        return res.data.data.collections as Collection[];
+    }
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    return await api
+        .get(endpoint)
+        .then(handleSuccess)
+        .catch(handleError);
+}
+
+export async function handleFindCollection({ id }: { id: string }) {
+    const endpoint = `/collections/${id}`;
+
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data as Collection;
     }
 
     function handleError(err: HTTPException) {

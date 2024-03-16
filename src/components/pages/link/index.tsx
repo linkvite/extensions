@@ -37,6 +37,10 @@ export function NewLinkPage({ params }: { params: URL }) {
     const url = decodeURIComponent(params.searchParams.get('url') || '');
     const tabId = decodeURIComponent(params.searchParams.get('tabId') || '');
 
+    const updateBookmark = useCallback((bookmark: Bookmark) => {
+        setBookmark(() => bookmark);
+    }, []);
+
     const checkExists = useCallback(async (url: string) => {
         const resp = await sendToBackground<ExistsMessageRequest, ExistsMessageResponse>({
             name: "exists",
@@ -99,7 +103,7 @@ export function NewLinkPage({ params }: { params: URL }) {
                         bookmark={bookmark}
                         tabId={Number(tabId)}
                         defaultImage={COVER_URL}
-                        setBookmark={setBookmark}
+                        updateBookmark={updateBookmark}
                     />
                     : <Spinner />
             }
@@ -152,6 +156,7 @@ function FromParsedData({ url, tabId, loading, data, setData }: ParsedDataProps)
             </InputContainer>
 
             <BookmarkImageComponent
+                standalone
                 tabId={Number(tabId)}
                 defaultImage={COVER_URL}
                 onImageError={onImageError}

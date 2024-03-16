@@ -3,10 +3,9 @@ General
 - [ ] Add a link `edit bookmark` to auto-save view if the bookmark exists.
 - [ ] ^ Add a link `delete bookmark` to delete the bookmark.
 - [ ] Redo the popup view, then integrate:
-    - [ ] Tags
-    - [ ] Collection
+    - [x] Tags
+    - [x] Collection
     - [ ] Star
-- [ ] fix HTML rendering for mobile devices
 
 Features
 ========

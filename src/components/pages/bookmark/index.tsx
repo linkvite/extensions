@@ -39,8 +39,8 @@ export function BookmarkPage({ params }: { params: URL }) {
                         tabId={tab?.id}
                         exists={exists}
                         bookmark={bookmark}
-                        updateBookmark={updateBookmark}
                         defaultImage={defaultImage}
+                        updateBookmark={updateBookmark}
                     />
 
                     {exists ? null : (

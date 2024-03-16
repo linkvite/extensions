@@ -49,6 +49,7 @@ export function NewImagePage({ params }: { params: URL }) {
 
             <BookmarkImageComponent
                 disabled
+                standalone
                 cover={media.source}
                 tabId={Number(tabId)}
                 defaultImage={COVER_URL}

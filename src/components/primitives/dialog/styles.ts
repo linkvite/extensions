@@ -66,10 +66,11 @@ export const DialogTitle = styled.p<{ theme: ITheme }>`
     font-weight: 500;
     color: ${p => p.theme.text};
     font-size: ${Fonts.sm};
-    margin-bottom: 5px;
+    margin-bottom: 15px;
 `;
 
 export const DialogDescription = styled.p<{ theme: ITheme }>`
+    margin-top: -5px;
     margin-bottom: 5px;
     color: ${p => p.theme.text_sub};
     font-size: ${Fonts.xxs};

@@ -22,7 +22,7 @@ export const TagsInputContainer = styled.div<{ theme: ITheme; }>`
     align-items: center;
     justify-content: space-between;
     color: ${p => p.theme.text_sub};
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 8px 8px;
     border: 1px solid ${p => p.theme.trans_bg};
     background-color: ${p => p.theme.background_sub};
@@ -56,7 +56,7 @@ export const TagAddButton = styled.button<{ theme: ITheme; $active: boolean }>`
     border: none;
     padding: 5px 10px;
     width: 15%;
-    border-radius: .35rem;
+    border-radius: 5px;
     color: ${p => p.theme.text};
     transition: all 0.3s ease-in-out;
     background-color: ${Colors.primary};
@@ -94,7 +94,7 @@ export const TagItem = styled.button<{ theme: ITheme; $closeHovered: boolean }>`
 
     &:hover {
         cursor: pointer;
-        border: 1px solid ${p => p.$closeHovered ? "transparent" : p.theme.text_sub};
+        border: 1px solid ${p => p.$closeHovered ? "transparent" : rgba(p.theme.text_sub, 0.5)};
     }
 `;
 

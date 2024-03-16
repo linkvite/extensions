@@ -1,6 +1,6 @@
 import { produce } from "immer";
-import type { Bookmark, Collection } from "@linkvite/js";
 import { sendToBackground } from "@plasmohq/messaging";
+import type { Bookmark, Collection } from "@linkvite/js";
 import React, { useCallback, useRef, useState } from "react";
 import {
     InputContainer,
@@ -16,7 +16,7 @@ import {
     BookmarkActionsContainer,
     BookmarkActionsSubContainer,
     BookmarkAction,
-    SectionOptionIcon,
+    BookmarkActionIcon,
     SelectCollectionImage,
     BookmarkActionText
 } from "./styles";
@@ -24,6 +24,7 @@ import { Colors } from "~utils/styles";
 import { Spinner } from "~components/spinner";
 import { NIL_OBJECT_ID, pluralize } from "~utils";
 import { HiCamera } from "react-icons/hi2";
+import { FaHashtag } from "react-icons/fa6";
 import { DropdownMenu } from "~components/primitives/dropdown";
 import { browser } from "~browser";
 import { AppDialog } from "~components/primitives/dialog";
@@ -51,20 +52,27 @@ import type {
 import toast from "react-hot-toast";
 import { IoFolderOpen } from "react-icons/io5";
 import { TagsModal } from "~components/tags";
+import { CollectionsModal } from "~components/collections";
+import { storage } from "~utils/storage";
+import type {
+    FindCollectionRequest,
+    FindCollectionResponse
+} from "~background/messages/collection";
+import { useEffectOnce } from "@legendapp/state/react";
 
 type BookmarkViewProps = {
     tabId: number;
     exists: boolean;
     bookmark: Bookmark;
     defaultImage: string;
-    collection: Collection | null;
     updateBookmark: (data: Bookmark) => void;
 };
 
-export function BookmarkView({ tabId, exists, defaultImage, bookmark, collection, updateBookmark }: BookmarkViewProps) {
+export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBookmark }: BookmarkViewProps) {
     const { theme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [collection, setCollection] = useState<Collection>(undefined);
     const [coverType, setCoverType] = useState<"default" | "custom">("default");
 
     const onChangeText = useCallback((text: string, key: string) => {
@@ -193,20 +201,63 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, collection
         setLoading(false);
     }, [onCreate, onUpdate, exists]);
 
+    const onSelectCollection = useCallback(async (c: Collection) => {
+        console.log("Before: ", bookmark.info.collection, c.id);
+
+        setCollection(c);
+        updateBookmark(produce(bookmark, (draft) => {
+            draft.info.collection = c.id;
+        }));
+
+        console.log("After: ", bookmark.info.collection, c.id);
+
+        await storage.set("collection", c);
+    }, [bookmark, updateBookmark]);
+
+    const fetchCollection = useCallback(async (id: string) => {
+        const resp = await sendToBackground<FindCollectionRequest, FindCollectionResponse>({
+            name: "collection",
+            body: { id }
+        });
+
+        if ('error' in resp) {
+            toast.error(resp.error);
+            return;
+        }
+
+        onSelectCollection(resp.data);
+    }, [onSelectCollection]);
+
+    useEffectOnce(() => {
+        async function init() {
+            const hasCollection = bookmark.info.collection !== NIL_OBJECT_ID;
+            const storedCollection = await storage.get<Collection>("collection");
+            if (storedCollection && !hasCollection) {
+                onSelectCollection(storedCollection);
+            }
+
+            if (hasCollection) {
+                fetchCollection(bookmark.info.collection);
+            }
+        }
+
+        init();
+    });
+
     return (
         <React.Fragment>
             <InputContainer>
                 <InputField
-                    value={bookmark.info.name}
                     placeholder={'Add a Title'}
+                    defaultValue={bookmark.info.name}
                     onChange={(e) => onChangeText(e.target.value, 'name')}
                 />
 
                 <InputFieldLine $isName />
 
                 <InputField
-                    value={bookmark.info.description}
                     placeholder={'Add a Description'}
+                    defaultValue={bookmark.info.description}
                     onChange={(e) => onChangeText(e.target.value, 'description')}
                 />
             </InputContainer>
@@ -215,7 +266,7 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, collection
                 <InputField
                     type="url"
                     onChange={onChangeURL}
-                    value={bookmark.meta.url}
+                    defaultValue={bookmark.meta.url}
                     placeholder={'https://example.com'}
                 />
             </InputContainer>
@@ -237,14 +288,14 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, collection
                         minHeight={200}
                         trigger={
                             <BookmarkAction>
-                                <SectionOptionIcon
+                                <BookmarkActionIcon
                                     bg={Colors.dark_sub}
                                 >
-                                    <IoFolderOpen
+                                    <FaHashtag
                                         size={20}
                                         color={Colors.light}
                                     />
-                                </SectionOptionIcon>
+                                </BookmarkActionIcon>
 
                                 <BookmarkActionText>
                                     {bookmark.tags.length
@@ -266,30 +317,40 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, collection
                             }}
                         />
                     </AppDialog>
+                    <AppDialog
+                        minHeight={300}
+                        title="Collection"
+                        trigger={
+                            <BookmarkAction>
+                                {collection?.assets?.icon
+                                    ? <SelectCollectionImage
+                                        alt={collection?.info.name}
+                                        src={collection?.assets?.icon}
+                                    />
+                                    : <BookmarkActionIcon
+                                        bg={Colors.orange}
+                                    >
+                                        <IoFolderOpen
+                                            size={20}
+                                            color={Colors.light}
+                                        />
+                                    </BookmarkActionIcon>
+                                }
 
-                    <BookmarkAction>
-                        {collection?.assets?.icon
-                            ? <SelectCollectionImage
-                                alt={collection?.info.name}
-                                src={collection?.assets?.icon}
-                            />
-                            : <SectionOptionIcon
-                                bg={Colors.orange}
-                            >
-                                <IoFolderOpen
-                                    size={20}
-                                    color={Colors.light}
-                                />
-                            </SectionOptionIcon>
+                                <BookmarkActionText>
+                                    {collection
+                                        ? collection.info.name
+                                        : "Add to Collection"
+                                    }
+                                </BookmarkActionText>
+                            </BookmarkAction>
                         }
-
-                        <BookmarkActionText>
-                            {collection
-                                ? ": " + collection.info.name
-                                : " Add to Collection Add to Collection Add to Collection"
-                            }
-                        </BookmarkActionText>
-                    </BookmarkAction>
+                    >
+                        <CollectionsModal
+                            collection={collection}
+                            setCollection={onSelectCollection}
+                        />
+                    </AppDialog>
                 </BookmarkActionsSubContainer>
             </BookmarkActionsContainer>
 
@@ -324,12 +385,13 @@ type BookmarkImageComponentProps = {
     tabId: number;
     cover: string;
     disabled?: boolean;
+    standalone?: boolean;
     defaultImage: string;
     onImageError: () => void;
     onChangeImage: (src: string, type: "default" | "custom") => void;
 };
 
-export function BookmarkImageComponent({ disabled, tabId, cover, defaultImage, onImageError, onChangeImage }: BookmarkImageComponentProps) {
+export function BookmarkImageComponent({ disabled, tabId, cover, defaultImage, standalone, onImageError, onChangeImage }: BookmarkImageComponentProps) {
     const [coverURL, setCoverURL] = useState("");
     const linkRef = useRef<HTMLButtonElement>(null);
     const mediaRef = useRef<HTMLInputElement>(null);
@@ -400,7 +462,7 @@ export function BookmarkImageComponent({ disabled, tabId, cover, defaultImage, o
     }, [handleLinkClick, handleUploadClick, handleScreenshot, handleReset]);
 
     return (
-        <BookmarkCoverMainContainer>
+        <BookmarkCoverMainContainer $standalone={standalone}>
             <BookmarkCoverContainer>
                 <BookmarkNewImage
                     src={cover}
