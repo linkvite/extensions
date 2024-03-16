@@ -12,7 +12,10 @@ import {
     BookmarkNewImageIcon,
     BookmarkSubmitButton,
     BookmarkSubmitButtonText,
-    BookmarkDeleteButton
+    BookmarkDeleteButton,
+    BookmarkActionsContainer,
+    BookmarkActionsSubContainer,
+    BookmarkAction
 } from "./styles";
 import { Colors } from "~utils/styles";
 import { Spinner } from "~components/spinner";
@@ -49,39 +52,33 @@ type BookmarkViewProps = {
     exists: boolean;
     bookmark: Bookmark;
     defaultImage: string;
-    setBookmark: React.Dispatch<React.SetStateAction<Bookmark>>;
+    updateBookmark: (data: Bookmark) => void;
 };
 
-export function BookmarkView({ tabId, exists, defaultImage, bookmark, setBookmark }: BookmarkViewProps) {
+export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBookmark }: BookmarkViewProps) {
     const { theme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [coverType, setCoverType] = useState<"default" | "custom">("default");
 
     const onChangeText = useCallback((text: string, key: string) => {
-        setBookmark(prev => {
-            return produce(prev, (draft) => {
-                draft.info[key] = text;
-            });
-        })
-    }, [setBookmark]);
+        updateBookmark(produce(bookmark, (draft) => {
+            draft.info[key] = text;
+        }));
+    }, [bookmark, updateBookmark]);
 
     const onChangeURL = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const url = e.target.value;
-        setBookmark(prev => {
-            return produce(prev, (draft) => {
-                draft.meta.url = url;
-            });
-        });
-    }, [setBookmark]);
+        updateBookmark(produce(bookmark, (draft) => {
+            draft.meta.url = url;
+        }));
+    }, [bookmark, updateBookmark]);
 
     const onChangeImage = useCallback(async (src: string, type: "default" | "custom") => {
         setCoverType(type);
-        setBookmark(prev => {
-            return produce(prev, (draft) => {
-                draft.assets.thumbnail = src;
-            });
-        });
+        updateBookmark(produce(bookmark, (draft) => {
+            draft.assets.thumbnail = src;
+        }));
 
         if (!exists) return;
 
@@ -101,11 +98,10 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, setBookmar
             return;
         }
 
-        const updated = resp.bookmark;
-        setBookmark(() => updated);
+        updateBookmark(resp.bookmark);
         setLoading(false);
         toast.success("Cover image updated");
-    }, [bookmark.id, exists, setBookmark]);
+    }, [bookmark, exists, updateBookmark]);
 
     const onCreate = useCallback(async () => {
         const data: CreateBookmarkProps = {
@@ -178,12 +174,10 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, setBookmar
     }, [bookmark, exists]);
 
     const onImageError = useCallback(() => {
-        setBookmark(prev => {
-            return produce(prev, (draft) => {
-                draft.assets.thumbnail = defaultImage;
-            });
-        });
-    }, [defaultImage, setBookmark]);
+        updateBookmark(produce(bookmark, (draft) => {
+            draft.assets.thumbnail = defaultImage;
+        }));
+    }, [bookmark, defaultImage, updateBookmark]);
 
     const onSubmit = useCallback(async () => {
         setLoading(true);
@@ -220,13 +214,27 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, setBookmar
                 />
             </InputContainer>
 
-            <BookmarkImageComponent
-                tabId={tabId}
-                onImageError={onImageError}
-                defaultImage={defaultImage}
-                onChangeImage={onChangeImage}
-                cover={bookmark.assets.thumbnail}
-            />
+            <BookmarkActionsContainer>
+                <BookmarkActionsSubContainer>
+                    <BookmarkImageComponent
+                        tabId={tabId}
+                        onImageError={onImageError}
+                        defaultImage={defaultImage}
+                        onChangeImage={onChangeImage}
+                        cover={bookmark.assets.thumbnail}
+                    />
+                </BookmarkActionsSubContainer>
+
+                <BookmarkActionsSubContainer>
+                    <BookmarkAction>
+                        🗂️ Collections
+                    </BookmarkAction>
+
+                    <BookmarkAction>
+                        🏷️ Tags
+                    </BookmarkAction>
+                </BookmarkActionsSubContainer>
+            </BookmarkActionsContainer>
 
             <BookmarkSubmitButton
                 onClick={onSubmit}

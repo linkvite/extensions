@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { browser } from "~browser";
 import { FORGOT_PASSWORD_URL, SIGNUP_URL } from "~utils";
-import type { User } from "@linkvite/js";
 import { Logo } from "~components/header";
 import { RootProvider } from "~components/wrapper";
 import { sendToBackground } from "@plasmohq/messaging"
@@ -18,6 +17,7 @@ import {
     AuthInputContainer,
     AuthInputField,
     AuthInputLabel,
+    AuthMethodContainer,
     AuthPasswordIcon,
     AuthSignUpContainer,
     AuthSignUpText,
@@ -25,19 +25,47 @@ import {
     AuthTitle
 } from "./styles";
 import { Spinner } from "~components/spinner";
-
-type OnLogin = (user: User, token: string) => void;
+import { AuthWithQR } from "./qrAuth";
+import type { OnLogin } from "~components/wrapper/auth";
 
 export function Login({ onLogin }: { onLogin: OnLogin }) {
+    const [view, setView] = useState<'login' | 'qr'>('login');
+    const Element = view === 'login' ? AuthWithCreds : AuthWithQR;
+
+    function toggleView() {
+        setView(view === 'login' ? 'qr' : 'login');
+    }
+
     return (
         <RootProvider $isAuth>
             <Logo />
-            <AuthComponent onLogin={onLogin} />
+            <Element onLogin={onLogin} />
+
+            <AuthMethodContainer>
+                {view === 'login'
+                    ? <AuthSignUpContainer>
+                        <AuthSignUpText type="button" $second
+                            onClick={toggleView}
+                            style={{ textDecoration: 'underline' }}
+                        >
+                            Got the app already? Use QR code
+                        </AuthSignUpText>
+                    </AuthSignUpContainer>
+                    : <AuthSignUpContainer style={{ marginTop: 15 }}>
+                        <AuthSignUpText type="button" $second
+                            onClick={toggleView}
+                            style={{ textDecoration: 'underline' }}
+                        >
+                            Log in with email instead
+                        </AuthSignUpText>
+                    </AuthSignUpContainer>
+                }
+            </AuthMethodContainer>
         </RootProvider>
     )
 }
 
-function AuthComponent({ onLogin }: { onLogin: OnLogin }) {
+function AuthWithCreds({ onLogin }: { onLogin: OnLogin }) {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [password, setPassword] = useState('');

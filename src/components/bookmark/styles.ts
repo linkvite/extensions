@@ -53,7 +53,6 @@ export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme }>`
     align-items: flex-start;
     justify-content: space-between;
     border-radius: 10px;
-    margin-top: 15px;
     padding: 5px;
     background-color: ${p => p.theme.background_sub};
 `;
@@ -70,7 +69,7 @@ export const BookmarkCoverContainer = styled.div`
 
 export const BookmarkNewImage = styled.img <{ theme: ITheme }>`
     width: 100%;
-    height: 300px;
+    height: 200px;
     border-radius: 8px;
     object-fit: cover;
     background-color: ${p => p.theme.trans_bg};
@@ -135,4 +134,28 @@ export const BookmarkDeleteButton = styled.button<{ theme: ITheme; disabled?: bo
         cursor: ${p => p.disabled ? 'not-allowed' : 'pointer'};
         color: ${p => p.disabled ? Colors.error : p.theme.text};
     }
+`;
+
+export const BookmarkActionsContainer = styled.div`
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 15px;
+`;
+
+export const BookmarkActionsSubContainer = styled.div`
+    display: flex;
+    width: 49%;
+    flex-direction: column;
+    align-self: flex-start;
+`;
+
+export const BookmarkAction = styled.div`
+    padding: 10px;
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    background-color: ${p => p.theme.background_sub};
 `;

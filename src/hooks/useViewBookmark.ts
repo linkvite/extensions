@@ -26,6 +26,11 @@ type Props = {
     isPopup?: boolean;
 }
 
+type BookmarkItem = {
+    data: Bookmark | null;
+    type: "local" | "parsed" | "exists";
+}
+
 export function useViewBookmark({ tab, isPopup = false }: Props) {
     const { autoSave } = useSelector(settingStore);
     const _bookmark = useMemo(() => {
@@ -44,16 +49,32 @@ export function useViewBookmark({ tab, isPopup = false }: Props) {
     const [view, setView] = useState<"local" | "api">("local");
 
     const [apiData, setAPIData] = useState<ParsedLinkData | null>(null);
-    const [apiBookmark, setAPIBookmark] = useState<Bookmark>(_bookmark);
-    const [localBookmark, setLocalBookmark] = useState<Bookmark>(_bookmark);
+    // const [apiBookmark, setAPIBookmark] = useState<Bookmark>(_bookmark);
+    // const [localBookmark, setLocalBookmark] = useState<Bookmark>(_bookmark);
+
+    const [bookmark, setBookmark] = useState<BookmarkItem>({
+        type: "local",
+        data: _bookmark,
+    });
+
+    const updateBookmark = useCallback((data: Bookmark) => {
+        setBookmark((prev) => {
+            const draft = produce(prev, (draft) => {
+                draft.data = data;
+            });
+
+            return draft;
+        });
+    }, []);
 
     const setAPIView = useCallback((description?: string, image?: string) => {
-        setAPIBookmark(prev => {
+        setBookmark(prev => {
             const draft = produce(prev, (draft) => {
-                draft.meta.url = tab?.url || prev.meta.url;
-                draft.info.name = tab?.title || prev.info.name;
-                draft.assets.thumbnail = image || apiData?.image || prev.assets.thumbnail;
-                draft.info.description = description || apiData?.description || prev.info.description;
+                draft.type = "parsed";
+                draft.data.meta.url = tab?.url || prev.data.meta.url;
+                draft.data.info.name = tab?.title || prev.data.info.name;
+                draft.data.assets.thumbnail = image || apiData?.image || prev.data.assets.thumbnail;
+                draft.data.info.description = description || apiData?.description || prev.data.info.description;
             });
 
             return draft;
@@ -61,12 +82,13 @@ export function useViewBookmark({ tab, isPopup = false }: Props) {
     }, [apiData?.description, apiData?.image, tab?.title, tab?.url]);
 
     const setLocalView = useCallback((description?: string, image?: string) => {
-        setLocalBookmark(prev => {
+        setBookmark(prev => {
             const draft = produce(prev, (draft) => {
-                draft.meta.url = tab?.url || prev.meta.url;
-                draft.info.name = tab?.title || prev.info.name;
-                draft.assets.thumbnail = image || prev.assets.thumbnail;
-                draft.info.description = description || prev.info.description;
+                draft.type = "local";
+                draft.data.meta.url = tab?.url || prev.data.meta.url;
+                draft.data.info.name = tab?.title || prev.data.info.name;
+                draft.data.assets.thumbnail = image || prev.data.assets.thumbnail;
+                draft.data.info.description = description || prev.data.info.description;
             });
 
             return draft;
@@ -131,10 +153,12 @@ export function useViewBookmark({ tab, isPopup = false }: Props) {
                 return;
             }
 
+            setBookmark(() => {
+                const draft = produce(data.bookmark, (draft) => draft);
+                return { data: draft, type: "exists" };
+            });
+
             setExists(true);
-            updateView("api");
-            setAPIView(data.bookmark.info.description, data.bookmark.assets.thumbnail);
-            setAPIBookmark(() => produce(data.bookmark, (draft) => draft));
             setLoading(false);
         };
 
@@ -145,9 +169,9 @@ export function useViewBookmark({ tab, isPopup = false }: Props) {
         view,
         exists,
         updateView,
+        updateBookmark,
+        bookmark: bookmark.data,
         loading: loading || !tab,
         defaultImage: _bookmark.assets.thumbnail,
-        bookmark: view === "api" ? apiBookmark : localBookmark,
-        setBookmark: view === "api" ? setAPIBookmark : setLocalBookmark,
     }
 }

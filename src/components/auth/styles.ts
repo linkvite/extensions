@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { AppText } from "~components/text";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
 
@@ -119,11 +119,88 @@ export const AuthSignUpText = styled.button<{ $second?: boolean; theme: ITheme }
     border: 1px solid transparent;
     background-color: transparent;
     transition: all .3s ease-in-out;
-    margin-left: ${p => p.$second ? "0.35rem" : "0"};
-    color: ${p => p.$second ? Colors.primary : p.theme.text_sub};
+    margin-left: ${p => p.$second ? "0.25rem" : "0"};
+    color: ${p => p.theme.text_sub};
+    text-decoration: ${p => p.$second ? "underline" : "none"};
 
     &:hover {
         cursor: ${p => p.$second ? "pointer" : "default"};
-        text-decoration: ${p => p.$second ? "underline" : "none"};
+        color: ${p => p.$second ? p.theme.text : p.theme.text_sub};
     }
+`;
+
+const Centered = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+
+export const AuthQrContainer = styled(Centered) <{ $notModal?: boolean }>`
+    flex-direction: column;
+    width: 100%;
+`;
+
+export const QRContainer = styled(Centered) <{ $qr?: boolean }>`
+    border-radius: .75rem;
+    margin-top: 2rem;
+    width: 22rem;
+    height: 22rem;
+    padding: 1rem;
+    max-width: 90%;
+    max-height: 90%;
+    background-color: ${p => p.$qr ? Colors.light : "transparent"};
+    box-shadow: ${p => p.$qr ? "0 0.1rem 0.5rem rgba(0,0,0,0.1);" : "none"};
+`;
+
+const slideUp = keyframes`
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+`;
+
+export const QRAuthImage = styled.img`
+    opacity: 0;
+    width: 20rem;
+    height: 20rem;
+    object-fit: cover;
+    border-radius: 100%;
+    transition: all .3s ease-in-out;
+    animation: ${slideUp} .5s ease-in-out forwards;
+`;
+
+export const QRSubTitle = styled(AppText)`
+    max-width: 80%;
+    margin-top: 1.5rem;
+    text-align: center;
+`;
+
+export const AlreadyRegistered = styled.button`
+    font-size: ${Fonts.xxs};
+    color: ${Colors.primary};
+    font-weight: bold;
+    text-align: center;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+    margin: .5rem 0;
+    background-color: transparent;
+    border: 1px solid transparent;
+    padding: 0;
+    width: auto;
+    &:hover {
+        opacity: 0.8;
+    }
+`;
+
+export const AuthMethodContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    text-align: center;
 `;

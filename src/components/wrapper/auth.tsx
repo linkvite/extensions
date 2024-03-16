@@ -17,10 +17,12 @@ import { Login } from "~components/auth";
 import { sendToBackground } from "@plasmohq/messaging";
 import type { InitResponse } from "~background/messages/init";
 
+export type OnLogin = (user: User, token: string) => void;
+
 type AuthCtx = {
     loggedIn: boolean;
+    login: OnLogin;
     logout: () => void;
-    login: (user: User, token: string) => void;
 }
 
 const AuthContext = createContext<AuthCtx>({
@@ -52,13 +54,17 @@ export const AuthProvider = observer(function AuthProvider({ children }: AuthPro
                 name: "init",
             });
 
+            console.log("Init response", resp);
+
             if (resp.loggedIn) {
                 userActions.setData(resp.user);
                 authStore.refreshToken.set(resp.token);
                 setLoggedIn(true);
+                console.log("User is logged in");
                 return;
             }
 
+            console.log("User is not logged in");
             userActions.clearData();
             authStore.refreshToken.set("");
             setLoggedIn(false);

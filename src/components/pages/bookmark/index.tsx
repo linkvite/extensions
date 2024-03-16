@@ -24,7 +24,7 @@ export function BookmarkPage({ params }: { params: URL }) {
         view,
         defaultImage,
         updateView,
-        setBookmark,
+        updateBookmark,
     } = useViewBookmark({ tab });
 
     return (
@@ -33,13 +33,13 @@ export function BookmarkPage({ params }: { params: URL }) {
                 <PopupLoadingContainer>
                     <Spinner />
                 </PopupLoadingContainer>
-            ) : (
+            ) : bookmark ? (
                 <React.Fragment>
                     <BookmarkView
+                        tabId={tab?.id}
                         exists={exists}
                         bookmark={bookmark}
-                        tabId={Number(tabId)}
-                        setBookmark={setBookmark}
+                        updateBookmark={updateBookmark}
                         defaultImage={defaultImage}
                     />
 
@@ -50,7 +50,7 @@ export function BookmarkPage({ params }: { params: URL }) {
                         />
                     )}
                 </React.Fragment>
-            )}
+            ) : <div>Bookmark not found</div>}
         </React.Fragment>
     )
 }

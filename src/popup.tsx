@@ -37,7 +37,7 @@ function IndexPopup() {
         view,
         defaultImage,
         updateView,
-        setBookmark,
+        updateBookmark,
     } = useViewBookmark({ tab, isPopup: true });
 
     return (
@@ -51,13 +51,13 @@ function IndexPopup() {
                     <PopupLoadingContainer>
                         <Spinner />
                     </PopupLoadingContainer>
-                ) : (
+                ) : bookmark ? (
                     <React.Fragment>
                         <BookmarkView
                             tabId={tab?.id}
                             exists={exists}
                             bookmark={bookmark}
-                            setBookmark={setBookmark}
+                            updateBookmark={updateBookmark}
                             defaultImage={defaultImage}
                         />
 
@@ -68,7 +68,7 @@ function IndexPopup() {
                             />
                         )}
                     </React.Fragment>
-                )}
+                ) : <div>Bookmark not found</div>}
             </PageProvider>
         </PopupContainer>
     )

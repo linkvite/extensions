@@ -30,8 +30,9 @@ export function Logo({ body }: { body?: React.ReactNode }) {
 export function LogoAndTitle({ noClose }: { noClose?: boolean }) {
     function onSettings() {
         route("tabs/index.html?type=options");
-        // closeTab();
+        closeTab();
     }
+
     const body = (
         <HeaderButtons>
             <HeaderButton onClick={onSettings}>
