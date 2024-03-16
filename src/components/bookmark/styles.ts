@@ -152,10 +152,48 @@ export const BookmarkActionsSubContainer = styled.div`
     align-self: flex-start;
 `;
 
-export const BookmarkAction = styled.div`
-    padding: 10px;
+export const BookmarkAction = styled.button<{ theme: ITheme }>`
+    padding: 8px;
     width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
     border-radius: 8px;
     margin-bottom: 15px;
+    outline: none;
+    border: 1px solid transparent;
+    transition: all 0.3s ease-in-out;
     background-color: ${p => p.theme.background_sub};
+
+    &:hover {
+        cursor: pointer;
+        border: 1px solid ${p => p.theme.trans_bg};
+    }
+`;
+
+export const BookmarkActionText = styled(AppText)`
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+`;
+
+export const SelectCollectionImage = styled.img`
+    width: 35px;
+    height: 35px;
+    border-radius: 8px;
+    object-fit: cover;
+`;
+
+export const SectionOptionIcon = styled.div<{ bg?: string }>`
+    margin-top: -2px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+    height: 30px;
+    width: 30px;
+    padding: 3px 4px;
+    background-color: ${p => p.bg || Colors.primary};
 `;

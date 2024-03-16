@@ -1,6 +1,7 @@
 {
   "extends": "plasmo/templates/tsconfig.base",
   "exclude": [
+    "build",
     "node_modules"
   ],
   "include": [
@@ -16,6 +17,5 @@
     },
     "baseUrl": "."
   },
-  "strict": true,
   "noImplicitAny": true,
 }

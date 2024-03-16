@@ -15,10 +15,11 @@ type Props = {
     trigger: React.ReactNode;
     children: React.ReactNode;
     title: string;
-    description: string;
+    description?: string;
+    minHeight?: number;
 }
 
-export function AppDialog({ children, trigger, title, description }: Props) {
+export function AppDialog({ children, trigger, title, description, minHeight }: Props) {
     return (
         <DialogRoot>
             <DialogTrigger asChild>
@@ -27,11 +28,14 @@ export function AppDialog({ children, trigger, title, description }: Props) {
 
             <RadixDialog.Portal>
                 <DialogOverlay />
-                <DialogContent>
+                <DialogContent min={minHeight}>
                     <DialogTitle>{title}</DialogTitle>
-                    <DialogDescription>
-                        {description}
-                    </DialogDescription>
+                    {description
+                        ? <DialogDescription>
+                            {description}
+                        </DialogDescription>
+                        : null
+                    }
 
                     {children}
 

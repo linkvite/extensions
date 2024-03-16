@@ -72,3 +72,14 @@ export function makeBookmark(): Bookmark {
         role: "owner",
     };
 }
+
+/**
+ * Return a singular or plural string based on the count.
+ * 
+ * @param {Number} count - The count to check.
+ * @param {String} singular - The singular string.
+ * @param {String} plural - The plural string.
+ */
+export function pluralize(count: number, singular: string, plural: string) {
+    return count <= 1 ? singular : plural;
+}

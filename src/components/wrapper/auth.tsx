@@ -54,17 +54,13 @@ export const AuthProvider = observer(function AuthProvider({ children }: AuthPro
                 name: "init",
             });
 
-            console.log("Init response", resp);
-
             if (resp.loggedIn) {
                 userActions.setData(resp.user);
                 authStore.refreshToken.set(resp.token);
                 setLoggedIn(true);
-                console.log("User is logged in");
                 return;
             }
 
-            console.log("User is not logged in");
             userActions.clearData();
             authStore.refreshToken.set("");
             setLoggedIn(false);

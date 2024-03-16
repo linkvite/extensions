@@ -1,5 +1,5 @@
 import { API_DOMAIN, NIL_OBJECT_ID } from "~utils";
-import type { Bookmark, ParsedLinkData } from "@linkvite/js";
+import type { Bookmark, Collection, ParsedLinkData } from "@linkvite/js";
 import type { AuthResponse, HTTPException } from "~types";
 import { authStore, userActions, userStore } from "~stores";
 import xior, { merge, XiorError, type XiorResponse } from "xior";
@@ -301,4 +301,22 @@ export async function handleUpdateBookmarkCover({ id, cover, type }: CoverProps)
         .patch(endpoint, formData)
         .then(handleSuccess)
         .catch(handleError)
+}
+
+export async function handleFindCollections({ query }: { query: string }) {
+    const endpoint = `/search?q=${query}&path=collection&limit=5000&sort=-date`;
+
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data as Collection[];
+    }
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    return await api
+        .get(endpoint)
+        .then(handleSuccess)
+        .catch(handleError);
 }

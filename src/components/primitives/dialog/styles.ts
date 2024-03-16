@@ -7,10 +7,6 @@ export const DialogRoot = styled(RadixDialog.Root)`
 `;
 
 export const DialogTrigger = styled(RadixDialog.Trigger)`;
-    border: none;
-    padding: 0;
-    background-color: transparent;
-
     &:hover {
         cursor: pointer;
     }
@@ -45,18 +41,19 @@ const contentShow = keyframes`
     }
 `;
 
-export const DialogContent = styled(RadixDialog.Content) <{ theme: ITheme }>`
+export const DialogContent = styled(RadixDialog.Content) <{ theme: ITheme; min?: number }>`
     background-color: ${p => p.theme.background_sub};
     border-radius: 0.5rem;
     box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
     position: fixed;
     top: 50%;
     left: 50%;
+    padding: 15px;
     transform: translate(-50%, -50%);
     width: 90vw;
     max-width: 400px;
-    max-height: 85vh;
-    padding: 15px;
+    max-height: 600px;
+    min-height: ${p => p.min ? p.min + 'px' : 'auto'};
     animation: ${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1);
 
     &:focus {
@@ -69,10 +66,11 @@ export const DialogTitle = styled.p<{ theme: ITheme }>`
     font-weight: 500;
     color: ${p => p.theme.text};
     font-size: ${Fonts.sm};
+    margin-bottom: 5px;
 `;
 
 export const DialogDescription = styled.p<{ theme: ITheme }>`
-    margin: 5px 0;
+    margin-bottom: 5px;
     color: ${p => p.theme.text_sub};
     font-size: ${Fonts.xxs};
     line-height: 1.5;

@@ -1,5 +1,5 @@
 import { produce } from "immer";
-import type { Bookmark } from "@linkvite/js";
+import type { Bookmark, Collection } from "@linkvite/js";
 import { sendToBackground } from "@plasmohq/messaging";
 import React, { useCallback, useRef, useState } from "react";
 import {
@@ -15,11 +15,14 @@ import {
     BookmarkDeleteButton,
     BookmarkActionsContainer,
     BookmarkActionsSubContainer,
-    BookmarkAction
+    BookmarkAction,
+    SectionOptionIcon,
+    SelectCollectionImage,
+    BookmarkActionText
 } from "./styles";
 import { Colors } from "~utils/styles";
 import { Spinner } from "~components/spinner";
-import { NIL_OBJECT_ID } from "~utils";
+import { NIL_OBJECT_ID, pluralize } from "~utils";
 import { HiCamera } from "react-icons/hi2";
 import { DropdownMenu } from "~components/primitives/dropdown";
 import { browser } from "~browser";
@@ -46,16 +49,19 @@ import type {
     UpdateCoverMessageResponse
 } from "~background/messages/cover";
 import toast from "react-hot-toast";
+import { IoFolderOpen } from "react-icons/io5";
+import { TagsModal } from "~components/tags";
 
 type BookmarkViewProps = {
     tabId: number;
     exists: boolean;
     bookmark: Bookmark;
     defaultImage: string;
+    collection: Collection | null;
     updateBookmark: (data: Bookmark) => void;
 };
 
-export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBookmark }: BookmarkViewProps) {
+export function BookmarkView({ tabId, exists, defaultImage, bookmark, collection, updateBookmark }: BookmarkViewProps) {
     const { theme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -226,12 +232,63 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBook
                 </BookmarkActionsSubContainer>
 
                 <BookmarkActionsSubContainer>
-                    <BookmarkAction>
-                        🗂️ Collections
-                    </BookmarkAction>
+                    <AppDialog
+                        title="Add Tags"
+                        minHeight={200}
+                        trigger={
+                            <BookmarkAction>
+                                <SectionOptionIcon
+                                    bg={Colors.dark_sub}
+                                >
+                                    <IoFolderOpen
+                                        size={20}
+                                        color={Colors.light}
+                                    />
+                                </SectionOptionIcon>
+
+                                <BookmarkActionText>
+                                    {bookmark.tags.length
+                                        ? `${bookmark.tags.length} ${pluralize(bookmark.tags.length, 'tag', 'tags')}`
+                                        : "Add Tags"
+                                    }
+                                </BookmarkActionText>
+                            </BookmarkAction>
+                        }
+                    >
+                        <TagsModal
+                            tags={bookmark.tags}
+                            setTags={(tags) => {
+                                return updateBookmark(
+                                    produce(bookmark, (draft) => {
+                                        draft.tags = tags;
+                                    })
+                                )
+                            }}
+                        />
+                    </AppDialog>
 
                     <BookmarkAction>
-                        🏷️ Tags
+                        {collection?.assets?.icon
+                            ? <SelectCollectionImage
+                                alt={collection?.info.name}
+                                src={collection?.assets?.icon}
+                            />
+                            : <SectionOptionIcon
+                                bg={Colors.orange}
+                            >
+                                <IoFolderOpen
+                                    size={20}
+                                    color={Colors.light}
+                                />
+                            </SectionOptionIcon>
+                        }
+
+                        <BookmarkActionText>
+                            {collection
+                                ? ": " + collection.info.name
+                                : " Add to Collection Add to Collection Add to Collection"
+                            }
+                        </BookmarkActionText>
                     </BookmarkAction>
                 </BookmarkActionsSubContainer>
             </BookmarkActionsContainer>
@@ -355,7 +412,11 @@ export function BookmarkImageComponent({ disabled, tabId, cover, defaultImage, o
                     <BookmarkNewImageIcon>
                         <DropdownMenu.Root
                             trigger={
-                                <HiCamera size={24} color={Colors.light} />
+                                <HiCamera
+                                    size={24}
+                                    color={Colors.light}
+                                    style={{ opacity: 0.7 }}
+                                />
                             }
                         >
                             {options.map((option) => (
