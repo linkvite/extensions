@@ -14,13 +14,14 @@ import { getCurrentTab } from "~utils";
 import type { browser } from "~browser";
 import { useSelector } from "@legendapp/state/react";
 import { BookmarkViewControls } from "~components/controls";
-import { settingStore } from "~stores";
+import { settingStore, userStore } from "~stores";
 import { AppText } from "~components/text";
 import { useAutoSave } from "~hooks/useAutoSave";
 import toast from "react-hot-toast";
 import { closeTab, route } from "~router";
 
 function IndexPopup() {
+    const { id } = useSelector(userStore);
     const { autoSave } = useSelector(settingStore);
     const [tab, setTab] = useState<browser.Tabs.Tab | null>(null);
     const { message, exists: autoSaveExists, url } = useAutoSave({ tab });
@@ -55,7 +56,7 @@ function IndexPopup() {
     }, [tab?.id, url]);
 
     return (
-        <PopupContainer $autoSave={autoSave}>
+        <PopupContainer $autoSave={autoSave && id !== ""}>
             <PageProvider>
                 {autoSave ? (
                     <AutoSaveContainer>
