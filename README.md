@@ -1,4 +1,4 @@
-## Browser Extension for Linkvite
+## Browser Extensions for Linkvite
 
 Easily save and organize bookmarks without leaving the page. This supports any Chronium-based browser, including Chrome, Arc, Edge, Opera, and Brave. Also works on Firefox, and Safari. See Plasmo's [documentation](https://docs.plasmo.com/framework/workflows/faq#what-are-the-officially-supported-browser-targets) for more information.
 
