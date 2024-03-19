@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { browser } from "~browser";
 import { BookmarkView } from "~components/bookmark";
 import { BookmarkViewControls } from "~components/controls";
 import { Spinner } from "~components/spinner";
+import { AppText } from "~components/text";
 import { useViewBookmark } from "~hooks";
-import { PopupLoadingContainer } from "~styles";
+import { AutoSaveContainer, PopupLoadingContainer } from "~styles";
 
 export function BookmarkPage({ params }: { params: URL }) {
     const [tab, setTab] = useState<browser.Tabs.Tab | null>(null);
     const tabId = decodeURIComponent(params.searchParams.get('tabId') || '');
     useEffect(() => {
         async function init() {
-            setTab(await browser.tabs.get(parseInt(tabId)));
+            try {
+                setTab(await browser.tabs.get(parseInt(tabId)));
+            } catch (error) {
+                toast.error('Could not get the current page');
+                console.error(error);
+            }
         }
 
         init();
@@ -22,9 +29,10 @@ export function BookmarkPage({ params }: { params: URL }) {
         exists,
         loading,
         view,
-        defaultImage,
         updateView,
         updateBookmark,
+        createBookmark,
+        updateCoverType,
     } = useViewBookmark({ tab });
 
     return (
@@ -39,8 +47,9 @@ export function BookmarkPage({ params }: { params: URL }) {
                         tabId={tab?.id}
                         exists={exists}
                         bookmark={bookmark}
-                        defaultImage={defaultImage}
+                        onCreate={createBookmark}
                         updateBookmark={updateBookmark}
+                        updateCoverType={updateCoverType}
                     />
 
                     {exists ? null : (
@@ -50,7 +59,11 @@ export function BookmarkPage({ params }: { params: URL }) {
                         />
                     )}
                 </React.Fragment>
-            ) : <div>Bookmark not found</div>}
+            ) : (
+                <AutoSaveContainer>
+                    <AppText>Bookmark not found</AppText>
+                </AutoSaveContainer>
+            )}
         </React.Fragment>
     )
 }

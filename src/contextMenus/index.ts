@@ -32,27 +32,30 @@ async function create() {
     }
 }
 
-async function handleClick({ pageUrl, linkUrl, srcUrl, menuItemId }: browser.Menus.OnClickData) {
+async function handleClick({ linkUrl, srcUrl, menuItemId }: browser.Menus.OnClickData) {
+    const tab = await getCurrentTab();
     const base = 'tabs/index.html?type';
 
     async function onNewBookmark() {
-        const tab = await getCurrentTab();
         if (!tab) return;
-        const { title, favIconUrl, id } = tab;
-        return await route(`${base}=bookmark&url=${encodeURIComponent(pageUrl)}&title=${encodeURIComponent(title)}&favicon=${encodeURIComponent(favIconUrl)}&tabId=${id}`);
+        return await route(`${base}=bookmark&tabId=${tab.id}`);
     }
 
     async function onNewLink() {
-        const tab = await getCurrentTab();
         if (!tab) return;
         return await route(`${base}=link&url=${encodeURIComponent(linkUrl)}&tabId=${tab?.id}`);
+    }
+
+    async function onNewImage() {
+        if (!tab) return;
+        return await route(`${base}=image&url=${encodeURIComponent(srcUrl)}&tabId=${tab.id}`);
     }
 
     switch (menuItemId) {
         case 'new:link':
             return onNewLink();
         case 'new:image':
-            return await route(`${base}=image&url=${encodeURIComponent(srcUrl)}`)
+            return await onNewImage();
         case 'save:tabs':
             return await route(`${base}=tabs`)
         case 'options':

@@ -1,42 +1,85 @@
+import React, { useCallback, useEffect, useState } from "react";
+import type { Theme } from "~types";
 import { settingStore } from "~stores";
-import { useSelector } from "@legendapp/state/react";
-import React from "react";
 import { useAuth } from "~components/wrapper/auth";
+import { useSelector } from "@legendapp/state/react";
+import { AppDialog } from "~components/primitives/dialog";
+import type { Collection } from "@linkvite/js";
+import { storage } from "~utils/storage";
+import { CollectionsModal } from "~components/collections";
+import {
+    OptionsContainer,
+    Label,
+    ThemeSelect,
+    CollectionContainer,
+    AutoContainers,
+    AutoCheckInput,
+    LogoutButton
+} from "./styles";
 
 export function OptionsPage() {
     const { logout } = useAuth();
     const store = useSelector(settingStore);
+    const [collection, setCollection] = useState<Collection | null>(null);
+    useEffect(() => {
+        async function init() {
+            const c = await storage.get<Collection>("collection");
+            if (c) {
+                setCollection(c);
+            }
+        }
+
+        init();
+    }, []);
+
+    const onSelectCollection = useCallback((c?: Collection) => {
+        setCollection(c || null);
+        storage.set("collection", c);
+    }, []);
+
     return (
-        <div style={{ width: "100%", height: "100%" }}>
-            <h3>Options Page</h3>
-            <p>Theme: {store.theme}</p>
-            <p>Collection: {store.collection}</p>
+        <OptionsContainer>
+            <Label htmlFor="theme">Theme</Label>
+            <ThemeSelect
+                id="theme"
+                value={store.theme}
+                onChange={(e) => settingStore.theme.set(e.target.value as Theme)}
+            >
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="system">System</option>
+            </ThemeSelect>
 
-            <p>Auto Save: {store.autoSave ? "Yes" : "No"}</p>
-            <label htmlFor="autoSave">Auto Save</label>
-            <input type="checkbox" checked={store.autoSave} onChange={() => settingStore.autoSave.set(!store.autoSave)} id="autoSave" />
+            <Label>Default Collection</Label>
+            <AppDialog
+                minHeight={300}
+                title="Collection"
+                trigger={
+                    <CollectionContainer>
+                        {collection
+                            ? collection.info.name
+                            : "Set Default Collection"
+                        }
+                    </CollectionContainer>
+                }
+            >
+                <CollectionsModal
+                    collection={collection}
+                    setCollection={onSelectCollection}
+                />
+            </AppDialog>
 
-            <p>Auto Close Popup: {store.autoClose ? "Yes" : "No"}</p>
-            <label htmlFor="autoClose">Auto Close Popup</label>
-            <input type="checkbox" checked={store.autoClose} onChange={() => settingStore.autoClose.set(!store.autoClose)} id="autoClose" />
+            <AutoContainers>
+                <AutoCheckInput type="checkbox" checked={store.autoSave} onChange={() => settingStore.autoSave.set(!store.autoSave)} id="autoSave" />
+                <Label htmlFor="autoSave">Auto Save</Label>
+            </AutoContainers>
 
-            <p>Permissions</p>
-            <ul>
-                {store.permissions.map((permission, index) => (
-                    <li key={index}>{permission}</li>
-                ))}
-            </ul>
+            <AutoContainers>
+                <AutoCheckInput type="checkbox" checked={store.autoClose} onChange={() => settingStore.autoClose.set(!store.autoClose)} id="autoClose" />
+                <Label htmlFor="autoClose">Auto Close</Label>
+            </AutoContainers>
 
-            <p>Hot Keys</p>
-            <ul>
-                {store.hotKeys.map((hotKey, index) => (
-                    <li key={index}>{hotKey}</li>
-                ))}
-            </ul>
-
-            <p>Copied Link: {store.copiedLink}</p>
-
-            <button onClick={logout}>Logout</button>
-        </div >
+            <LogoutButton onClick={logout}>Logout</LogoutButton>
+        </OptionsContainer >
     )
 }

@@ -17,7 +17,8 @@ import {
     CollectionItemName,
     CollectionMineOnly,
     CollectionMineOnlyLabel,
-    CollectionMineOnlyInput
+    CollectionMineOnlyInput,
+    RemoveCollection
 } from "./styles";
 import { useSelector } from "@legendapp/state/react";
 import { userStore } from "~stores";
@@ -25,7 +26,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 
 type Props = {
     collection?: Collection
-    setCollection: (c: Collection) => void;
+    setCollection: (c?: Collection) => void;
 }
 
 export function CollectionsModal({ collection, setCollection }: Props) {
@@ -81,14 +82,24 @@ export function CollectionsModal({ collection, setCollection }: Props) {
                 id='search'
                 name='search'
                 value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder='eg: "Articles"'
                 style={{ margin: 0 }}
+                placeholder='eg: "Articles"'
+                onChange={(e) => setText(e.target.value)}
             />
 
             <CollectionItems
                 onScroll={onScroll}
             >
+                {(collection?.id && !text)
+                    ? (
+                        <RemoveCollection
+                            onClick={() => setCollection(null)}
+                        >
+                            Remove from {collection.info.name}
+                        </RemoveCollection>
+                    ) : null
+                }
+
                 {!text ? (
                     <EmptyCollectionsText>Start typing to search for collections</EmptyCollectionsText>
                 ) : !data.length ? (

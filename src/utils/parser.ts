@@ -2,7 +2,7 @@ import { browser } from "~browser";
 import { COVER_URL, normalize } from "~utils";
 import * as htmlparser from "htmlparser2";
 
-type ParsedHTML = {
+export type ParsedHTML = {
     image: string;
     description: string;
 }
@@ -12,6 +12,9 @@ type ParsedHTML = {
  * 
  * Use the meta tags to get the information.
  * But use the regular tags as fallback.
+ * 
+ * @param {String} html
+ * @param {Number} windowId
  */
 export async function parseHTML(html: string, windowId: number): Promise<ParsedHTML> {
     let image = "";

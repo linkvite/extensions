@@ -67,11 +67,11 @@ export const AuthInputField = styled.input<{ $hasError?: boolean; theme: ITheme 
     }
 
     &::placeholder {
-        color: ${Colors.light_divider};
+        color: ${p => p.theme.text_sub};
     }
 
     color: ${p => p.theme.text};
-    border: 1px solid ${p => (p.$hasError ? Colors.error : p.theme.trans_bg)};
+    border: 1px solid ${p => (p.$hasError ? Colors.error : rgba(p.theme.trans_bg, 1))};
 `;
 
 export const AuthInputLabel = styled.label<{ $second?: boolean; theme: ITheme }>`

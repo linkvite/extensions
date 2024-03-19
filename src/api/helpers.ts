@@ -37,7 +37,6 @@ api.interceptors.response.use(resp => resp, async (error: XiorError) => {
 });
 
 api.interceptors.request.use(async (config) => {
-    // if the endpoint is /auth/login, don't add the token.
     if (config.url?.includes("/auth/login")) return config;
 
     const accessToken = authStore.accessToken.get();
@@ -184,16 +183,20 @@ export async function handleBookmarkExists({ url }: { url: string }): Promise<Bo
         .catch(handleError);
 }
 
+type UploadProps = {
+    tags?: string[];
+    starred?: boolean;
+    collection?: string;
+    description?: string;
+}
+
 export type CreateBookmarkProps = {
     url: string;
     title: string;
-    description?: string;
-    tags?: string[];
-    favicon?: string;
     cover: string;
     coverType: "default" | "custom";
-    collection?: string;
-};
+    favicon?: string;
+} & UploadProps;
 
 export async function handleCreateBookmark({ tags, collection: c, cover, coverType, ...rest }: CreateBookmarkProps) {
     const endpoint = `/bookmarks/manual`;
@@ -218,7 +221,47 @@ export async function handleCreateBookmark({ tags, collection: c, cover, coverTy
     }
 
     Object.entries(rest).forEach(([key, value]) => {
-        formData.append(key, value);
+        formData.append(key, value.toString());
+    });
+
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data as Bookmark;
+    }
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    return await api
+        .post(endpoint, formData)
+        .then(handleSuccess)
+        .catch(handleError);
+}
+
+export type FileBookmarkProps = {
+    url: string;
+    title?: string;
+} & UploadProps;
+
+export async function handleCreateFile({ url, tags, collection, ...rest }: FileBookmarkProps) {
+    const endpoint = `/bookmarks/file`;
+
+    const formData = new FormData();
+    const response = await fetch(url, { mode: "cors" });
+    const blob = await response.blob();
+    formData.append("file", blob, `File-${Date.now().toString()}`);
+
+    if (tags) {
+        formData.append("tags", tags.join(","));
+    }
+
+    if (collection) {
+        formData.append("collection", collection);
+    }
+
+    Object.entries(rest).forEach(([key, value]) => {
+        formData.append(key, value.toString());
     });
 
     function handleSuccess(res: XiorResponse) {
@@ -238,14 +281,11 @@ export async function handleCreateBookmark({ tags, collection: c, cover, coverTy
 
 export async function handleUpdateBookmark({ bookmark }: { bookmark: Bookmark }) {
     const endpoint = `/bookmarks/${bookmark.id}`;
-    const { info, meta, config, assets, tags } = bookmark;
-    const collection = info.collection !== NIL_OBJECT_ID
-        ? info.collection
-        : undefined;
+    const { info, meta, config, assets, tags, isLiked } = bookmark;
 
     const body = {
-        collection,
         name: info.name,
+        collection: info.collection,
         description: info.description,
         tags: tags.join(","),
         url: meta.url,
@@ -253,6 +293,7 @@ export async function handleUpdateBookmark({ bookmark }: { bookmark: Bookmark })
         favIcon: assets.icon,
         image: bookmark.assets.thumbnail,
         allowComments: config.allowComments,
+        starred: isLiked,
     };
 
     function handleSuccess(res: XiorResponse) {

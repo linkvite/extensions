@@ -18,7 +18,7 @@ const handler: PlasmoMessaging.MessageHandler<
         await api.patch(endpoint, body);
         return res.send({ message: "Bookmark deleted successfully" });
     } catch (error) {
-        return res.send({ error });
+        return res.send({ error: String(error) });
     }
 }
 

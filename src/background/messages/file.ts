@@ -1,23 +1,24 @@
 import {
-    handleCreateBookmark,
-    type CreateBookmarkProps,
+    handleCreateFile,
+    type FileBookmarkProps,
 } from "~api";
 import type { PlasmoMessaging } from "@plasmohq/messaging"
 
-export type CreateMessageRequest = {
-    data: CreateBookmarkProps;
+export type CreateFileMessageRequest = {
+    data: FileBookmarkProps;
 }
 
-export type CreateMessageResponse = { message: string } | { error: string };
+export type CreateFileMessageResponse = { message: string } | { error: string };
 
 const handler: PlasmoMessaging.MessageHandler<
-    CreateMessageRequest,
-    CreateMessageResponse
+    CreateFileMessageRequest,
+    CreateFileMessageResponse
 > = async (req, res) => {
     try {
-        await handleCreateBookmark({ ...req.body.data });
+        await handleCreateFile({ ...req.body.data });
         return res.send({ message: "Bookmark created successfully" });
     } catch (error) {
+        console.error("Failed to create bookmark.", error);
         return res.send({ error: String(error) });
     }
 }

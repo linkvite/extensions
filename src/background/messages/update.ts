@@ -18,7 +18,7 @@ const handler: PlasmoMessaging.MessageHandler<
         });
         return res.send({ message: "Bookmark updated successfully" });
     } catch (error) {
-        return res.send({ error });
+        return res.send({ error: String(error) });
     }
 }
 

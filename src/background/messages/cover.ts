@@ -22,7 +22,7 @@ const handler: PlasmoMessaging.MessageHandler<
         });
         return res.send({ bookmark });
     } catch (error) {
-        return res.send({ error });
+        return res.send({ error: String(error) });
     }
 }
 

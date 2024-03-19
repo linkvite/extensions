@@ -18,11 +18,12 @@ import {
     BookmarkAction,
     BookmarkActionIcon,
     SelectCollectionImage,
-    BookmarkActionText
+    BookmarkActionText,
+    BookmarkStarIcon
 } from "./styles";
 import { Colors } from "~utils/styles";
 import { Spinner } from "~components/spinner";
-import { NIL_OBJECT_ID, pluralize } from "~utils";
+import { COVER_URL, NIL_OBJECT_ID, pluralize } from "~utils";
 import { HiCamera } from "react-icons/hi2";
 import { FaHashtag } from "react-icons/fa6";
 import { DropdownMenu } from "~components/primitives/dropdown";
@@ -30,11 +31,6 @@ import { browser } from "~browser";
 import { AppDialog } from "~components/primitives/dialog";
 import { AuthInputField } from "~components/auth/styles";
 import * as Dialog from '@radix-ui/react-dialog';
-import type {
-    CreateMessageRequest,
-    CreateMessageResponse
-} from "~background/messages/create";
-import type { CreateBookmarkProps } from "~api";
 import type {
     UpdateMessageRequest,
     UpdateMessageResponse
@@ -58,22 +54,43 @@ import type {
     FindCollectionRequest,
     FindCollectionResponse
 } from "~background/messages/collection";
-import { useEffectOnce } from "@legendapp/state/react";
+import { useEffectOnce, useSelector } from "@legendapp/state/react";
+import { TbStar, TbStarFilled } from "react-icons/tb";
+import { settingStore } from "~stores";
 
 type BookmarkViewProps = {
     tabId: number;
     exists: boolean;
     bookmark: Bookmark;
-    defaultImage: string;
+    hideURL?: boolean;
+    disabledImage?: boolean;
+    onCreate: () => Promise<void>;
     updateBookmark: (data: Bookmark) => void;
+    updateCoverType?: (type: "default" | "custom") => void;
 };
 
-export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBookmark }: BookmarkViewProps) {
+export function BookmarkView({
+    tabId,
+    exists,
+    bookmark,
+    hideURL = false,
+    disabledImage = false,
+    onCreate,
+    updateBookmark,
+    updateCoverType
+}: BookmarkViewProps) {
     const { theme } = useTheme();
     const [loading, setLoading] = useState(false);
     const [deleting, setDeleting] = useState(false);
-    const [collection, setCollection] = useState<Collection>(undefined);
-    const [coverType, setCoverType] = useState<"default" | "custom">("default");
+    const [collection, setCollection] = useState<Collection>();
+    const { autoClose } = useSelector(settingStore);
+    const StarIcon = bookmark.isLiked ? TbStarFilled : TbStar;
+
+    const onToggleLike = useCallback(() => {
+        updateBookmark(produce(bookmark, (draft) => {
+            draft.isLiked = !draft.isLiked;
+        }));
+    }, [bookmark, updateBookmark]);
 
     const onChangeText = useCallback((text: string, key: string) => {
         updateBookmark(produce(bookmark, (draft) => {
@@ -89,7 +106,7 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBook
     }, [bookmark, updateBookmark]);
 
     const onChangeImage = useCallback(async (src: string, type: "default" | "custom") => {
-        setCoverType(type);
+        updateCoverType?.(type);
         updateBookmark(produce(bookmark, (draft) => {
             draft.assets.thumbnail = src;
         }));
@@ -115,33 +132,7 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBook
         updateBookmark(resp.bookmark);
         setLoading(false);
         toast.success("Cover image updated");
-    }, [bookmark, exists, updateBookmark]);
-
-    const onCreate = useCallback(async () => {
-        const data: CreateBookmarkProps = {
-            coverType,
-            url: bookmark.meta.url,
-            title: bookmark.info.name,
-            description: bookmark.info.description,
-            tags: bookmark.tags,
-            favicon: bookmark.assets.icon,
-            cover: bookmark.assets.thumbnail,
-            collection: bookmark.info.collection,
-        }
-
-        const resp = await sendToBackground<CreateMessageRequest, CreateMessageResponse>({
-            name: "create",
-            body: { data }
-        });
-
-        if ('error' in resp) {
-            toast.error(resp.error);
-            return;
-        }
-
-        toast.success(resp.message);
-        closeTab();
-    }, [bookmark, coverType]);
+    }, [bookmark, exists, updateBookmark, updateCoverType]);
 
     const onUpdate = useCallback(async () => {
         if (!bookmark.id || !exists || bookmark.id === NIL_OBJECT_ID) {
@@ -162,8 +153,11 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBook
         }
 
         toast.success(resp.message);
-        closeTab();
-    }, [bookmark, exists]);
+
+        if (autoClose) {
+            closeTab();
+        }
+    }, [autoClose, bookmark, exists]);
 
     const onDelete = useCallback(async () => {
         if (!bookmark.id || !exists || bookmark.id === NIL_OBJECT_ID) {
@@ -184,14 +178,17 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBook
         }
 
         toast.success(resp.message);
-        closeTab();
-    }, [bookmark, exists]);
+
+        if (autoClose) {
+            closeTab();
+        }
+    }, [autoClose, bookmark.id, exists]);
 
     const onImageError = useCallback(() => {
         updateBookmark(produce(bookmark, (draft) => {
-            draft.assets.thumbnail = defaultImage;
+            draft.assets.thumbnail = COVER_URL;
         }));
-    }, [bookmark, defaultImage, updateBookmark]);
+    }, [bookmark, updateBookmark]);
 
     const onSubmit = useCallback(async () => {
         setLoading(true);
@@ -201,15 +198,11 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBook
         setLoading(false);
     }, [onCreate, onUpdate, exists]);
 
-    const onSelectCollection = useCallback(async (c: Collection) => {
-        console.log("Before: ", bookmark.info.collection, c.id);
-
+    const onSelectCollection = useCallback(async (c?: Collection) => {
         setCollection(c);
         updateBookmark(produce(bookmark, (draft) => {
-            draft.info.collection = c.id;
+            draft.info.collection = c?.id || NIL_OBJECT_ID;
         }));
-
-        console.log("After: ", bookmark.info.collection, c.id);
 
         await storage.set("collection", c);
     }, [bookmark, updateBookmark]);
@@ -248,35 +241,37 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBook
         <React.Fragment>
             <InputContainer>
                 <InputField
+                    value={bookmark.info.name}
                     placeholder={'Add a Title'}
-                    defaultValue={bookmark.info.name}
                     onChange={(e) => onChangeText(e.target.value, 'name')}
                 />
 
                 <InputFieldLine $isName />
 
                 <InputField
+                    value={bookmark.info.description}
                     placeholder={'Add a Description'}
-                    defaultValue={bookmark.info.description}
                     onChange={(e) => onChangeText(e.target.value, 'description')}
                 />
             </InputContainer>
 
-            <InputContainer $isURL>
-                <InputField
-                    type="url"
-                    onChange={onChangeURL}
-                    defaultValue={bookmark.meta.url}
-                    placeholder={'https://example.com'}
-                />
-            </InputContainer>
+            {hideURL ? null : (
+                <InputContainer $isURL>
+                    <InputField
+                        type="url"
+                        onChange={onChangeURL}
+                        value={bookmark.meta.url}
+                        placeholder={'https://example.com'}
+                    />
+                </InputContainer>
+            )}
 
             <BookmarkActionsContainer>
                 <BookmarkActionsSubContainer>
                     <BookmarkImageComponent
                         tabId={tabId}
+                        disabled={disabledImage}
                         onImageError={onImageError}
-                        defaultImage={defaultImage}
                         onChangeImage={onChangeImage}
                         cover={bookmark.assets.thumbnail}
                     />
@@ -322,10 +317,10 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBook
                         title="Collection"
                         trigger={
                             <BookmarkAction>
-                                {collection?.assets?.icon
+                                {collection
                                     ? <SelectCollectionImage
-                                        alt={collection?.info.name}
-                                        src={collection?.assets?.icon}
+                                        alt={collection.info.name}
+                                        src={collection.assets.icon}
                                     />
                                     : <BookmarkActionIcon
                                         bg={Colors.orange}
@@ -351,6 +346,18 @@ export function BookmarkView({ tabId, exists, defaultImage, bookmark, updateBook
                             setCollection={onSelectCollection}
                         />
                     </AppDialog>
+
+                    <BookmarkStarIcon
+                        onClick={onToggleLike}
+                    >
+                        <StarIcon
+                            size={21}
+                            color={bookmark.isLiked
+                                ? Colors.warning
+                                : theme.text_sub
+                            }
+                        />
+                    </BookmarkStarIcon>
                 </BookmarkActionsSubContainer>
             </BookmarkActionsContainer>
 
@@ -385,13 +392,11 @@ type BookmarkImageComponentProps = {
     tabId: number;
     cover: string;
     disabled?: boolean;
-    standalone?: boolean;
-    defaultImage: string;
     onImageError: () => void;
     onChangeImage: (src: string, type: "default" | "custom") => void;
 };
 
-export function BookmarkImageComponent({ disabled, tabId, cover, defaultImage, standalone, onImageError, onChangeImage }: BookmarkImageComponentProps) {
+function BookmarkImageComponent({ disabled, tabId, cover, onImageError, onChangeImage }: BookmarkImageComponentProps) {
     const [coverURL, setCoverURL] = useState("");
     const linkRef = useRef<HTMLButtonElement>(null);
     const mediaRef = useRef<HTMLInputElement>(null);
@@ -441,8 +446,8 @@ export function BookmarkImageComponent({ disabled, tabId, cover, defaultImage, s
     }, [onChangeImage, tabId]);
 
     const handleReset = useCallback(() => {
-        onChangeImage(defaultImage, "default");
-    }, [defaultImage, onChangeImage]);
+        onChangeImage(COVER_URL, "default");
+    }, [onChangeImage]);
 
     const handleMenuClick = useCallback((value: Option["value"]) => {
         switch (value) {
@@ -462,12 +467,13 @@ export function BookmarkImageComponent({ disabled, tabId, cover, defaultImage, s
     }, [handleLinkClick, handleUploadClick, handleScreenshot, handleReset]);
 
     return (
-        <BookmarkCoverMainContainer $standalone={standalone}>
+        <BookmarkCoverMainContainer>
             <BookmarkCoverContainer>
                 <BookmarkNewImage
                     src={cover}
                     alt={"Cover Image"}
                     onError={onImageError}
+                    crossOrigin="use-credentials"
                 />
 
                 {disabled ? null : (

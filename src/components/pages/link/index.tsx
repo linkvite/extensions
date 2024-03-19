@@ -2,7 +2,7 @@ import { useState } from "react"
 import toast from "react-hot-toast"
 import React, { useCallback, useEffect } from "react"
 import { sendToBackground } from "@plasmohq/messaging"
-import type { Bookmark, ParsedLinkData } from "@linkvite/js"
+import type { Bookmark } from "@linkvite/js"
 import type {
     ExistsMessageRequest,
     ExistsMessageResponse
@@ -13,33 +13,67 @@ import type {
 } from "~background/messages/parse"
 import {
     BookmarkView,
-    BookmarkImageComponent
 } from "~components/bookmark"
-import {
-    InputContainer,
-    InputField,
-    InputFieldLine,
-    BookmarkSubmitButton,
-    BookmarkSubmitButtonText
-} from "~components/bookmark/styles"
-import { Spinner } from "~components/spinner"
-import { COVER_URL } from "~utils"
-import { Colors } from "~utils/styles"
 import { produce } from "immer"
+import { closeTab } from "~router"
+import { Spinner } from "~components/spinner"
+import type { CreateBookmarkProps } from "~api"
+import type {
+    CreateMessageRequest,
+    CreateMessageResponse
+} from "~background/messages/create"
+import { makeBookmark } from "~utils"
+import { useSelector } from "@legendapp/state/react"
+import { settingStore } from "~stores"
 
 export function NewLinkPage({ params }: { params: URL }) {
     const [exists, setExists] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [bookmark, setBookmark] = useState<Bookmark>(makeBookmark());
+    const [coverType, setCoverType] = useState<"default" | "custom">("default");
 
-    const [data, setData] = useState<ParsedLinkData>();
-    const [bookmark, setBookmark] = useState<Bookmark>();
-
+    const { autoClose } = useSelector(settingStore);
     const url = decodeURIComponent(params.searchParams.get('url') || '');
     const tabId = decodeURIComponent(params.searchParams.get('tabId') || '');
 
     const updateBookmark = useCallback((bookmark: Bookmark) => {
         setBookmark(() => bookmark);
     }, []);
+
+    const createBookmark = useCallback(async () => {
+        if (exists) {
+            toast.error("Bookmark already exists");
+            return;
+        }
+
+        const data: CreateBookmarkProps = {
+            coverType,
+            tags: bookmark.tags,
+            url: bookmark.meta.url,
+            title: bookmark.info.name,
+            starred: bookmark.isLiked,
+            favicon: bookmark.assets.icon,
+            cover: bookmark.assets.thumbnail,
+            collection: bookmark.info.collection,
+            description: bookmark.info.description,
+        }
+
+        const resp = await sendToBackground<CreateMessageRequest, CreateMessageResponse>({
+            name: "create",
+            body: { data }
+        });
+
+        if ('error' in resp) {
+            toast.error(resp.error);
+            return;
+        }
+
+        toast.success(resp.message);
+
+        if (autoClose) {
+            closeTab();
+        }
+    }, [autoClose, bookmark, coverType, exists]);
 
     const checkExists = useCallback(async (url: string) => {
         const resp = await sendToBackground<ExistsMessageRequest, ExistsMessageResponse>({
@@ -63,7 +97,15 @@ export function NewLinkPage({ params }: { params: URL }) {
             });
 
             if (resp.data) {
-                setData(resp.data);
+                setBookmark(prev => {
+                    return produce(prev, (draft) => {
+                        draft.info.name = resp.data.title;
+                        draft.info.description = resp.data.description;
+                        draft.meta.url = resp.data.url;
+                        draft.assets.icon = resp.data.favicon;
+                        draft.assets.thumbnail = resp.data.image;
+                    });
+                });
             }
         } catch (error) {
             console.error("Error extracting HTML: ", error);
@@ -89,92 +131,17 @@ export function NewLinkPage({ params }: { params: URL }) {
 
     return (
         <React.Fragment>
-            {!exists && data
-                ? <FromParsedData
-                    url={url}
-                    tabId={tabId}
-                    loading={loading}
-                    data={data}
-                    setData={setData}
+            {loading
+                ? <Spinner />
+                : <BookmarkView
+                    exists={exists}
+                    bookmark={bookmark}
+                    tabId={Number(tabId)}
+                    onCreate={createBookmark}
+                    updateCoverType={setCoverType}
+                    updateBookmark={updateBookmark}
                 />
-                : exists && bookmark
-                    ? <BookmarkView
-                        exists={exists}
-                        bookmark={bookmark}
-                        tabId={Number(tabId)}
-                        defaultImage={COVER_URL}
-                        updateBookmark={updateBookmark}
-                    />
-                    : <Spinner />
             }
-        </React.Fragment>
-    )
-}
-
-type ParsedDataProps = {
-    url: string
-    tabId: string
-    loading: boolean
-    data: ParsedLinkData
-    setData: React.Dispatch<React.SetStateAction<ParsedLinkData>>
-}
-
-function FromParsedData({ url, tabId, loading, data, setData }: ParsedDataProps) {
-    const onImageError = useCallback(() => {
-        setData(prev => {
-            return produce(prev, (draft) => {
-                draft.image = COVER_URL
-            });
-        });
-    }, [setData]);
-
-    return (
-        <React.Fragment>
-            <InputContainer>
-                <InputField
-                    value={data.name}
-                    placeholder={'Add a Title'}
-                    onChange={(e) => setData({ ...data, name: e.target.value })}
-                />
-
-                <InputFieldLine $isName />
-
-                <InputField
-                    value={data.description}
-                    placeholder={'Add a Description'}
-                    onChange={(e) => setData({ ...data, description: e.target.value })}
-                />
-            </InputContainer>
-
-            <InputContainer $isURL>
-                <InputField
-                    type="url"
-                    value={url}
-                    placeholder={'https://example.com'}
-                    onChange={(e) => setData({ ...data, url: e.target.value })}
-                />
-            </InputContainer>
-
-            <BookmarkImageComponent
-                standalone
-                tabId={Number(tabId)}
-                defaultImage={COVER_URL}
-                onImageError={onImageError}
-                cover={data.image || COVER_URL}
-                onChangeImage={(image) => setData({ ...data, image })}
-            />
-
-            <BookmarkSubmitButton
-            // onClick={onSubmit}
-            // disabled={loading || deleting}
-            >
-                {loading
-                    ? <Spinner color={Colors.light} />
-                    : <BookmarkSubmitButtonText>
-                        Save
-                    </BookmarkSubmitButtonText>
-                }
-            </BookmarkSubmitButton>
         </React.Fragment>
     )
 }

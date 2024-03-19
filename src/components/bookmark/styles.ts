@@ -45,7 +45,7 @@ export const InputFieldLine = styled.div<{ theme: ITheme, $isName?: boolean }>`
     margin: ${p => p.$isName ? '5px 0 5px 0' : '0 0 0 auto'};
 `;
 
-export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme; $standalone?: boolean }>`
+export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme; }>`
     width: 100%;
     height: auto;
     position: relative;
@@ -54,7 +54,6 @@ export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme; $standalon
     align-items: flex-start;
     justify-content: space-between;
     border-radius: 10px;
-    margin-top: ${p => p.$standalone ? '15px' : '0'};
     background-color: ${p => p.theme.background_sub};
 `;
 
@@ -169,7 +168,7 @@ export const BookmarkAction = styled.button<{ theme: ITheme }>`
 
     &:hover {
         cursor: pointer;
-        border: 1px solid ${p => rgba(p.theme.trans_bg, 0.5)};
+        border-color: ${p => rgba(p.theme.trans_bg, 0.5)};
     }
 `;
 
@@ -197,4 +196,26 @@ export const BookmarkActionIcon = styled.div<{ bg?: string }>`
     width: 30px;
     padding: 3px 4px;
     background-color: ${p => p.bg || Colors.primary};
+`;
+
+export const BookmarkStarIcon = styled.button<{ theme: ITheme }>`
+    border: none;
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease-in-out;
+    border: 1px solid transparent;
+    background-color: ${p => p.theme.background_sub};
+    outline: none;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        cursor: pointer;
+        border-color: ${p => rgba(p.theme.trans_bg, 0.5)};
+    }
 `;

@@ -1,10 +1,10 @@
 import { produce } from "immer";
 import { closeTab } from "~router";
-import { makeBookmark } from "~utils";
+import { NIL_OBJECT_ID, makeBookmark } from "~utils";
 import { settingStore } from "~stores";
 import type { browser } from "~browser";
 import { parseHTML } from "~utils/parser";
-import type { Bookmark } from "@linkvite/js";
+import type { Bookmark, Collection } from "@linkvite/js";
 import type { CreateBookmarkProps } from "~api";
 import { useSelector } from "@legendapp/state/react";
 import { sendToBackground } from "@plasmohq/messaging";
@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { CreateMessageRequest, CreateMessageResponse } from "~background/messages/create";
 import type { ExistsMessageRequest, ExistsMessageResponse } from "~background/messages/exists";
 import type { ParseHTMLMessageRequest, ParseHTMLMessageResponse } from "~background/messages/html";
+import { storage } from "~utils/storage";
 
 /**
  * Hook to auto save a bookmark.
@@ -19,8 +20,9 @@ import type { ParseHTMLMessageRequest, ParseHTMLMessageResponse } from "~backgro
  * Used only in popup when user has enabled auto save.
  */
 export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
-    const { autoSave } = useSelector(settingStore);
+    const [url, setUrl] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const { autoSave, autoClose } = useSelector(settingStore);
     const [status, setStatus] = useState<"loading" | "success" | "error" | "exists">("loading");
 
     const message = useMemo(() => {
@@ -58,6 +60,7 @@ export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
         const exists = await checkExists(tab.url);
         if (exists.exists) {
             setStatus("exists");
+            setUrl(exists.bookmark.meta.url);
             setError("Bookmark already exists");
             return;
         }
@@ -79,10 +82,12 @@ export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
             return;
         }
 
+        const collection = await storage.get<Collection | undefined>("collection");
         const parsed = await parseHTML(resp.data[0].result, tab.windowId);
         const bookmark = produce(makeBookmark(), (draft) => {
             draft.meta.url = tab.url;
             draft.info.name = tab.title;
+            draft.info.collection = collection?.id || NIL_OBJECT_ID;
             draft.assets.icon = tab.favIconUrl || draft.assets.icon;
             draft.assets.thumbnail = parsed.image || draft.assets.thumbnail;
             draft.info.description = parsed.description || draft.info.description;
@@ -96,8 +101,11 @@ export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
         }
 
         setStatus("success");
-        await closeTab();
-    }, [checkExists, onCreate]);
+
+        if (autoClose) {
+            await closeTab();
+        }
+    }, [autoClose, checkExists, onCreate]);
 
     useEffect(() => {
         (async () => {
@@ -106,5 +114,9 @@ export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
         })();
     }, [autoSave, autoSaveAction, tab]);
 
-    return { message };
+    return {
+        url,
+        message,
+        exists: status === "exists"
+    };
 }

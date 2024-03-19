@@ -112,3 +112,22 @@ export const CollectionMineOnlyInput = styled.input<{ theme: ITheme }>`
         border: 1px solid ${Colors.primary};
     }
 `;
+
+export const RemoveCollection = styled.button <{ theme: ITheme }>`
+    border: none;
+    outline: none;
+    padding: 0;
+    text-align: center;
+    max-width: 100%;
+    margin-top: 10px;
+    font-size: ${Fonts.xxs};
+    text-decoration: underline;
+    background-color: transparent;
+    color: ${p => p.theme.text_sub};
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        cursor: pointer;
+        color: ${p => p.theme.text};
+    }
+`;

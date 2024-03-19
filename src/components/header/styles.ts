@@ -42,6 +42,7 @@ export const HeaderButton = styled.button<{ theme: ITheme }>`
 
     &:hover {
         cursor: pointer;
+        color: ${Colors.light};
         background-color: ${Colors.primary};
     }
 `;

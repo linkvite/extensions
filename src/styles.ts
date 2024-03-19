@@ -84,8 +84,31 @@ export const PageContainer = styled.div`
 
 export const AutoSaveContainer = styled.div`
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     min-width: 350px;
     min-height: calc(150px - 70px);
+`;
+
+export const AutoSaveAction = styled.button<{ theme: ITheme; $isDelete?: boolean }>`
+    padding: 0;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    color: ${p => p.$isDelete ? Colors.error : p.theme.text};
+    transition: all 0.3s ease-in-out;
+    background-color: transparent;
+    text-decoration: underline;
+    margin: 0 5px;
+    margin-top: 8px;
+    padding: 3px 5px;
+    border-radius: .25rem;
+
+    &:hover {
+        cursor: pointer;
+        color: ${Colors.light};
+        text-decoration: none;
+        background-color: ${p => p.$isDelete ? Colors.error : Colors.primary};
+    }
 `;
