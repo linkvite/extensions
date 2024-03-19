@@ -1,3 +1,7 @@
+## Browser Extension for Linkvite
+
+Easily save and organize bookmarks without leaving the page. This supports any Chronium-based browser, including Chrome, Arc, Edge, Opera, and Brave. Also works on Firefox, and Safari. See Plasmo's [documentation](https://docs.plasmo.com/framework/workflows/faq#what-are-the-officially-supported-browser-targets) for more information.
+
 This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
 
 ## Getting Started
@@ -6,28 +10,56 @@ First, run the development server:
 
 ```bash
 pnpm dev
-# or
-npm run dev
 ```
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, use: `build/chrome-mv3-dev`. 
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+<!-- note -->
+> **Note**: NB: We use the `mv3` manifest version, which is the latest and recommended version for all new extensions.
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
+You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. If you import some module and do some logic, then reload the extension on your browser.
+
+> **Note**: The development build is not optimized for performance, and the size might look bloated. Use the production build for a better experience and performance.
+
+To test the extension of Safari, you need to build the extension and load it manually. To do this, run the following:
+
+```bash
+pnpm test:safari
+```
+
+This will create a production build for the Safari browser. You can then load the extension manually by following the instructions [on Apple's documentation [1]](https://developer.apple.com/documentation/safariservices/safari_app_extensions/building_a_safari_app_extension).
+
+This works by converting the extension to a Safari App Extension, which can be loaded manually on the browser. Read more about this on [Apple's documentation [2]](https://developer.apple.com/documentation/safariservices/safari_web_extensions/converting_a_web_extension_for_safari).
+
+
+For further guidance, [visit Plasmo's Documentation](https://docs.plasmo.com/)
 
 ## Making production build
 
 Run the following:
 
 ```bash
-pnpm build
-# or
-npm run build
+pnpm build:all
 ```
 
 This should create a production bundle for your extension, ready to be zipped and published to the stores.
 
-## Submit to the webstores
+## Building for a specific browser
 
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+To build for a specific browser, run the following:
+
+```bash
+pnpm build:<target>
+```
+
+Where `<target>` is the target browser. For example, to build for Chrome, run:
+
+```bash
+pnpm build:chrome
+```
+
+This will create a production build for the Chrome browser.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

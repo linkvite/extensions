@@ -3,7 +3,7 @@
     "displayName": "Linkvite",
     "version": "0.0.3",
     "description": "The easiest way to save and organize your bookmarks.",
-    "author": "Kayode Ogunmakinwa",
+    "author": "Linkvite <support@linkvite.io>",
     "homepage_url": "https://app.linkvite.io",
     "scripts": {
         "dev": "plasmo dev",
