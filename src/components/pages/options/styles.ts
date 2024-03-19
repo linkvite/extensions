@@ -111,6 +111,7 @@ export const LogoutButton = styled.button<{ theme: ITheme }>`
     border-radius: 8px;
     color: ${Colors.light};
     font-size: ${Fonts.xxs};
+    font-weight: bold;
     background-color: ${Colors.error};
     border: 1px solid transparent;
     transition: all 0.3s ease-in-out;

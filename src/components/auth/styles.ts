@@ -1,6 +1,7 @@
 import { rgba } from "polished";
 import styled, { keyframes } from "styled-components";
 import { AppText } from "~components/text";
+import { settingStore } from "~stores";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
 
 export const AuthContainer = styled.form`
@@ -71,7 +72,7 @@ export const AuthInputField = styled.input<{ $hasError?: boolean; theme: ITheme 
     }
 
     color: ${p => p.theme.text};
-    border: 1px solid ${p => (p.$hasError ? Colors.error : rgba(p.theme.trans_bg, 1))};
+    border: 1px solid ${p => (p.$hasError ? Colors.error : rgba(p.theme.trans_bg, settingStore.theme.get() === "dark" ? 0.5 : 1))};
 `;
 
 export const AuthInputLabel = styled.label<{ $second?: boolean; theme: ITheme }>`
