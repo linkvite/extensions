@@ -203,8 +203,6 @@ export function BookmarkView({
         updateBookmark(produce(bookmark, (draft) => {
             draft.info.collection = c?.id || NIL_OBJECT_ID;
         }));
-
-        await storage.set("collection", c);
     }, [bookmark, updateBookmark]);
 
     const fetchCollection = useCallback(async (id: string) => {
@@ -224,9 +222,9 @@ export function BookmarkView({
     useEffectOnce(() => {
         async function init() {
             const hasCollection = bookmark.info.collection !== NIL_OBJECT_ID;
-            const storedCollection = await storage.get<Collection>("collection");
-            if (storedCollection && !hasCollection) {
-                onSelectCollection(storedCollection);
+            const defaultCollection = await storage.get<Collection>("collection");
+            if (defaultCollection && !hasCollection) {
+                onSelectCollection(defaultCollection);
             }
 
             if (hasCollection) {
