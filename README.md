@@ -4,8 +4,6 @@ Easily save and organize bookmarks without leaving the page. This supports any C
 
 Currently only available on the [Chrome Web Store](https://chromewebstore.google.com/detail/linkvite/jdkkldhichblefcaiogghmmiijcacadn) and [Apple App Store](https://apps.apple.com/us/app/linkvite-safari-extension/id6479678583).
 
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
-
 ## Getting Started
 
 First, run the development server:
