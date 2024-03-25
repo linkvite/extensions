@@ -4,6 +4,8 @@ import type { AuthResponse, HTTPException } from "~types";
 import { authStore, userActions, userStore } from "~stores";
 import xior, { merge, XiorError, type XiorResponse } from "xior";
 import { persistAuthData, storage } from '~utils/storage';
+import { sendToBackground } from "@plasmohq/messaging";
+import type { RefreshRequest, RefreshResponse } from "~background/messages/refresh";
 
 export const api = xior.create({
     timeout: 10000,
@@ -18,14 +20,20 @@ api.interceptors.response.use(resp => resp, async (error: XiorError) => {
         if (!originalRequest['_retry']) {
             originalRequest['_retry'] = true;
 
-            const refreshToken = authStore.refreshToken.get() || await storage.get("token");
-            const resp = await api.post(`${API_DOMAIN}/auth/token/refresh`, { refreshToken });
-            const data = resp.data.data as AuthResponse;
-            await persistAuthData(data);
+            const resp = await sendToBackground<RefreshRequest, RefreshResponse>({
+                name: "refresh",
+                body: {
+                    token: authStore.refreshToken.get()
+                }
+            });
+
+            if ('error' in resp) {
+                return Promise.reject(resp.error);
+            }
 
             const request = merge(originalRequest, {
                 headers: {
-                    Authorization: `Bearer ${data.accessToken}`
+                    Authorization: `Bearer ${resp.token}`
                 }
             });
 
