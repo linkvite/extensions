@@ -1,9 +1,9 @@
 
-import React, { useCallback, useEffect, useState } from "react";
 import { useViewBookmark } from "~hooks";
 import { Spinner } from "~components/spinner";
 import { PageProvider } from "~components/wrapper";
 import { BookmarkView } from "~components/bookmark";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     AutoSaveAction,
     AutoSaveContainer,
@@ -40,10 +40,10 @@ function IndexPopup() {
     }, []);
 
     const {
-        bookmark,
+        view,
         exists,
         loading,
-        view,
+        bookmark,
         updateView,
         updateBookmark,
         createBookmark,

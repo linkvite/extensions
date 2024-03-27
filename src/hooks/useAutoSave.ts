@@ -1,18 +1,14 @@
-import { produce } from "immer";
 import { closeTab } from "~router";
-import { NIL_OBJECT_ID, makeBookmark } from "~utils";
+import { NIL_OBJECT_ID } from "~utils";
 import { settingStore } from "~stores";
 import type { browser } from "~browser";
-import { parseHTML } from "~utils/parser";
-import type { Bookmark, Collection } from "@linkvite/js";
-import type { CreateBookmarkProps } from "~api";
+import { storage } from "~utils/storage";
+import type { Collection } from "@linkvite/js";
 import { useSelector } from "@legendapp/state/react";
 import { sendToBackground } from "@plasmohq/messaging";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { CreateMessageRequest, CreateMessageResponse } from "~background/messages/create";
 import type { ExistsMessageRequest, ExistsMessageResponse } from "~background/messages/exists";
-import type { ParseHTMLMessageRequest, ParseHTMLMessageResponse } from "~background/messages/html";
-import { storage } from "~utils/storage";
+import type { CreateBookmarkRequest, CreateBookmarkResponse } from "~background/messages/link";
 
 /**
  * Hook to auto save a bookmark.
@@ -39,23 +35,6 @@ export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
         });
     }, []);
 
-    const onCreate = useCallback(async (b: Bookmark) => {
-        const data: CreateBookmarkProps = {
-            url: b.meta.url,
-            title: b.info.name,
-            coverType: "default",
-            favicon: b.assets.icon,
-            cover: b.assets.thumbnail,
-            collection: b.info.collection,
-            description: b.info.description,
-        }
-
-        return await sendToBackground<CreateMessageRequest, CreateMessageResponse>({
-            name: "create",
-            body: { data }
-        });
-    }, []);
-
     const autoSaveAction = useCallback(async (tab: browser.Tabs.Tab) => {
         const exists = await checkExists(tab.url);
         if (exists.exists) {
@@ -65,9 +44,12 @@ export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
             return;
         }
 
-        const resp = await sendToBackground<ParseHTMLMessageRequest, ParseHTMLMessageResponse>({
-            name: "html",
-            body: { id: tab.id }
+        const collection = await storage.get<Collection | undefined>("collection");
+        const resp = await sendToBackground<CreateBookmarkRequest, CreateBookmarkResponse>({
+            name: "link",
+            body: {
+                url: tab.url, collection: collection?.id || NIL_OBJECT_ID
+            }
         });
 
         if ('error' in resp) {
@@ -76,36 +58,12 @@ export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
             return;
         }
 
-        if (!resp.data || !resp.data.length) {
-            setStatus("error");
-            setError("No data found");
-            return;
-        }
-
-        const collection = await storage.get<Collection | undefined>("collection");
-        const parsed = await parseHTML(resp.data[0].result, tab.windowId);
-        const bookmark = produce(makeBookmark(), (draft) => {
-            draft.meta.url = tab.url;
-            draft.info.name = tab.title;
-            draft.info.collection = collection?.id || NIL_OBJECT_ID;
-            draft.assets.icon = tab.favIconUrl || draft.assets.icon;
-            draft.assets.thumbnail = parsed.image || draft.assets.thumbnail;
-            draft.info.description = parsed.description || draft.info.description;
-        });
-
-        const bookmarkResp = await onCreate(bookmark);
-        if ('error' in bookmarkResp) {
-            setStatus("error");
-            setError(bookmarkResp.error);
-            return;
-        }
-
         setStatus("success");
 
         if (autoClose) {
             await closeTab();
         }
-    }, [autoClose, checkExists, onCreate]);
+    }, [autoClose, checkExists]);
 
     useEffect(() => {
         (async () => {

@@ -4,8 +4,6 @@ import type { AuthResponse, HTTPException } from "~types";
 import { authStore, userActions, userStore } from "~stores";
 import xior, { merge, XiorError, type XiorResponse } from "xior";
 import { persistAuthData, storage } from '~utils/storage';
-import { sendToBackground } from "@plasmohq/messaging";
-import type { RefreshRequest, RefreshResponse } from "~background/messages/refresh";
 
 export const api = xior.create({
     timeout: 10000,
@@ -20,20 +18,14 @@ api.interceptors.response.use(resp => resp, async (error: XiorError) => {
         if (!originalRequest['_retry']) {
             originalRequest['_retry'] = true;
 
-            const resp = await sendToBackground<RefreshRequest, RefreshResponse>({
-                name: "refresh",
-                body: {
-                    token: authStore.refreshToken.get()
-                }
-            });
-
-            if ('error' in resp) {
-                return Promise.reject(resp.error);
-            }
+            const refreshToken = authStore.refreshToken.get() || await storage.get("token");
+            const resp = await api.post(`${API_DOMAIN}/auth/token/refresh`, { refreshToken });
+            const data = resp.data.data as AuthResponse;
+            await persistAuthData(data);
 
             const request = merge(originalRequest, {
                 headers: {
-                    Authorization: `Bearer ${resp.token}`
+                    Authorization: `Bearer ${data.accessToken}`
                 }
             });
 
@@ -188,6 +180,19 @@ export async function handleBookmarkExists({ url }: { url: string }): Promise<Bo
     return await api
         .post(endpoint, { url })
         .then(handleSuccess)
+        .catch(handleError);
+}
+
+export async function handleCreateLinkBookmark({ url, collection }: { url: string; collection?: string }) {
+    const endpoint = `/bookmarks`;
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    return await api
+        .post(endpoint, { url, collection })
         .catch(handleError);
 }
 
@@ -360,7 +365,7 @@ type SearchProps = {
 
 export async function handleFindCollections({ query, limit, owner }: SearchProps) {
     let endpoint = `/search?q=${query}`;
-    endpoint += `&sort=-date`;
+    endpoint += `&sort=-updatedAt`;
     endpoint += `&public=false`;
     endpoint += `&limit=${limit}`;
     endpoint += `&path=collections`;

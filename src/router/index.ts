@@ -8,9 +8,14 @@ const base = '/'
  * @param {string} path - the path for the new window
  * @return {Promise<browser.windows.Window>} a Promise that resolves to the newly created window
  */
-export async function route(path: string) {
-    const height = 800;
+export async function route(path: string, newTab?: boolean) {
+    const url = `${base}${path}`;
+    if (newTab) {
+        return await browser.tabs.create({ url });
+    }
+
     const width = 600;
+    const height = 800;
     const origin = await browser.windows.getCurrent();
 
     const values = {
@@ -19,13 +24,13 @@ export async function route(path: string) {
     };
 
     return await browser.windows.create({
+        url,
+        width,
+        height,
         type: 'popup',
         top: values.top,
         left: values.left,
-        url: `${base}${path}`,
-        height,
-        width
-    })
+    });
 }
 
 /**

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { closeTab, route } from "~router";
-import { APP_DOMAIN, FAVICON_URL } from "~utils";
+import { APP_DOMAIN, FAVICON_URL, IS_SAFARI } from "~utils";
 import {
     Favicon,
     LinkviteLogo,
@@ -33,7 +33,7 @@ export function LogoAndTitle({ noClose }: { noClose?: boolean }) {
     }, []);
 
     function onSettings() {
-        route("tabs/index.html?type=options");
+        route("tabs/index.html?type=options", !IS_SAFARI)
         closeTab();
     }
 

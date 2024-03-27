@@ -1,12 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
 import type { Theme } from "~types";
-import { settingStore } from "~stores";
+import { settingStore, userStore } from "~stores";
+import { storage } from "~utils/storage";
+import { AppText } from "~components/text";
+import type { Collection } from "@linkvite/js";
 import { useAuth } from "~components/wrapper/auth";
 import { useSelector } from "@legendapp/state/react";
 import { AppDialog } from "~components/primitives/dialog";
-import type { Collection } from "@linkvite/js";
-import { storage } from "~utils/storage";
 import { CollectionsModal } from "~components/collections";
+import React, { useCallback, useEffect, useState } from "react";
 import {
     OptionsContainer,
     Label,
@@ -19,7 +20,8 @@ import {
 
 export function OptionsPage() {
     const { logout } = useAuth();
-    const store = useSelector(settingStore);
+    const user = useSelector(userStore);
+    const settings = useSelector(settingStore);
     const [collection, setCollection] = useState<Collection | null>(null);
     useEffect(() => {
         async function init() {
@@ -42,7 +44,7 @@ export function OptionsPage() {
             <Label htmlFor="theme">Theme</Label>
             <ThemeSelect
                 id="theme"
-                value={store.theme}
+                value={settings.theme}
                 onChange={(e) => settingStore.theme.set(e.target.value as Theme)}
             >
                 <option value="light">Light</option>
@@ -70,16 +72,36 @@ export function OptionsPage() {
             </AppDialog>
 
             <AutoContainers>
-                <AutoCheckInput type="checkbox" checked={store.autoSave} onChange={() => settingStore.autoSave.set(!store.autoSave)} id="autoSave" />
+                <AutoCheckInput type="checkbox" checked={settings.autoSave} onChange={() => settingStore.autoSave.set(!settings.autoSave)} id="autoSave" />
                 <Label htmlFor="autoSave">Auto Save</Label>
             </AutoContainers>
 
             <AutoContainers>
-                <AutoCheckInput type="checkbox" checked={store.autoClose} onChange={() => settingStore.autoClose.set(!store.autoClose)} id="autoClose" />
+                <AutoCheckInput type="checkbox" checked={settings.autoClose} onChange={() => settingStore.autoClose.set(!settings.autoClose)} id="autoClose" />
                 <Label htmlFor="autoClose">Auto Close</Label>
             </AutoContainers>
 
-            <LogoutButton onClick={logout}>Logout</LogoutButton>
+            <Label
+                style={{ marginTop: 15 }}
+            >
+                Logged in as: {user.username}
+            </Label>
+
+            <AppDialog
+                title="Logout"
+                minHeight={100}
+                trigger={
+                    <LogoutButton>Logout</LogoutButton>
+                }
+            >
+                <AppText>Are you sure you want to logout?</AppText>
+                <LogoutButton
+                    onClick={logout}
+                    style={{ marginTop: 20 }}
+                >
+                    Logout
+                </LogoutButton>
+            </AppDialog>
         </OptionsContainer >
     )
 }

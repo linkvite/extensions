@@ -1,5 +1,7 @@
 export const IS_DEV = process.env.NODE_ENV === "development";
 
+export const IS_SAFARI = navigator.userAgent.includes("Safari") && !navigator.userAgent.includes("Chrome");
+
 export const APP_DOMAIN = "https://app.linkvite.io"
 export const WS_DOMAIN = "wss://api.linkvite.io/ws";
 export const API_DOMAIN = "https://api.linkvite.io/v1";
