@@ -1,22 +1,21 @@
 {
     "name": "linkvite-extension",
     "displayName": "Linkvite",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "The easiest way to save and organize your bookmarks.",
     "author": "Linkvite <support@linkvite.io>",
     "homepage_url": "https://app.linkvite.io",
     "scripts": {
         "dev": "plasmo dev",
         "build": "plasmo build",
+        "package": "pnpm run build --zip",
         "dev:firefox": "plasmo dev --target=firefox-mv3",
         "build:firefox": "plasmo build --target=firefox-mv3",
-        "build:safari": "plasmo build --target=safari-mv3",
-        "test:safari": "pnpm run build:safari && xcrun safari-web-extension-converter build/safari-mv3-prod",
-        "build:all": "pnpm run build && pnpm run build:firefox && pnpm run build:safari",
-        "package:chrome": "pnpm run build --zip",
-        "package:safari": "pnpm run build:safari --zip",
         "package:firefox": "pnpm run build:firefox --zip",
-        "package:all": "pnpm run package:chrome && pnpm run package:firefox && pnpm run package:safari",
+        "build:safari": "plasmo build --target=safari-mv3",
+        "package:safari": "pnpm run build:safari --zip",
+        "test:safari": "pnpm run build:safari && xcrun safari-web-extension-converter build/safari-mv3-prod",
+        "mobile:prepare": "pnpm run build:safari && node prepare.js",
         "lint": "eslint . --ext .ts --ext .tsx"
     },
     "dependencies": {

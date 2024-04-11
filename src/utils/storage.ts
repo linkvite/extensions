@@ -1,18 +1,12 @@
-import { Storage } from "@plasmohq/storage"
+import type { User } from "@linkvite/js";
+import { Storage } from "@plasmohq/storage";
+import { authStore, settingStore, userActions, userStore } from "~stores";
+import type { ClassConstructor, ObservablePersistLocal } from "@legendapp/state";
+import { persistObservable, configureObservablePersistence } from '@legendapp/state/persist';
+
 export const storage = new Storage();
 
-import type {
-    ClassConstructor,
-    ObservablePersistLocal
-} from "@legendapp/state";
-import {
-    persistObservable,
-    configureObservablePersistence
-} from '@legendapp/state/persist';
-import { authStore, settingStore, userActions, userStore } from "~stores";
-import type { User } from "@linkvite/js";
-
-interface IPersistOptions {
+type PersistOptions = {
     pluginLocal: ClassConstructor<ObservablePersistLocal, unknown[]> | undefined
 }
 
@@ -20,7 +14,7 @@ interface IPersistOptions {
  * Persist the state observers to local storage.
  * Important: This should only be called once at the root of the app.
  */
-export function persistStateObservers({ pluginLocal }: IPersistOptions = { pluginLocal: undefined }) {
+export function persistStateObservers({ pluginLocal }: PersistOptions = { pluginLocal: undefined }) {
     configureObservablePersistence({
         pluginLocal,
     });

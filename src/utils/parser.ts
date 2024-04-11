@@ -1,6 +1,6 @@
 import { browser } from "~browser";
-import { COVER_URL, normalize } from "~utils";
 import * as htmlparser from "htmlparser2";
+import { COVER_URL, normalize } from "~utils";
 
 export type ParsedHTML = {
     image: string;
