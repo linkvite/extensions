@@ -1,6 +1,8 @@
+import { closeTab } from "~router";
 import React, { useMemo } from "react";
-import { closeTab, route } from "~router";
-import { APP_DOMAIN, FAVICON_URL, IS_SAFARI } from "~utils";
+import { settingStore } from "~stores";
+import { APP_DOMAIN, FAVICON_URL } from "~utils";
+import { useSelector } from "@legendapp/state/react";
 import {
     Favicon,
     LinkviteLogo,
@@ -28,26 +30,32 @@ export function Logo({ body }: { body?: React.ReactNode }) {
 }
 
 export function LogoAndTitle({ noClose }: { noClose?: boolean }) {
+    const { currentPage } = useSelector(settingStore);
+
     const inOptions = useMemo(() => {
-        return location?.href?.endsWith("tabs/index.html?type=options");
-    }, []);
+        return currentPage === "options";
+    }, [currentPage]);
 
     function onSettings() {
-        route("tabs/index.html?type=options", !IS_SAFARI)
-        closeTab();
+        settingStore.currentPage.set(inOptions ? "popup" : "options");
+    }
+
+    function onClose() {
+        settingStore.currentPage.set("popup");
+        closeTab(true);
     }
 
     const body = (
         <HeaderButtons>
             {inOptions ? null
                 : <HeaderButton onClick={onSettings}>
-                    Options
+                    Settings
                 </HeaderButton>
             }
 
             {noClose ? null
                 : <HeaderButton
-                    onClick={() => closeTab(true)}
+                    onClick={onClose}
                 >
                     Close
                 </HeaderButton>

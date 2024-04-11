@@ -3,20 +3,24 @@ import { NIL_OBJECT_ID } from "~utils";
 import { settingStore } from "~stores";
 import type { browser } from "~browser";
 import { storage } from "~utils/storage";
-import type { Collection } from "@linkvite/js";
+import type { Bookmark, Collection } from "@linkvite/js";
 import { useSelector } from "@legendapp/state/react";
 import { sendToBackground } from "@plasmohq/messaging";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ExistsMessageRequest, ExistsMessageResponse } from "~background/messages/exists";
 import type { CreateBookmarkRequest, CreateBookmarkResponse } from "~background/messages/link";
 
+type Props = {
+    tab: browser.Tabs.Tab;
+    setBookmark: (bookmark: Bookmark) => void;
+}
+
 /**
  * Hook to auto save a bookmark.
  * 
  * Used only in popup when user has enabled auto save.
  */
-export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
-    const [url, setUrl] = useState<string | null>(null);
+export function useAutoSave({ tab, setBookmark }: Props) {
     const [error, setError] = useState<string | null>(null);
     const { autoSave, autoClose } = useSelector(settingStore);
     const [status, setStatus] = useState<"loading" | "success" | "error" | "exists">("loading");
@@ -39,7 +43,7 @@ export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
         const exists = await checkExists(tab.url);
         if (exists.exists) {
             setStatus("exists");
-            setUrl(exists.bookmark.meta.url);
+            setBookmark(exists.bookmark);
             setError("Bookmark already exists");
             return;
         }
@@ -63,17 +67,18 @@ export function useAutoSave({ tab }: { tab: browser.Tabs.Tab }) {
         if (autoClose) {
             await closeTab();
         }
-    }, [autoClose, checkExists]);
+    }, [autoClose, checkExists, setBookmark]);
 
     useEffect(() => {
-        (async () => {
-            if (!autoSave || !tab) return;
+        async function init() {
+            if (!autoSave || !tab || !tab?.url) return;
             await autoSaveAction(tab);
-        })();
+        }
+
+        init();
     }, [autoSave, autoSaveAction, tab]);
 
     return {
-        url,
         message,
         exists: status === "exists"
     };

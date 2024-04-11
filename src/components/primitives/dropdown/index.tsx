@@ -18,16 +18,17 @@ import {
 type Props = {
     children: React.ReactNode;
     trigger: React.ReactNode;
+    disabled?: boolean;
 }
 
 type WithChildren = {
     children: React.ReactNode;
 }
 
-function Root({ children, trigger }: Props) {
+function Root({ children, trigger, disabled }: Props) {
     return (
         <RadixDropdownMenu.Root>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger disabled={disabled}>
                 {trigger}
             </DropdownMenuTrigger>
 

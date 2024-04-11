@@ -83,3 +83,18 @@ export function makeBookmark(): Bookmark {
 export function pluralize(count: number, singular: string, plural: string) {
     return count <= 1 ? singular : plural;
 }
+
+/**
+ * Parse the qr-auth url.
+ * to get the string after /qr-auth/
+ *
+ * @param {String} data The qr-auth url.
+ * @returns A parsed response object, for navigation.
+ */
+export function parseQRAuth(data: string) {
+    const id = data.indexOf("/qr-auth/") > -1
+        ? data.substring(data.indexOf("/qr-auth/") + 9)
+        : "";
+
+    return { id };
+}

@@ -50,14 +50,15 @@ export function TagsModal({ tags, setTags }: Props) {
         if (!tag) return;
 
         const newTag = tag.trim().replace(/\s/g, '');
-        const unique = new Set([...uniqueTags, ...newTag.split(',')]);
+        const split = newTag.split(',');
+        const unique = new Set([...uniqueTags, ...split]);
 
         setTags(Array.from(unique));
         setCurrentTag(currentTag === tag ? "" : tag);
 
         setTag("");
 
-        addToRecent(newTag);
+        for (const t of split) addToRecent(t);
     }
 
     async function addToRecent(tag: string) {
@@ -171,39 +172,36 @@ type TagItemProps = {
 
 function Tag({ tag, currentTag, onPressTag, onRemoveTag }: TagItemProps) {
     const [closeHovered, setCloseHovered] = useState(false);
-
     return (
-        <React.Fragment>
-            <TagItem
-                type="button"
-                $closeHovered={closeHovered}
-                onClick={() => onPressTag(tag)}
+        <TagItem
+            type="button"
+            $closeHovered={closeHovered}
+            onClick={() => onPressTag(tag)}
+        >
+            <AppText
+                color="light"
+                fontSize="xxs"
             >
-                <AppText
-                    color="light"
-                    fontSize="xxs"
-                >
-                    {tag}
-                </AppText>
+                {tag}
+            </AppText>
 
-                {currentTag && currentTag === tag
-                    ? <TagItemCloseButton
-                        role="button"
-                        aria-label="remove tag"
-                        tabIndex={0}
-                        onClick={() => onRemoveTag?.(tag)}
-                        onMouseEnter={() => setCloseHovered(true)}
-                        onMouseLeave={() => setCloseHovered(false)}
-                    >
-                        <IoMdClose
-                            size={14}
-                            name="ios-close"
-                            color={Colors.light}
-                        />
-                    </TagItemCloseButton>
-                    : null
-                }
-            </TagItem>
-        </React.Fragment>
+            {currentTag && currentTag === tag
+                ? <TagItemCloseButton
+                    role="button"
+                    aria-label="remove tag"
+                    tabIndex={0}
+                    onClick={() => onRemoveTag?.(tag)}
+                    onMouseEnter={() => setCloseHovered(true)}
+                    onMouseLeave={() => setCloseHovered(false)}
+                >
+                    <IoMdClose
+                        size={14}
+                        name="ios-close"
+                        color={Colors.light}
+                    />
+                </TagItemCloseButton>
+                : null
+            }
+        </TagItem>
     )
 }

@@ -1,13 +1,12 @@
 import { useTheme } from "~hooks";
-import { v4 as UUID } from 'uuid';
 import { QRCodeSVG } from "qrcode.react";
 import { Colors } from "~utils/styles";
 import type { AuthResponse } from "~types";
 import { Spinner } from "~components/spinner";
-import useWebSocket from 'react-use-websocket';
-import { QR_LOGO_URL, WS_DOMAIN } from "~utils";
+import { API_DOMAIN, QR_LOGO_URL, WS_ENDPOINT, parseQRAuth } from "~utils";
 import { type OnLogin } from "~components/wrapper/auth";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
+import { Centrifuge, type ServerPublicationContext } from 'centrifuge';
 import {
     AlreadyRegistered,
     AuthQrContainer,
@@ -16,6 +15,9 @@ import {
     QRSubTitle,
 } from './styles';
 import { persistAuthData } from "~utils/storage";
+import toast from "react-hot-toast";
+import { useEffectOnce } from "@legendapp/state/react";
+import { AppText } from "~components/text";
 
 type QROwner = {
     avatar: string;
@@ -44,79 +46,125 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
     const isDark = colorScheme === 'dark';
     const spinnerColor = isDark ? Colors.light : Colors.dark;
 
+    const ws = useRef<Centrifuge | null>(null);
+
     const [qrCode, setQrCode] = useState("");
-    const [userID, setUserID] = useState(UUID());
-    const [roomID, setRoomID] = useState(UUID());
     const [qrCodeLoading, setQrCodeLoading] = useState(true);
     const [owner, setOwner] = useState<QROwner | null>(null);
 
-    const getMessage = useCallback((isRestart?: boolean) => {
-        return {
-            data: {},
-            event: isRestart
-                ? "restart:qr:session"
-                : "start:qr:session",
-        }
+    const stopLoading = useCallback(() => {
+        setTimeout(() => {
+            setQrCodeLoading(false);
+        }, 1000);
     }, []);
 
-    const endpoint = `${WS_DOMAIN}/${roomID}/${userID}`;
-    const { sendJsonMessage } = useWebSocket(endpoint, {
-        onOpen: () => {
-            sendJsonMessage(getMessage());
-        },
-        onMessage: (event) => {
-            handleSocketMessage(event);
-        }
-    });
+    async function closeSession() {
+        const { id } = parseQRAuth(qrCode);
+        (async () => {
+            if (id) {
+                ws.current?.publish(`#${id}`, { event: "qr:session:canceled" });
+            }
+        })()
+            .finally(() => {
+                setOwner(null);
+                ws.current?.disconnect();
+                ws.current = null;
+            })
+    }
 
-    const restartSession = useCallback(() => {
-        setQrCodeLoading(true);
-        setRoomID(UUID());
-        setUserID(UUID());
-        setOwner(null);
+    function processEvent(ctx: ServerPublicationContext) {
+        const data = ctx?.data?.data;
+        const event = ctx?.data?.event as string;
 
-        const message = getMessage(true);
-        return sendJsonMessage(message);
-    }, [getMessage, sendJsonMessage]);
-
-    const handleSocketMessage = useCallback(async (event: MessageEvent) => {
-        if (!event?.data) return;
-        const data = JSON.parse(event.data);
-
-        if (data.event === "qr:session:started") {
-            const endpoint = data?.data?.endpoint;
-            if (!endpoint) return;
-
-            setQrCode(data?.data?.endpoint);
-
-            setTimeout(() => {
-                setQrCodeLoading(false);
-            }, 1000);
+        if (!event) {
+            toast.error("Missing event");
+            return;
         }
 
-        if (data.event === "qr:session:validated") {
-            const owner = data?.data;
-            if (!owner) return;
-
-            setOwner(owner);
-        }
-
-        if (data.event === "qr:session:rejected") {
+        if (event === "qr:session:closed") {
+            toast.error("QR session closed by the other device.");
+            setOwner(null);
             restartSession();
         }
 
-        if (data.event === "qr:session:accepted") {
-            const response = data?.data as AuthResponse;
-            if (!response) return;
+        if (event === "qr:session:validated") {
+            if (!data) {
+                toast.error("Failed to validate QR code.");
+                return;
+            }
+            setOwner(data);
+        }
+
+        if (event === "qr:session:accepted") {
+            const response = data as AuthResponse;
+            if (!response) {
+                toast.error("Failed to log in.");
+                return;
+            }
 
             const { refreshToken, user } = response;
-            await persistAuthData(response);
+            persistAuthData(response);
+            toast.success("Logged in successfully.");
             onLogin(user, refreshToken);
         }
-    }, [onLogin, restartSession]);
+    }
 
-    useEffect(() => {
-        // refresh the QR code every 5 minutes.
+    async function init() {
+        setQrCodeLoading(true);
+
+        const res = await fetch(`${API_DOMAIN}/qr-auth/new`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!res.ok) {
+            toast.error("Failed to get QR code.");
+            setQrCode("");
+            stopLoading();
+            return;
+        }
+
+        const data = await res.json() as { data: { token: string; endpoint: string; } };
+        const token = data.data.token;
+        if (!token) {
+            stopLoading();
+            toast.error("Failed to get QR code.");
+            return;
+        }
+
+        setQrCode(data.data.endpoint);
+        stopLoading();
+
+        if (!ws.current) {
+            ws.current = new Centrifuge([{
+                transport: 'websocket',
+                endpoint: WS_ENDPOINT,
+            }], { token });
+            ws.current
+                .on("publication", processEvent)
+                .connect();
+        }
+    }
+
+    async function restartSession() {
+        setQrCodeLoading(true);
+        closeSession();
+
+        await init();
+    }
+
+    useEffectOnce(() => {
+        init();
+
+        return () => {
+            ws.current?.disconnect();
+            closeSession();
+        }
+    });
+
+    useEffectOnce(() => {
         const FIVE_MINUTES = 5 * 60 * 1000;
         const interval = setInterval(() => {
             restartSession();
@@ -125,7 +173,7 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
         return () => {
             clearInterval(interval);
         }
-    }, [getMessage, sendJsonMessage, restartSession]);
+    });
 
     return (
         <AuthQrContainer>
@@ -137,14 +185,18 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
                             src={owner.avatar}
                             alt="qr-avatar"
                         />
-                        : <AuthQrCode qrCode={qrCode} />
+                        : qrCode ? <AuthQrCode qrCode={qrCode} />
+                            : <AppText color="dark" textAlign='center' $isSubText>
+                                Oh no! Could not load QR code {":("}
+                            </AppText>
                 }
             </QRContainer>
 
             <QRSubTitle $isSubText>
                 {owner
                     ? `Trying to login as @${owner.username}?`
-                    : `Scan this code with the Linkvite Mobile App to log in.`
+                    : qrCode ? `Scan this code with the Linkvite Mobile App to log in.`
+                        : "Ran into an issue loading the QR code. Please refresh the page to try again."
                 }
             </QRSubTitle>
 

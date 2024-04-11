@@ -8,9 +8,10 @@ export const OptionsContainer = styled.div<{ theme: ITheme }>`
     background-color: ${p => p.theme.background_sub};
     width: 100%;
     height: 100%;
-    max-width: 300px;
+    max-width: 576px;
     padding: 15px;
     border-radius: 8px;
+    margin-top: 15px;
 `;
 
 export const Label = styled.label<{ theme: ITheme }>`
@@ -21,16 +22,23 @@ export const Label = styled.label<{ theme: ITheme }>`
 
 export const ThemeSelect = styled.select<{ theme: ITheme }>`
     width: 100%;
-    padding: 10px 5px;
+    padding: 10px 10px;
     border-radius: 8px;
     font-size: ${Fonts.xxs};
     color: ${p => p.theme.text};
     margin-bottom: 20px;
     margin-top: 10px;
     outline: none;
-    background-color: ${p => p.theme.trans_bg};
     border: 1px solid ${p => rgba(p.theme.text, 0.2)};
     transition: all 0.3s ease-in-out;
+    
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='%23${p => p.theme.text_sub.replace("#", "")}'><polygon points='0,0 100,0 50,50'/></svg>") no-repeat;
+    background-size: 10px;
+    background-color: ${p => p.theme.trans_bg};
+    background-position: calc(100% - 10px) 60%;
 
     &:hover {
         cursor: pointer;
@@ -46,7 +54,6 @@ export const CollectionContainer = styled.button<{ theme: ITheme }>`
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 300px;
     padding: 10px;
     margin-top: 10px;
     border-radius: 8px;

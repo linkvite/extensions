@@ -3,6 +3,14 @@ import styled from "styled-components";
 import { AppText } from "~components/text";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
 
+export const ViewBookmarkContainer = styled.div`
+    width: 100%;
+    max-width: 576px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+`;
+
 export const InputContainer = styled.div<{ theme: ITheme, $isURL?: boolean }>`
     width: 100%;
     display: flex;
@@ -47,7 +55,8 @@ export const InputFieldLine = styled.div<{ theme: ITheme, $isName?: boolean }>`
 
 export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme; }>`
     width: 100%;
-    height: auto;
+    min-width: 150px;
+    height: 150px;
     position: relative;
     display: flex;
     flex-direction: row;
@@ -69,7 +78,7 @@ export const BookmarkCoverContainer = styled.div`
 
 export const BookmarkNewImage = styled.img <{ theme: ITheme }>`
     width: 100%;
-    height: 200px;
+    height: 100%;
     border-radius: 8px;
     object-fit: cover;
     background-color: ${p => p.theme.trans_bg};
@@ -143,13 +152,16 @@ export const BookmarkActionsContainer = styled.div`
     align-items: center;
     justify-content: space-between;
     margin-top: 15px;
+    height: 150px;
 `;
 
-export const BookmarkActionsSubContainer = styled.div`
+export const BookmarkActionsSubContainer = styled.div<{ $isImage?: boolean }>`
     display: flex;
-    width: 49%;
+    width: 100%;
+    height: 100%;
     flex-direction: column;
-    align-self: flex-start;
+    justify-content: space-evenly;
+    width: ${p => p.$isImage ? '40%' : 'calc(60% - 15px)'};
 `;
 
 export const BookmarkAction = styled.button<{ theme: ITheme }>`
@@ -160,7 +172,7 @@ export const BookmarkAction = styled.button<{ theme: ITheme }>`
     align-items: center;
     justify-content: flex-start;
     border-radius: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     outline: none;
     border: 1px solid transparent;
     transition: all 0.3s ease-in-out;
@@ -203,8 +215,8 @@ export const BookmarkStarIcon = styled.button<{ theme: ITheme }>`
     margin: 0px;
     padding: 0px;
     display: flex;
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     border-radius: 8px;
     align-items: center;
     justify-content: center;

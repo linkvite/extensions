@@ -34,11 +34,11 @@ async function create() {
 
 async function handleClick({ linkUrl, srcUrl, menuItemId }: browser.Menus.OnClickData) {
     const tab = await getCurrentTab();
-    const base = 'tabs/index.html?type';
+    const base = 'popup.html?page';
 
     async function onNewBookmark() {
         if (!tab) return;
-        return await route(`${base}=bookmark&tabId=${tab.id}`);
+        return await route(`${base}=popup&tabId=${tab.id}`);
     }
 
     async function onNewLink() {

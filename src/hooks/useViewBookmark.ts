@@ -18,64 +18,23 @@ import type {
     ParseMessageResponse
 } from "~background/messages/parse";
 import toast from "react-hot-toast";
-import { useSelector } from "@legendapp/state/react";
 import { settingStore } from "~stores";
-import type { CreateBookmarkProps } from "~api";
-import type {
-    CreateMessageRequest,
-    CreateMessageResponse
-} from "~background/messages/create";
-import { closeTab } from "~router";
+import { useSelector } from "@legendapp/state/react";
 
 type Props = {
     tab: browser.Tabs.Tab;
-    isPopup?: boolean;
+    setBookmark: (bookmark: Bookmark) => void;
 }
 
-export function useViewBookmark({ tab, isPopup = false }: Props) {
+export function useViewBookmark({ tab, setBookmark }: Props) {
     const [exists, setExists] = useState(false);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState<"local" | "api">("local");
 
-    const { autoSave, autoClose } = useSelector(settingStore);
-    const [bookmark, setBookmark] = useState<Bookmark>(null);
+    const { autoSave } = useSelector(settingStore);
     const [apiData, setAPIData] = useState<ParsedLinkData | null>(null);
     const [localData, setLocalData] = useState<ParsedHTML | null>(null);
     const [coverType, setCoverType] = useState<"default" | "custom">("default");
-
-    const updateBookmark = useCallback((data: Bookmark) => {
-        setBookmark(() => data);
-    }, []);
-
-    const createBookmark = useCallback(async () => {
-        const data: CreateBookmarkProps = {
-            coverType,
-            tags: bookmark.tags,
-            url: bookmark.meta.url,
-            title: bookmark.info.name,
-            starred: bookmark.isLiked,
-            favicon: bookmark.assets.icon,
-            cover: bookmark.assets.thumbnail,
-            collection: bookmark.info.collection,
-            description: bookmark.info.description,
-        }
-
-        const resp = await sendToBackground<CreateMessageRequest, CreateMessageResponse>({
-            name: "create",
-            body: { data }
-        });
-
-        if ('error' in resp) {
-            toast.error(resp.error);
-            return;
-        }
-
-        toast.success(resp.message);
-
-        if (autoClose) {
-            closeTab();
-        }
-    }, [bookmark, coverType, autoClose]);
 
     const setAPIView = useCallback((description?: string, image?: string) => {
         const data = produce(makeBookmark(), (draft) => {
@@ -85,8 +44,8 @@ export function useViewBookmark({ tab, isPopup = false }: Props) {
             draft.info.description = description || draft.info.description;
         });
 
-        setBookmark(() => data);
-    }, [tab?.title, tab?.url]);
+        setBookmark(data);
+    }, [setBookmark, tab?.title, tab?.url]);
 
     const setLocalView = useCallback((description?: string, image?: string) => {
         const data = produce(makeBookmark(), (draft) => {
@@ -96,8 +55,8 @@ export function useViewBookmark({ tab, isPopup = false }: Props) {
             draft.info.description = description || draft.info.description;
         });
 
-        setBookmark(() => data);
-    }, [tab?.title, tab?.url]);
+        setBookmark(data);
+    }, [setBookmark, tab?.title, tab?.url]);
 
     const updateView = useCallback((v: "local" | "api") => {
         setView(v);
@@ -152,7 +111,7 @@ export function useViewBookmark({ tab, isPopup = false }: Props) {
     }, []);
 
     useEffect(() => {
-        if (!tab || (autoSave && isPopup)) return;
+        if (!tab || !tab?.url || autoSave) return;
         const fetchCurrentTab = async () => {
             const data = await checkExists(tab.url);
             if (!data.exists) {
@@ -169,15 +128,13 @@ export function useViewBookmark({ tab, isPopup = false }: Props) {
         };
 
         fetchCurrentTab();
-    }, [autoSave, checkExists, fetchFromAPI, fetchFromLocal, isPopup, tab]);
+    }, [autoSave, checkExists, fetchFromAPI, fetchFromLocal, setBookmark, tab]);
 
     return {
         view,
         exists,
-        bookmark,
+        coverType,
         updateView,
-        updateBookmark,
-        createBookmark,
         loading: loading || !tab,
         updateCoverType: setCoverType,
     }

@@ -19,7 +19,8 @@ import {
     BookmarkActionIcon,
     SelectCollectionImage,
     BookmarkActionText,
-    BookmarkStarIcon
+    BookmarkStarIcon,
+    ViewBookmarkContainer
 } from "./styles";
 import { Colors } from "~utils/styles";
 import { Spinner } from "~components/spinner";
@@ -64,7 +65,7 @@ type BookmarkViewProps = {
     bookmark: Bookmark;
     hideURL?: boolean;
     disabledImage?: boolean;
-    onCreate: () => Promise<void>;
+    onCreate: () => void;
     updateBookmark: (data: Bookmark) => void;
     updateCoverType?: (type: "default" | "custom") => void;
 };
@@ -73,8 +74,8 @@ export function BookmarkView({
     tabId,
     exists,
     bookmark,
-    hideURL = false,
-    disabledImage = false,
+    hideURL,
+    disabledImage,
     onCreate,
     updateBookmark,
     updateCoverType
@@ -196,7 +197,7 @@ export function BookmarkView({
             ? await onUpdate()
             : await onCreate();
         setLoading(false);
-    }, [onCreate, onUpdate, exists]);
+    }, [exists, onCreate, onUpdate]);
 
     const onSelectCollection = useCallback(async (c?: Collection) => {
         setCollection(c);
@@ -236,7 +237,7 @@ export function BookmarkView({
     });
 
     return (
-        <React.Fragment>
+        <ViewBookmarkContainer>
             <InputContainer>
                 <InputField
                     value={bookmark.info.name}
@@ -265,11 +266,11 @@ export function BookmarkView({
             )}
 
             <BookmarkActionsContainer>
-                <BookmarkActionsSubContainer>
+                <BookmarkActionsSubContainer $isImage>
                     <BookmarkImageComponent
                         tabId={tabId}
-                        disabled={disabledImage}
                         onImageError={onImageError}
+                        disabledImage={disabledImage}
                         onChangeImage={onChangeImage}
                         cover={bookmark.assets.thumbnail}
                     />
@@ -382,19 +383,19 @@ export function BookmarkView({
                     }
                 </BookmarkDeleteButton>
             )}
-        </React.Fragment>
+        </ViewBookmarkContainer>
     )
 }
 
 type BookmarkImageComponentProps = {
     tabId: number;
     cover: string;
-    disabled?: boolean;
+    disabledImage?: boolean;
     onImageError: () => void;
     onChangeImage: (src: string, type: "default" | "custom") => void;
 };
 
-function BookmarkImageComponent({ disabled, tabId, cover, onImageError, onChangeImage }: BookmarkImageComponentProps) {
+function BookmarkImageComponent({ tabId, cover, disabledImage, onImageError, onChangeImage }: BookmarkImageComponentProps) {
     const [coverURL, setCoverURL] = useState("");
     const linkRef = useRef<HTMLButtonElement>(null);
     const mediaRef = useRef<HTMLInputElement>(null);
@@ -474,28 +475,27 @@ function BookmarkImageComponent({ disabled, tabId, cover, onImageError, onChange
                     crossOrigin="use-credentials"
                 />
 
-                {disabled ? null : (
-                    <BookmarkNewImageIcon>
-                        <DropdownMenu.Root
-                            trigger={
-                                <HiCamera
-                                    size={24}
-                                    color={Colors.light}
-                                    style={{ opacity: 0.7 }}
-                                />
-                            }
-                        >
-                            {options.map((option) => (
-                                <DropdownMenu.Item
-                                    key={option.value}
-                                    onClick={() => handleMenuClick(option.value)}
-                                >
-                                    {option.label}
-                                </DropdownMenu.Item>
-                            ))}
-                        </DropdownMenu.Root>
-                    </BookmarkNewImageIcon>
-                )}
+                <BookmarkNewImageIcon>
+                    <DropdownMenu.Root
+                        disabled={disabledImage}
+                        trigger={
+                            <HiCamera
+                                size={24}
+                                color={Colors.light}
+                                style={{ opacity: 0.7 }}
+                            />
+                        }
+                    >
+                        {options.map((option) => (
+                            <DropdownMenu.Item
+                                key={option.value}
+                                onClick={() => handleMenuClick(option.value)}
+                            >
+                                {option.label}
+                            </DropdownMenu.Item>
+                        ))}
+                    </DropdownMenu.Root>
+                </BookmarkNewImageIcon>
             </BookmarkCoverContainer>
 
             <input

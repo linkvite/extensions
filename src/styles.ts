@@ -1,12 +1,11 @@
 import styled from "styled-components";
-import { AppText } from "~components/text";
-import { Colors, Fonts, type ITheme } from "~utils/styles";
+import { Colors, type ITheme } from "~utils/styles";
 
 export const PopupContainer = styled.div<{ $autoSave?: boolean }>`
     width: 100%;
     height: 100%;
+    min-width: 576px;
     position: relative;
-    min-width: ${p => p.$autoSave ? 350 : 500}px;
     min-height: ${p => p.$autoSave ? 150 : 600}px;
 `;
 
@@ -51,64 +50,11 @@ export const PopupAction = styled.button<{ $active: boolean; theme: ITheme }>`
     }
 `;
 
-export const PopupActionText = styled(AppText) <{ theme: ITheme }>`
-    font-size: ${Fonts.xxs};
-    color: ${p => p.theme.text_sub};
-    transition: all 0.3s ease-in-out;
-    margin-top: 5px;
-
-    &:hover {
-        cursor: pointer;
-        color: ${p => p.theme.text};
-    }
-`;
-
-export const PopupActionDescription = styled(AppText)`
-    margin-top: 5px;
-    margin-bottom: 10px;
-    font-size: ${Fonts.xxs};
-    max-height: 200px;
-    overflow-y: scroll;
-`;
-
-export const PageContainer = styled.div`
-    width: 100%;
-    height: 100%;
-    min-height: 400px;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-`;
-
 export const AutoSaveContainer = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-width: 350px;
+    min-width: 576px;
     min-height: calc(150px - 70px);
-`;
-
-export const AutoSaveAction = styled.button<{ theme: ITheme; $isDelete?: boolean }>`
-    padding: 0;
-    border: none;
-    align-items: center;
-    justify-content: center;
-    color: ${p => p.$isDelete ? Colors.error : p.theme.text};
-    transition: all 0.3s ease-in-out;
-    background-color: transparent;
-    text-decoration: underline;
-    margin: 0 5px;
-    margin-top: 8px;
-    padding: 3px 5px;
-    border-radius: .25rem;
-
-    &:hover {
-        cursor: pointer;
-        color: ${Colors.light};
-        text-decoration: none;
-        background-color: ${p => p.$isDelete ? Colors.error : Colors.primary};
-    }
 `;

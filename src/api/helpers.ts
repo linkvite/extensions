@@ -257,8 +257,9 @@ export type FileBookmarkProps = {
     title?: string;
 } & UploadProps;
 
-export async function handleCreateFile({ url, tags, collection, ...rest }: FileBookmarkProps) {
+export async function handleCreateFile({ url, tags, collection: c, ...rest }: FileBookmarkProps) {
     const endpoint = `/bookmarks/file`;
+    const collection = c !== NIL_OBJECT_ID ? c : undefined;
 
     const formData = new FormData();
     const response = await fetch(url, { mode: "cors" });
