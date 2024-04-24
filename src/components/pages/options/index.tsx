@@ -1,13 +1,13 @@
 import type { Theme } from "~types";
-import { settingStore, userStore } from "~stores";
 import { storage } from "~utils/storage";
 import { AppText } from "~components/text";
 import type { Collection } from "@linkvite/js";
+import { settingStore, userStore } from "~stores";
 import { useAuth } from "~components/wrapper/auth";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "@legendapp/state/react";
 import { AppDialog } from "~components/primitives/dialog";
 import { CollectionsModal } from "~components/collections";
-import React, { useCallback, useEffect, useState } from "react";
 import {
     OptionsContainer,
     Label,
@@ -26,17 +26,10 @@ export function OptionsPage() {
     useEffect(() => {
         async function init() {
             const c = await storage.get<Collection>("collection");
-            if (c) {
-                setCollection(c);
-            }
+            setCollection(c || null);
         }
 
         init();
-    }, []);
-
-    const onSelectCollection = useCallback((c?: Collection) => {
-        setCollection(c || null);
-        storage.set("collection", c);
     }, []);
 
     return (
@@ -67,7 +60,7 @@ export function OptionsPage() {
             >
                 <CollectionsModal
                     collection={collection}
-                    setCollection={onSelectCollection}
+                    setCollection={setCollection}
                 />
             </AppDialog>
 

@@ -142,6 +142,7 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
                 transport: 'websocket',
                 endpoint: WS_ENDPOINT,
             }], { token });
+
             ws.current
                 .on("publication", processEvent)
                 .connect();

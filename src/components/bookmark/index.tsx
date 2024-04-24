@@ -24,7 +24,7 @@ import {
 } from "./styles";
 import { Colors } from "~utils/styles";
 import { Spinner } from "~components/spinner";
-import { COVER_URL, NIL_OBJECT_ID, pluralize } from "~utils";
+import { COVER_URL, NIL_OBJECT_ID } from "~utils";
 import { HiCamera } from "react-icons/hi2";
 import { FaHashtag } from "react-icons/fa6";
 import { DropdownMenu } from "~components/primitives/dropdown";
@@ -199,7 +199,7 @@ export function BookmarkView({
         setLoading(false);
     }, [exists, onCreate, onUpdate]);
 
-    const onSelectCollection = useCallback(async (c?: Collection) => {
+    const onSelectCollection = useCallback((c?: Collection) => {
         setCollection(c);
         updateBookmark(produce(bookmark, (draft) => {
             draft.info.collection = c?.id || NIL_OBJECT_ID;
@@ -278,7 +278,7 @@ export function BookmarkView({
 
                 <BookmarkActionsSubContainer>
                     <AppDialog
-                        title="Add Tags"
+                        title="Tags"
                         minHeight={200}
                         trigger={
                             <BookmarkAction>
@@ -292,10 +292,13 @@ export function BookmarkView({
                                 </BookmarkActionIcon>
 
                                 <BookmarkActionText>
-                                    {bookmark.tags.length
-                                        ? `${bookmark.tags.length} ${pluralize(bookmark.tags.length, 'tag', 'tags')}`
-                                        : "Add Tags"
-                                    }
+                                    Tags
+                                </BookmarkActionText>
+
+                                <BookmarkActionText
+                                    style={{ marginLeft: "auto" }}
+                                >
+                                    {bookmark.tags.length}
                                 </BookmarkActionText>
                             </BookmarkAction>
                         }

@@ -126,6 +126,11 @@ export function TagsModal({ tags, setTags }: Props) {
                         textAlign="center"
                     >
                         No tags added yet
+
+                        <br />
+                        <br />
+
+                        &#8505; double click a tag to remove it
                     </AppText>
                 )}
             </TagItems>
@@ -177,6 +182,7 @@ function Tag({ tag, currentTag, onPressTag, onRemoveTag }: TagItemProps) {
             type="button"
             $closeHovered={closeHovered}
             onClick={() => onPressTag(tag)}
+            onDoubleClick={() => onRemoveTag?.(tag)}
         >
             <AppText
                 color="light"

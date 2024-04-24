@@ -406,3 +406,21 @@ export async function handleFindCollection({ id }: { id: string }) {
         .then(handleSuccess)
         .catch(handleError);
 }
+
+export async function handleCreateCollection({ name }: { name: string }) {
+    const endpoint = `/collections/`;
+
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data as Collection;
+    }
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    return await api
+        .post(endpoint, { name })
+        .then(handleSuccess)
+        .catch(handleError);
+}

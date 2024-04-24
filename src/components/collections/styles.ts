@@ -131,3 +131,27 @@ export const RemoveCollection = styled.button <{ theme: ITheme }>`
         color: ${p => p.theme.text};
     }
 `;
+
+export const NoCollections = styled.div<{ theme: ITheme }>`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+`;
+
+export const CreateCollectionButton = styled.button<{ theme: ITheme }>`
+    border: none;
+    outline: none;
+    margin-top: 10px;
+    border-radius: 5px;
+    background-color: transparent;
+    text-decoration: underline;
+    text-decoration-offset: 0.2rem;
+    color: ${p => p.theme.text_sub};
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        cursor: pointer;
+        color: ${p => p.theme.text};
+    }
+`;

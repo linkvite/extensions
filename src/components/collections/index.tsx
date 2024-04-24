@@ -1,13 +1,17 @@
 import toast from "react-hot-toast";
 import type { Collection } from "@linkvite/js";
+import { sendToBackground } from "@plasmohq/messaging";
 import { useDebounceText } from "~hooks/useDebounceText";
 import { AuthInputField } from "~components/auth/styles";
-import { sendToBackground } from "@plasmohq/messaging";
 import React, { useCallback, useEffect, useState } from "react";
 import type {
     FindCollectionsRequest,
     FindCollectionsResponse
 } from "~background/messages/collections";
+import type {
+    CreateCollectionRequest,
+    CreateCollectionResponse
+} from "~background/messages/create-collection";
 import {
     CollectionItem,
     CollectionItems,
@@ -18,11 +22,16 @@ import {
     CollectionMineOnly,
     CollectionMineOnlyLabel,
     CollectionMineOnlyInput,
-    RemoveCollection
+    RemoveCollection,
+    NoCollections,
+    CreateCollectionButton
 } from "./styles";
-import { useSelector } from "@legendapp/state/react";
+import { useTheme } from "~hooks";
 import { userStore } from "~stores";
+import { Spinner } from "~components/spinner";
 import * as Dialog from "@radix-ui/react-dialog";
+import { useSelector } from "@legendapp/state/react";
+import { storage } from "~utils/storage";
 
 type Props = {
     collection?: Collection
@@ -30,8 +39,11 @@ type Props = {
 }
 
 export function CollectionsModal({ collection, setCollection }: Props) {
+    const { theme } = useTheme();
     const onEndReachedThreshold = 0;
     const { id: uID } = useSelector(userStore);
+    const [loading, setLoading] = useState(false);
+    const [creating, setCreating] = useState(false);
     const [data, setData] = useState<Collection[]>([]);
     const { query, text, setText } = useDebounceText('');
     const [params, setParams] = useState({
@@ -53,6 +65,7 @@ export function CollectionsModal({ collection, setCollection }: Props) {
 
     const fetchData = useCallback(async () => {
         if (!query) return;
+        setLoading(true);
         const resp = await sendToBackground<FindCollectionsRequest, FindCollectionsResponse>({
             name: "collections",
             body: {
@@ -62,13 +75,35 @@ export function CollectionsModal({ collection, setCollection }: Props) {
             }
         });
 
-        if ('error' in resp) {
-            toast.error(resp.error);
-            return;
-        }
+        'error' in resp
+            ? toast.error(resp.error)
+            : setData(resp.data);
 
-        setData(resp.data);
+        setLoading(false);
     }, [query, params.limit, params.mineOnly, uID]);
+
+    const onSelect = useCallback(async (c?: Collection) => {
+        setCollection(c || null);
+        await storage.set("collection", c);
+    }, [setCollection]);
+
+    const onCreate = useCallback(async () => {
+        if (!text) return;
+        setCreating(true);
+        const resp = await sendToBackground<CreateCollectionRequest, CreateCollectionResponse>({
+            name: "create-collection",
+            body: { name: text }
+        });
+
+        'error' in resp
+            ? toast.error(resp.error)
+            : (
+                onSelect(resp.data),
+                setText("")
+            )
+
+        setCreating(false);
+    }, [onSelect, setText, text]);
 
     useEffect(() => {
         fetchData();
@@ -91,54 +126,66 @@ export function CollectionsModal({ collection, setCollection }: Props) {
                 onScroll={onScroll}
             >
                 {(collection?.id && !text)
-                    ? (
-                        <RemoveCollection
-                            onClick={() => setCollection(null)}
-                        >
-                            Remove from {collection.info.name}
-                        </RemoveCollection>
-                    ) : null
+                    ? <RemoveCollection
+                        onClick={() => onSelect(null)}
+                    >
+                        Remove from {collection.info.name}
+                    </RemoveCollection>
+                    : null
                 }
 
-                {!text ? (
-                    <EmptyCollectionsText>Start typing to search for collections</EmptyCollectionsText>
-                ) : !data.length ? (
-                    <EmptyCollectionsText>No collections found</EmptyCollectionsText>
-                ) : (
-                    <React.Fragment>
-                        <CollectionMineOnly>
-                            <CollectionMineOnlyLabel htmlFor="mineOnly">
-                                Mine only
-                            </CollectionMineOnlyLabel>
-                            <CollectionMineOnlyInput
-                                type="checkbox"
-                                id="mineOnly"
-                                name="mineOnly"
-                                checked={params.mineOnly}
-                                onChange={(e) => setParams((prev) => ({ ...prev, mineOnly: e.target.checked }))}
-                            />
-                        </CollectionMineOnly>
-                        {data.map((c) => (
-                            <Dialog.Close asChild key={c.id}>
-                                <CollectionItem
-                                    type="button"
-                                    onClick={() => setCollection(c)}
-                                    $current={collection?.id === c.id}
-                                >
-                                    <CollectionItemIcon
-                                        alt={c?.info.name}
-                                        src={c?.assets?.icon}
-                                        style={{ width: 35, height: 35, marginRight: 10 }}
-                                    />
+                {loading ? <div style={{ marginTop: 15 }}><Spinner color={theme.text} /></div>
+                    : !text ? <EmptyCollectionsText>Start typing to search for collections</EmptyCollectionsText>
+                        : !data.length ? (
+                            <NoCollections>
+                                <EmptyCollectionsText>
+                                    No collections found
+                                </EmptyCollectionsText>
 
-                                    <CollectionItemName>
-                                        {c.info.name}
-                                    </CollectionItemName>
-                                </CollectionItem>
-                            </Dialog.Close>
-                        ))}
-                    </React.Fragment>
-                )}
+                                <CreateCollectionButton
+                                    onClick={onCreate}
+                                >
+                                    {creating
+                                        ? <Spinner color={theme.text} size={15} />
+                                        : `Create ${text}`
+                                    }
+                                </CreateCollectionButton>
+                            </NoCollections>
+                        ) : (
+                            <React.Fragment>
+                                <CollectionMineOnly>
+                                    <CollectionMineOnlyLabel htmlFor="mineOnly">
+                                        Mine only
+                                    </CollectionMineOnlyLabel>
+                                    <CollectionMineOnlyInput
+                                        type="checkbox"
+                                        id="mineOnly"
+                                        name="mineOnly"
+                                        checked={params.mineOnly}
+                                        onChange={(e) => setParams((prev) => ({ ...prev, mineOnly: e.target.checked }))}
+                                    />
+                                </CollectionMineOnly>
+                                {data.map((c) => (
+                                    <Dialog.Close asChild key={c.id}>
+                                        <CollectionItem
+                                            type="button"
+                                            onClick={() => onSelect(c)}
+                                            $current={collection?.id === c.id}
+                                        >
+                                            <CollectionItemIcon
+                                                alt={c?.info.name}
+                                                src={c?.assets?.icon}
+                                                style={{ width: 35, height: 35, marginRight: 10 }}
+                                            />
+
+                                            <CollectionItemName>
+                                                {c.info.name}
+                                            </CollectionItemName>
+                                        </CollectionItem>
+                                    </Dialog.Close>
+                                ))}
+                            </React.Fragment>
+                        )}
             </CollectionItems>
         </CollectionsContainer>
     )
