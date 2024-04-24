@@ -55,9 +55,9 @@ import type {
     FindCollectionRequest,
     FindCollectionResponse
 } from "~background/messages/collection";
-import { useEffectOnce, useSelector } from "@legendapp/state/react";
-import { TbStar, TbStarFilled } from "react-icons/tb";
 import { settingStore } from "~stores";
+import { TbStar, TbStarFilled } from "react-icons/tb";
+import { useEffectOnce, useSelector } from "@legendapp/state/react";
 
 type BookmarkViewProps = {
     tabId: number;

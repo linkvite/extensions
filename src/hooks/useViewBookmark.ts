@@ -1,10 +1,9 @@
-import { sendToBackground } from "@plasmohq/messaging";
 import { produce } from "immer";
-import { useCallback, useEffect, useState } from "react";
 import { browser } from "~browser";
+import { sendToBackground } from "@plasmohq/messaging";
 import { parseHTML, type ParsedHTML } from "~utils/parser";
 import type { Bookmark, ParsedLinkData } from "@linkvite/js";
-import { makeBookmark } from "~utils";
+import React, { useCallback, useEffect, useState } from "react";
 import type {
     ExistsMessageRequest,
     ExistsMessageResponse
@@ -21,9 +20,15 @@ import toast from "react-hot-toast";
 import { settingStore } from "~stores";
 import { useSelector } from "@legendapp/state/react";
 
+type ViewProps = {
+    title?: string;
+    image?: string;
+    description?: string;
+} | null;
+
 type Props = {
     tab: browser.Tabs.Tab;
-    setBookmark: (bookmark: Bookmark) => void;
+    setBookmark: React.Dispatch<React.SetStateAction<Bookmark>>;
 }
 
 export function useViewBookmark({ tab, setBookmark }: Props) {
@@ -36,37 +41,38 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
     const [localData, setLocalData] = useState<ParsedHTML | null>(null);
     const [coverType, setCoverType] = useState<"default" | "custom">("default");
 
-    const setAPIView = useCallback((description?: string, image?: string) => {
-        const data = produce(makeBookmark(), (draft) => {
-            draft.meta.url = tab?.url || draft.meta.url;
-            draft.info.name = tab?.title || draft.info.name;
-            draft.assets.thumbnail = image || draft.assets.thumbnail;
-            draft.info.description = description || draft.info.description;
+    const setAPIView = useCallback(({ title, image, description }: ViewProps) => {
+        setBookmark((prev) => {
+            return produce(prev, (draft) => {
+                draft.info.name = title || draft.info.name;
+                draft.meta.url = tab?.url || draft.meta.url;
+                draft.assets.thumbnail = image || draft.assets.thumbnail;
+                draft.info.description = description || draft.info.description;
+            });
         });
+    }, [setBookmark, tab?.url]);
 
-        setBookmark(data);
-    }, [setBookmark, tab?.title, tab?.url]);
-
-    const setLocalView = useCallback((description?: string, image?: string) => {
-        const data = produce(makeBookmark(), (draft) => {
-            draft.meta.url = tab?.url || draft.meta.url;
-            draft.info.name = tab?.title || draft.info.name;
-            draft.assets.thumbnail = image || draft.assets.thumbnail;
-            draft.info.description = description || draft.info.description;
+    const setLocalView = useCallback(({ title, image, description }: ViewProps) => {
+        setBookmark((prev) => {
+            return produce(prev, (draft) => {
+                draft.info.name = title || draft.info.name;
+                draft.meta.url = tab?.url || draft.meta.url;
+                draft.assets.thumbnail = image || draft.assets.thumbnail;
+                draft.info.description = description || draft.info.description;
+            });
         });
-
-        setBookmark(data);
-    }, [setBookmark, tab?.title, tab?.url]);
+    }, [setBookmark, tab?.url]);
 
     const updateView = useCallback((v: "local" | "api") => {
         setView(v);
+        const title = v === "local" ? tab?.title : apiData?.title;
         const image = v === "local" ? localData?.image : apiData?.image;
         const description = v === "local" ? localData?.description : apiData?.description;
 
         v === "local"
-            ? setLocalView(description, image)
-            : setAPIView(description, image);
-    }, [apiData?.description, apiData?.image, localData?.description, localData?.image, setAPIView, setLocalView]);
+            ? setLocalView({ title, image, description })
+            : setAPIView({ title, image, description });
+    }, [apiData?.description, apiData?.image, apiData?.title, localData?.description, localData?.image, setAPIView, setLocalView, tab?.title]);
 
     const fetchFromLocal = useCallback(async (tab: browser.Tabs.Tab) => {
         const resp = await sendToBackground<ParseHTMLMessageRequest, ParseHTMLMessageResponse>({
@@ -75,14 +81,18 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
         });
 
         if ('error' in resp) {
-            setLocalView();
+            setLocalView(null);
             toast.error(resp.error);
             return;
         }
 
         if (resp && resp.data.length > 0) {
             const data = await parseHTML(resp.data[0].result, tab.windowId);
-            setLocalView(data.description, data.image);
+            setLocalView({
+                title: tab.title,
+                image: data.image,
+                description: data.description
+            });
             setLocalData(data);
         }
     }, [setLocalView]);
@@ -111,7 +121,11 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
     }, []);
 
     useEffect(() => {
-        if (!tab || !tab?.url || autoSave) return;
+        if (!tab || !tab?.url || autoSave) {
+            setLoading(false);
+            return;
+        }
+
         const fetchCurrentTab = async () => {
             const data = await checkExists(tab.url);
             if (!data.exists) {
@@ -133,9 +147,9 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
     return {
         view,
         exists,
+        loading,
         coverType,
         updateView,
-        loading: loading || !tab,
         updateCoverType: setCoverType,
     }
 }

@@ -1,15 +1,14 @@
 
-import toast from "react-hot-toast";
-import { getCurrentTab } from "~utils";
 import { browser } from "~browser";
+import toast from "react-hot-toast";
 import { useViewBookmark } from "~hooks";
 import { AppText } from "~components/text";
-import type { Bookmark } from "@linkvite/js";
 import { Spinner } from "~components/spinner";
 import { useAutoSave } from "~hooks/useAutoSave";
 import { settingStore, userStore } from "~stores";
 import { PageProvider } from "~components/wrapper";
 import { BookmarkView } from "~components/bookmark";
+import { getCurrentTab, makeBookmark } from "~utils";
 import { useSelector } from "@legendapp/state/react";
 import { OptionsPage } from "~components/pages/options";
 import React, {
@@ -46,8 +45,8 @@ function IndexPopup() {
     const { id } = useSelector(userStore);
 
     const [showBookmark, setShowBookmark] = useState(false);
+    const [bookmark, setBookmark] = useState(makeBookmark());
     const [tab, setTab] = useState<browser.Tabs.Tab | null>(null);
-    const [bookmark, setBookmark] = useState<Bookmark | null>(null);
 
     const params = useMemo(() => new URL(window.location.href), []);
     const { message, exists: autoSaveExists } = useAutoSave({ tab, setBookmark });
@@ -137,6 +136,10 @@ function IndexPopup() {
                                 ) : null
                             }
                         </AutoSaveContainer>
+                    ) : loading ? (
+                        <PopupLoadingContainer>
+                            <Spinner />
+                        </PopupLoadingContainer>
                     ) : bookmark ? (
                         <React.Fragment>
                             <BookmarkView
@@ -155,10 +158,6 @@ function IndexPopup() {
                                 </PopupActions>
                             )}
                         </React.Fragment>
-                    ) : loading ? (
-                        <PopupLoadingContainer>
-                            <Spinner />
-                        </PopupLoadingContainer>
                     ) : (
                         <AutoSaveContainer>
                             <AppText>Bookmark not found</AppText>
