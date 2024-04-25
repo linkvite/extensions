@@ -9,7 +9,7 @@ const fs = require('fs');
 
 const build = './build';
 const root = `${build}/safari-mv3-prod`;
-const destination = '../linkvite/horus/safari-extension/src';
+const destination = '../linkvite/horus/SafariExtension/src';
 
 const files = [
     { from: `${root}/static/background/index.js`, to: `${destination}/background.js` },
