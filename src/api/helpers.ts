@@ -427,16 +427,16 @@ export async function handleCreateCollection({ name }: { name: string }) {
 
 
 export type CreateTabBookmarkProps = {
-    tabs: ({
+    data: ({
         url: string;
         title: string;
     } & UploadProps)[];
 }
 
-export async function handleCreateTabBookmarks({ tabs }: CreateTabBookmarkProps) {
+export async function handleCreateTabBookmarks({ data }: CreateTabBookmarkProps) {
     const endpoint = `/bookmarks/tabs`;
 
-    const body = tabs.map(tab => {
+    const tabs = data.map(tab => {
         const { collection: c, tags, ...rest } = tab;
         const collection = c !== NIL_OBJECT_ID
             ? tab.collection
@@ -458,10 +458,10 @@ export async function handleCreateTabBookmarks({ tabs }: CreateTabBookmarkProps)
         return Promise.reject(error);
     }
 
-    console.log(body);
+    console.log({ tabs });
 
     return await api
-        .post(endpoint, body)
+        .post(endpoint, { tabs })
         .then(handleSuccess)
         .catch(handleError);
 }

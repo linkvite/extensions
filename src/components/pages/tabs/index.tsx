@@ -143,7 +143,7 @@ export function NewTabsPage() {
 
         setState(prev => ({ ...prev, saving: true }));
 
-        const bookmarks = tabs
+        const data = tabs
             .filter(tab => selected.includes(tab.id) && tab.url)
             .map(tab => ({
                 url: tab.url,
@@ -156,7 +156,7 @@ export function NewTabsPage() {
 
         const resp = await sendToBackground<CreateTabBookmarkProps, TabsMessageResponse>({
             name: "tabs",
-            body: { tabs: bookmarks }
+            body: { data }
         });
 
         setState(prev => ({ ...prev, saving: false }));
