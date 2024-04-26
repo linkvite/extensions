@@ -434,7 +434,7 @@ export type CreateTabBookmarkProps = {
 }
 
 export async function handleCreateTabBookmarks({ tabs }: CreateTabBookmarkProps) {
-    const endpoint = `/bookmarks/tab`;
+    const endpoint = `/bookmarks/tabs`;
 
     const body = tabs.map(tab => {
         const { collection: c, tags, ...rest } = tab;
