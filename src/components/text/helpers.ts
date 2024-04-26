@@ -10,10 +10,10 @@ import type { StyledTextProps } from "./types";
  * @returns The color from the Colors object or the text color from the theme.
  */
 export function getTextColor(props: StyledTextProps) {
-    const { color, $isSubText, theme } = props;
+    const { color, isSubText, theme } = props;
 
     if (color) return Colors[color];
-    if ($isSubText) return theme?.text_sub;
+    if (isSubText) return theme?.text_sub;
 
     return theme?.text || Colors.light;
 }

@@ -118,7 +118,7 @@ export function TagsModal({ tags, setTags }: Props) {
                     />
                 )) : (
                     <AppText
-                        $isSubText
+                        isSubText
                         fontSize="xxs"
                         topSpacing="md"
                         width="100%"
@@ -139,7 +139,7 @@ export function TagsModal({ tags, setTags }: Props) {
                 <RecentTags>
                     <RecentTagsHeader>
                         <AppText
-                            $isSubText
+                            isSubText
                             fontSize="xxs"
                         >
                             Recent tags

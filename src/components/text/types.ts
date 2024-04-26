@@ -6,7 +6,7 @@ export type StyledTextProps = {
     theme?: ITheme;
     maxWidth?: string;
     fontSize?: FontSize;
-    $isSubText?: boolean;
+    isSubText?: boolean;
     textAlign?: TextAlign;
     fontWeight?: FontWeight;
     topSpacing?: MarginSpacing;

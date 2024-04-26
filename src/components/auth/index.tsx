@@ -137,7 +137,7 @@ function AuthWithCreds({ onLogin }: { onLogin: OnLogin }) {
                 Welcome back
             </AuthTitle>
 
-            <AuthDescription $isSubText>
+            <AuthDescription isSubText>
                 Sign in to your account to continue.
             </AuthDescription>
 

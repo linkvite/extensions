@@ -121,12 +121,15 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
     }, []);
 
     useEffect(() => {
-        if (!tab || !tab?.url || autoSave) {
+        const timer = setTimeout(() => {
             setLoading(false);
+        }, 5000);
+
+        if (!tab || !tab?.url || autoSave) {
             return;
         }
 
-        const fetchCurrentTab = async () => {
+        const init = async () => {
             const data = await checkExists(tab.url);
             if (!data.exists) {
                 await Promise.all([
@@ -141,7 +144,11 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
             setLoading(false);
         };
 
-        fetchCurrentTab();
+        init();
+
+        return () => {
+            clearTimeout(timer);
+        }
     }, [autoSave, checkExists, fetchFromAPI, fetchFromLocal, setBookmark, tab]);
 
     return {
@@ -150,6 +157,7 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
         loading,
         coverType,
         updateView,
+        // loading: loading || !tab,
         updateCoverType: setCoverType,
     }
 }

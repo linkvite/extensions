@@ -134,58 +134,62 @@ export function CollectionsModal({ collection, setCollection }: Props) {
                     : null
                 }
 
-                {loading ? <div style={{ marginTop: 15 }}><Spinner color={theme.text} /></div>
-                    : !text ? <EmptyCollectionsText>Start typing to search for collections</EmptyCollectionsText>
-                        : !data.length ? (
-                            <NoCollections>
-                                <EmptyCollectionsText>
-                                    No collections found
-                                </EmptyCollectionsText>
+                {loading ? (
+                    <div style={{ marginTop: 15 }}><Spinner color={theme.text} /></div>
+                ) : !text ? (
+                    <EmptyCollectionsText>Start typing to search for collections</EmptyCollectionsText>
+                ) : !data.length ? (
+                    <NoCollections>
+                        <EmptyCollectionsText>
+                            No collections found
+                        </EmptyCollectionsText>
 
-                                <CreateCollectionButton
-                                    onClick={onCreate}
+                        <CreateCollectionButton
+                            onClick={onCreate}
+                        >
+                            {creating
+                                ? <Spinner color={theme.text} size={15} />
+                                : `Create ${text}`
+                            }
+                        </CreateCollectionButton>
+                    </NoCollections>
+                ) : null}
+
+                {text && data.length ? (
+                    <React.Fragment>
+                        <CollectionMineOnly>
+                            <CollectionMineOnlyLabel htmlFor="mineOnly">
+                                Mine only
+                            </CollectionMineOnlyLabel>
+                            <CollectionMineOnlyInput
+                                type="checkbox"
+                                id="mineOnly"
+                                name="mineOnly"
+                                checked={params.mineOnly}
+                                onChange={(e) => setParams((prev) => ({ ...prev, mineOnly: e.target.checked }))}
+                            />
+                        </CollectionMineOnly>
+                        {data.map((c) => (
+                            <Dialog.Close asChild key={c.id}>
+                                <CollectionItem
+                                    type="button"
+                                    onClick={() => onSelect(c)}
+                                    $current={collection?.id === c.id}
                                 >
-                                    {creating
-                                        ? <Spinner color={theme.text} size={15} />
-                                        : `Create ${text}`
-                                    }
-                                </CreateCollectionButton>
-                            </NoCollections>
-                        ) : (
-                            <React.Fragment>
-                                <CollectionMineOnly>
-                                    <CollectionMineOnlyLabel htmlFor="mineOnly">
-                                        Mine only
-                                    </CollectionMineOnlyLabel>
-                                    <CollectionMineOnlyInput
-                                        type="checkbox"
-                                        id="mineOnly"
-                                        name="mineOnly"
-                                        checked={params.mineOnly}
-                                        onChange={(e) => setParams((prev) => ({ ...prev, mineOnly: e.target.checked }))}
+                                    <CollectionItemIcon
+                                        alt={c?.info.name}
+                                        src={c?.assets?.icon}
+                                        style={{ width: 35, height: 35, marginRight: 10 }}
                                     />
-                                </CollectionMineOnly>
-                                {data.map((c) => (
-                                    <Dialog.Close asChild key={c.id}>
-                                        <CollectionItem
-                                            type="button"
-                                            onClick={() => onSelect(c)}
-                                            $current={collection?.id === c.id}
-                                        >
-                                            <CollectionItemIcon
-                                                alt={c?.info.name}
-                                                src={c?.assets?.icon}
-                                                style={{ width: 35, height: 35, marginRight: 10 }}
-                                            />
 
-                                            <CollectionItemName>
-                                                {c.info.name}
-                                            </CollectionItemName>
-                                        </CollectionItem>
-                                    </Dialog.Close>
-                                ))}
-                            </React.Fragment>
-                        )}
+                                    <CollectionItemName>
+                                        {c.info.name}
+                                    </CollectionItemName>
+                                </CollectionItem>
+                            </Dialog.Close>
+                        ))}
+                    </React.Fragment>
+                ) : null}
             </CollectionItems>
         </CollectionsContainer>
     )

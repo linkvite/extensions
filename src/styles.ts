@@ -24,7 +24,7 @@ export const PopupActions = styled.div`
     bottom: 10px;
     left: 0;
     background-color: ${p => p.theme.background_sub};
-    padding: 8px;
+    padding: 5px;
     border-radius: .5rem;
     align-items: center;
     justify-content: center;

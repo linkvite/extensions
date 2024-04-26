@@ -1,13 +1,11 @@
 import { browser } from "~browser";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import toast from "react-hot-toast";
 
 /**
  * Get all the tabs from the current window.
  */
 export function useTabs() {
-    const [tabs, setTabs] = useState<browser.Tabs.Tab[]>([]);
-
     // filter out tabs that are not HTTPS or are pinned.
     // we don't want to save pinned tabs, because the user
     // will likely want to keep them hanging around.
@@ -34,16 +32,13 @@ export function useTabs() {
                     return [];
                 });
 
-            setTabs(filterValidTabs(tabs));
+            return filterValidTabs(tabs);
         } catch (error) {
             toast.error('Error loading tabs');
             console.error('Error loading tabs:', error);
+            return [];
         }
     }, []);
 
-    useEffect(() => {
-        loadTabs();
-    }, [loadTabs]);
-
-    return [tabs, loadTabs] as const;
+    return [loadTabs] as const;
 }

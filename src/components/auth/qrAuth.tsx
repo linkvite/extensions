@@ -187,13 +187,13 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
                             alt="qr-avatar"
                         />
                         : qrCode ? <AuthQrCode qrCode={qrCode} />
-                            : <AppText color="dark" textAlign='center' $isSubText>
+                            : <AppText color="dark" textAlign='center' isSubText>
                                 Oh no! Could not load QR code {":("}
                             </AppText>
                 }
             </QRContainer>
 
-            <QRSubTitle $isSubText>
+            <QRSubTitle isSubText>
                 {owner
                     ? `Trying to login as @${owner.username}?`
                     : qrCode ? `Scan this code with the Linkvite Mobile App to log in.`

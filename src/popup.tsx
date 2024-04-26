@@ -140,29 +140,23 @@ function IndexPopup() {
                         <PopupLoadingContainer>
                             <Spinner />
                         </PopupLoadingContainer>
-                    ) : bookmark ? (
-                        <React.Fragment>
-                            <BookmarkView
-                                tabId={tab?.id}
-                                bookmark={bookmark}
-                                exists={bookmarkExists}
-                                onCreate={onCreate}
-                                updateBookmark={setBookmark}
-                                updateCoverType={updateCoverType}
-                            />
+                    ) : <React.Fragment>
+                        <BookmarkView
+                            tabId={tab?.id}
+                            bookmark={bookmark}
+                            exists={bookmarkExists}
+                            onCreate={onCreate}
+                            updateBookmark={setBookmark}
+                            updateCoverType={updateCoverType}
+                        />
 
-                            {bookmarkExists ? null : (
-                                <PopupActions>
-                                    <PopupAction onClick={() => updateView("local")} $active={view === "local"}>Local</PopupAction>
-                                    <PopupAction onClick={() => updateView("api")} $active={view === "api"}>API</PopupAction>
-                                </PopupActions>
-                            )}
-                        </React.Fragment>
-                    ) : (
-                        <AutoSaveContainer>
-                            <AppText>Bookmark not found</AppText>
-                        </AutoSaveContainer>
-                    )
+                        {bookmarkExists ? null : (
+                            <PopupActions>
+                                <PopupAction onClick={() => updateView("local")} $active={view === "local"}>Local</PopupAction>
+                                <PopupAction onClick={() => updateView("api")} $active={view === "api"}>API</PopupAction>
+                            </PopupActions>
+                        )}
+                    </React.Fragment>
                 ) : currentPage === "options" ? <OptionsPage />
                     : currentPage === "tabs" ? <NewTabsPage />
                         : currentPage === "image" ? <NewImagePage params={params} />
