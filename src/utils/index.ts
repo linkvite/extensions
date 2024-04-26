@@ -85,6 +85,19 @@ export function pluralize(count: number, singular: string, plural: string) {
 }
 
 /**
+ * Truncate a string.
+ * 
+ * Also adds an ellipsis if the string is longer than the length.
+ * 
+ * @param {String} str - The string to truncate.
+ * @param {Number} length - The length to truncate the string to.
+ * @returns The truncated string.
+ */
+export function subString(str = "", length: number) {
+    return str.substring(0, length) + (str.length > length ? "..." : "");
+}
+
+/**
  * Parse the qr-auth url.
  * to get the string after /qr-auth/
  *

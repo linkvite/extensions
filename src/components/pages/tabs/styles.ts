@@ -1,5 +1,6 @@
 import { rgba } from "polished";
 import styled from "styled-components";
+import { BookmarkStarIcon } from "~components/bookmark/styles";
 import { AppText } from "~components/text";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
 
@@ -43,6 +44,7 @@ export const TabList = styled.ol`
     padding: 0;
     list-style: none;
     width: 100%;
+    margin-bottom: 5rem;
 `;
 
 export const TabListItem = styled.li<{ theme: ITheme }>`
@@ -55,6 +57,7 @@ export const TabListItem = styled.li<{ theme: ITheme }>`
     cursor: pointer;
     transition: all 0.3s ease-in-out;
     border-radius: 0.5rem;
+    position: relative;
 
     &:hover {
         background-color: ${p => p.theme.trans_bg};
@@ -75,6 +78,12 @@ export const TabListItemInfo = styled.div`
     flex-direction: column;
     justify-content: center;
     width: calc(100% - 16px);
+`;
+
+
+export const TabListItemInfoBottom = styled.div`
+    display: flex;
+    align-items: center;
 `;
 
 export const TabListItemTitle = styled(AppText)`
@@ -104,6 +113,7 @@ export const TabListItemUrl = styled(AppText)`
     max-width: 100%;
     font-size: ${Fonts.xxs};
     margin-top: 0.25rem;
+    margin-left: 0.25rem;
 `;
 
 export const TabAddButtonContainer = styled.div<{ $active: boolean; theme: ITheme }>`
@@ -163,5 +173,74 @@ export const TabSelectCollectionButton = styled.button<{ $hide: boolean, }>`
     &:hover {
         cursor: pointer;
         scale: 1.1;
+    }
+`;
+
+export const TabEditButton = styled.button<{ $hide: boolean }>`
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    color: ${Colors.light};
+    border: none;
+    border-radius: 0.25rem;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease-in-out;
+    opacity: ${p => p.$hide ? 0 : 1};
+    position: absolute;
+    right: 10px;
+
+    &:hover {
+        cursor: pointer;
+        scale: 1.1;
+    }
+`;
+
+export const TabStarIcon = styled(BookmarkStarIcon) <{ theme: ITheme; $active: boolean }>`
+    height: 20px;
+    width: 20px;
+    border: none;
+    margin-top: 0.25rem;
+    background-color: transparent;
+    transition: all 0.3s ease-in-out;
+    color: ${p => p.$active ? Colors.warning : p.theme.text_sub};
+
+    &:hover {
+        border: none;
+        cursor: pointer;
+        color: ${Colors.warning};
+        background-color: transparent;
+    }
+`;
+
+export const TabDescriptionInput = styled.textarea<{ theme: ITheme }>`
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    min-height: 100px;
+    border-radius: 0.25rem;
+    padding: 10px;
+    margin-right: 10px;
+    max-height: 300px;
+    outline: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    color: ${p => p.theme.text};
+    font-size: 14px;
+    line-height: 1.5;
+
+    &::placeholder {
+        color: ${p => p.theme.text_sub};
+    }
+
+    &:focus {
+        outline: none;
     }
 `;

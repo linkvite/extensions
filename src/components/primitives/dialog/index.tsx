@@ -22,13 +22,19 @@ type Props = {
 export function AppDialog({ children, trigger, title, description, minHeight }: Props) {
     return (
         <DialogRoot>
-            <DialogTrigger asChild>
+            <DialogTrigger
+                asChild
+                onClick={(e) => e.stopPropagation()}
+            >
                 {trigger}
             </DialogTrigger>
 
             <RadixDialog.Portal>
                 <DialogOverlay />
-                <DialogContent min={minHeight}>
+                <DialogContent
+                    min={minHeight}
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <DialogTitle>{title}</DialogTitle>
                     {description
                         ? <DialogDescription>

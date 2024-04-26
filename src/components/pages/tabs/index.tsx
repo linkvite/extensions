@@ -1,4 +1,4 @@
-import { useTabs } from "~hooks";
+import { useTabs, useTheme } from "~hooks";
 import { browser } from "~browser";
 import toast from "react-hot-toast";
 import React, {
@@ -26,29 +26,49 @@ import {
     TabAddButton,
     TabAddButtonContainer,
     TabSelectCollectionButton,
+    TabEditButton,
+    TabListItemInfoBottom,
+    TabStarIcon,
+    TabDescriptionInput,
 } from "./styles";
+import { closeTab } from "~router";
 import { Colors } from "~utils/styles";
+import { settingStore } from "~stores";
 import { storage } from "~utils/storage";
+import { pluralize, subString } from "~utils";
+import { Spinner } from "~components/spinner";
+import { AiOutlineEdit } from "react-icons/ai";
 import type { Collection } from "@linkvite/js";
 import { FcOpenedFolder } from "react-icons/fc";
+import { useSelector } from "@legendapp/state/react";
 import { AppDialog } from "~components/primitives/dialog";
 import { CollectionsModal } from "~components/collections";
-import { SelectCollectionImage } from "~components/bookmark/styles";
-import { Spinner } from "~components/spinner";
-import { useSelector } from "@legendapp/state/react";
-import { settingStore } from "~stores";
-import { closeTab } from "~router";
+import {
+    InputContainer,
+    InputField,
+    InputFieldLine,
+    SelectCollectionImage
+} from "~components/bookmark/styles";
+import { TbStar, TbStarFilled } from "react-icons/tb";
+import { sendToBackground } from "@plasmohq/messaging";
+import type {
+    TabsMessageResponse
+} from "~background/messages/tabs";
+import type { CreateTabBookmarkProps } from "~api";
 
 type Tab = browser.Tabs.Tab & {
     tags?: string[];
+    starred?: boolean;
     description?: string;
 }
 
 export function NewTabsPage() {
     const [loadTabs] = useTabs();
+    const { theme } = useTheme();
     const [state, setState] = useState({
         saving: false,
-        hovered: false,
+        submitHovered: false,
+        tabHovered: null as number | null,
     });
 
     const {
@@ -59,14 +79,10 @@ export function NewTabsPage() {
     const [collection, setCollection] = useState<Collection>();
     const [hasTabsPermission, setHasTabsPermission] = useState(false);
 
-    function subString(str = "", length: number) {
-        return str.substring(0, length) + (str.length > length ? "..." : "");
-    }
-
     const countText = useMemo(() => {
         if (selected.length === 0) return "No tabs selected";
         if (selected.length === tabs.length) return "All tabs selected";
-        return `${selected.length} of ${tabs.length} tab${tabs.length > 1 ? "s" : ""} selected`;
+        return `${selected.length} of ${tabs.length} ${pluralize(tabs.length, "tab", "tabs")} selected`;
     }, [selected, tabs]);
 
     const saveToName = useMemo(() => {
@@ -77,13 +93,47 @@ export function NewTabsPage() {
         return "Save";
     }, [collection]);
 
-    const onHover = useCallback((value: boolean) => {
-        setState({ ...state, hovered: value });
-    }, [state]);
+    const onTabHover = useCallback((id: number) => {
+        setState(prev => ({ ...prev, tabHovered: id }));
+    }, []);
+
+    const onSubmitHover = useCallback((value: boolean) => {
+        setState(prev => ({ ...prev, submitHovered: value }));
+    }, []);
 
     const onSelectCollection = useCallback((c?: Collection) => {
         setCollection(c);
     }, []);
+
+    const onChangeText = useCallback((value: string, key: string) => {
+        const updatedTabs = tabs.map(tab => {
+            if (tab.id === state.tabHovered) {
+                return {
+                    ...tab,
+                    [key]: value,
+                }
+            }
+
+            return tab;
+        });
+
+        setTabs(updatedTabs);
+    }, [tabs, state.tabHovered]);
+
+    const onStar = useCallback((id: number) => {
+        const updatedTabs = tabs.map(tab => {
+            if (tab.id === id) {
+                return {
+                    ...tab,
+                    starred: !tab.starred,
+                }
+            }
+
+            return tab;
+        });
+
+        setTabs(updatedTabs);
+    }, [tabs]);
 
     const onSave = useCallback(async () => {
         if (selected.length === 0) {
@@ -91,17 +141,36 @@ export function NewTabsPage() {
             return;
         }
 
-        setState({ hovered: false, saving: true });
+        setState(prev => ({ ...prev, saving: true }));
 
-        setTimeout(() => {
-            setState({ hovered: false, saving: false });
-            toast.success('Tabs saved successfully');
+        const bookmarks = tabs
+            .filter(tab => selected.includes(tab.id) && tab.url)
+            .map(tab => ({
+                url: tab.url,
+                tags: tab?.tags,
+                starred: tab.starred,
+                collection: collection?.id,
+                description: tab?.description,
+                title: tab.title || "Untitled",
+            }));
 
-            if (autoClose) {
-                closeTab();
-            }
-        }, 5000);
-    }, [autoClose, selected]);
+        const resp = await sendToBackground<CreateTabBookmarkProps, TabsMessageResponse>({
+            name: "tabs",
+            body: { tabs: bookmarks }
+        });
+
+        setState(prev => ({ ...prev, saving: false }));
+
+        if ('error' in resp) {
+            toast.error(resp.error)
+            return;
+        }
+
+        toast.success(resp.message);
+        if (autoClose) {
+            closeTab();
+        }
+    }, [autoClose, collection?.id, selected, tabs]);
 
     const requestTabsPermission = useCallback(async () => {
         if (hasTabsPermission) return;
@@ -174,39 +243,97 @@ export function NewTabsPage() {
                     {countText}
                 </TabPermissionHeader>
 
-                {tabs.map(tab => (
-                    <TabListItem key={tab.id}
-                        onClick={() => onSelect(tab.id)}
-                    >
-                        <TabListItemCheck
+                {tabs.map(tab => {
+                    const StarIcon = tab.starred ? TbStarFilled : TbStar;
+
+                    return (
+                        <TabListItem key={tab.id}
                             onClick={() => onSelect(tab.id)}
+                            onMouseEnter={() => onTabHover(tab.id)}
+                            onMouseLeave={() => onTabHover(tab.id)}
                         >
-                            {selected.includes(tab.id)
-                                ? <Checked color={Colors.primary} size={20} />
-                                : <Unchecked color={Colors.primary} size={20} />
-                            }
-                        </TabListItemCheck>
-
-                        <TabListItemInfo>
-                            <TabListItemTitle>
-                                {tab.title || "Untitled"}
-                            </TabListItemTitle>
-
-                            {tab.description
-                                ? <TabListItemDescription>
-                                    {tab.description}
-                                </TabListItemDescription>
-                                : null
-                            }
-
-                            <TabListItemUrl
-                                isSubText={!tab.description}
+                            <TabListItemCheck
+                                onClick={() => onSelect(tab.id)}
                             >
-                                {subString(tab.url, 50)}
-                            </TabListItemUrl>
-                        </TabListItemInfo>
-                    </TabListItem>
-                ))}
+                                {selected.includes(tab.id)
+                                    ? <Checked color={Colors.primary} size={20} />
+                                    : <Unchecked color={Colors.primary} size={20} />
+                                }
+                            </TabListItemCheck>
+
+                            <TabListItemInfo>
+                                <TabListItemTitle>
+                                    {tab.title || "Untitled"}
+                                </TabListItemTitle>
+
+                                {tab.description
+                                    ? <TabListItemDescription isSubText>
+                                        {tab.description}
+                                    </TabListItemDescription>
+                                    : null
+                                }
+
+                                <TabListItemInfoBottom
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onStar(tab.id);
+                                    }}
+                                >
+                                    <TabStarIcon
+                                        $active={tab.starred}
+                                    >
+                                        <StarIcon size={18} />
+                                    </TabStarIcon>
+
+                                    <TabListItemUrl
+                                        isSubText
+                                    >
+                                        &#x2022;
+                                    </TabListItemUrl>
+
+                                    <TabListItemUrl
+                                        isSubText
+                                    >
+                                        {subString(tab.url, 50)}
+                                    </TabListItemUrl>
+                                </TabListItemInfoBottom>
+                            </TabListItemInfo>
+
+                            <AppDialog
+                                title="Edit Tab"
+                                minHeight={200}
+                                trigger={
+                                    <TabEditButton
+                                        $hide={state.tabHovered !== tab.id}
+                                    >
+                                        <AiOutlineEdit
+                                            size={20}
+                                            color={Colors.primary}
+                                        />
+                                    </TabEditButton>
+                                }
+                            >
+                                <InputContainer
+                                    style={{ backgroundColor: theme.trans_bg }}
+                                >
+                                    <InputField
+                                        value={tab.title}
+                                        placeholder={'Add a Title'}
+                                        onChange={(e) => onChangeText(e.target.value, 'title')}
+                                    />
+
+                                    <InputFieldLine $isName />
+
+                                    <TabDescriptionInput
+                                        value={tab.description}
+                                        placeholder={'Add a Description'}
+                                        onChange={(e) => onChangeText(e.target.value, 'description')}
+                                    />
+                                </InputContainer>
+                            </AppDialog>
+                        </TabListItem>
+                    )
+                })}
             </TabList>
 
             <TabAddButtonContainer
@@ -214,9 +341,10 @@ export function NewTabsPage() {
             >
                 <TabAddButton
                     onClick={onSave}
+                    disabled={state.saving}
                     $active={selected.length > 0}
-                    onMouseEnter={() => onHover(true)}
-                    onMouseLeave={() => onHover(false)}
+                    onMouseEnter={() => onSubmitHover(true)}
+                    onMouseLeave={() => onSubmitHover(false)}
                 >
                     {state.saving
                         ? <>
@@ -232,7 +360,7 @@ export function NewTabsPage() {
                     title="Collection"
                     trigger={
                         <TabSelectCollectionButton
-                            $hide={state.hovered || state.saving}
+                            $hide={state.submitHovered || state.saving}
                         >
                             {collection
                                 ? <SelectCollectionImage

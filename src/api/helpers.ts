@@ -424,3 +424,44 @@ export async function handleCreateCollection({ name }: { name: string }) {
         .then(handleSuccess)
         .catch(handleError);
 }
+
+
+export type CreateTabBookmarkProps = {
+    tabs: ({
+        url: string;
+        title: string;
+    } & UploadProps)[];
+}
+
+export async function handleCreateTabBookmarks({ tabs }: CreateTabBookmarkProps) {
+    const endpoint = `/bookmarks/tab`;
+
+    const body = tabs.map(tab => {
+        const { collection: c, tags, ...rest } = tab;
+        const collection = c !== NIL_OBJECT_ID
+            ? tab.collection
+            : undefined;
+
+        return {
+            ...rest,
+            collection,
+            tags: tags?.join(","),
+        }
+    });
+
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data as Bookmark;
+    }
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    console.log(body);
+
+    return await api
+        .post(endpoint, body)
+        .then(handleSuccess)
+        .catch(handleError);
+}
