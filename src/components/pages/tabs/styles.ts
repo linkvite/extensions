@@ -126,7 +126,7 @@ export const TabAddButtonContainer = styled.div<{ $active: boolean; theme: IThem
     bottom: 2%;
     right: 3%;
     display: flex;
-    background-color: ${p => p.theme.trans_bg};
+    background-color: ${p => p.theme.background_sub};
     transform: translateX(${p => p.$active ? 0 : 200}%);
 `;
 
