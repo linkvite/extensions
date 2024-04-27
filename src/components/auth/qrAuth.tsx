@@ -48,25 +48,28 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
 
     const ws = useRef<Centrifuge | null>(null);
 
-    const [qrCode, setQrCode] = useState("");
-    const [qrCodeLoading, setQrCodeLoading] = useState(true);
-    const [owner, setOwner] = useState<QROwner | null>(null);
+    const [qr, setQR] = useState({
+        code: "",
+        loading: true,
+        error: null as string | null,
+        owner: null as QROwner | null,
+    });
 
     const stopLoading = useCallback(() => {
         setTimeout(() => {
-            setQrCodeLoading(false);
+            setQR(prev => ({ ...prev, loading: false }));
         }, 1000);
     }, []);
 
     async function closeSession() {
-        const { id } = parseQRAuth(qrCode);
+        const { id } = parseQRAuth(qr.code);
         (async () => {
             if (id) {
                 ws.current?.publish(`#${id}`, { event: "qr:session:canceled" });
             }
         })()
             .finally(() => {
-                setOwner(null);
+                setQR(prev => ({ ...prev, owner: null }));
                 ws.current?.disconnect();
                 ws.current = null;
             })
@@ -83,7 +86,7 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
 
         if (event === "qr:session:closed") {
             toast.error("QR session closed by the other device.");
-            setOwner(null);
+            setQR(prev => ({ ...prev, owner: null }));
             restartSession();
         }
 
@@ -92,7 +95,7 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
                 toast.error("Failed to validate QR code.");
                 return;
             }
-            setOwner(data);
+            setQR(prev => ({ ...prev, owner: data }));
         }
 
         if (event === "qr:session:accepted") {
@@ -104,13 +107,13 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
 
             const { refreshToken, user } = response;
             persistAuthData(response);
-            toast.success("Logged in successfully.");
             onLogin(user, refreshToken);
+            toast.success("Logged in successfully.");
         }
     }
 
     async function init() {
-        setQrCodeLoading(true);
+        setQR(prev => ({ ...prev, loading: true }));
 
         const res = await fetch(`${API_DOMAIN}/qr-auth/new`, {
             method: "POST",
@@ -120,8 +123,12 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
         });
 
         if (!res.ok) {
-            toast.error("Failed to get QR code.");
-            setQrCode("");
+            const resp = await res.json() as { ok: boolean; error: string; };
+            setQR(prev => ({
+                ...prev,
+                code: "",
+                error: resp?.error ?? "Failed to get QR code."
+            }));
             stopLoading();
             return;
         }
@@ -130,11 +137,11 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
         const token = data.data.token;
         if (!token) {
             stopLoading();
-            toast.error("Failed to get QR code.");
+            setQR(prev => ({ ...prev, error: "Failed to get QR code." }));
             return;
         }
 
-        setQrCode(data.data.endpoint);
+        setQR(prev => ({ ...prev, code: data.data.endpoint }));
         stopLoading();
 
         if (!ws.current) {
@@ -150,7 +157,7 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
     }
 
     async function restartSession() {
-        setQrCodeLoading(true);
+        setQR(prev => ({ ...prev, loading: true }));
         closeSession();
 
         await init();
@@ -178,15 +185,15 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
 
     return (
         <AuthQrContainer>
-            <QRContainer $qr={!qrCodeLoading && !owner}>
-                {qrCodeLoading
+            <QRContainer $qr={!qr.loading && !qr.owner}>
+                {qr.loading
                     ? <Spinner size={25} color={spinnerColor} />
-                    : owner
+                    : qr.owner
                         ? <QRAuthImage
-                            src={owner.avatar}
+                            src={qr.owner.avatar}
                             alt="qr-avatar"
                         />
-                        : qrCode ? <AuthQrCode qrCode={qrCode} />
+                        : qr.code ? <AuthQrCode qrCode={qr.code} />
                             : <AppText color="dark" textAlign='center' isSubText>
                                 Oh no! Could not load QR code {":("}
                             </AppText>
@@ -194,14 +201,15 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
             </QRContainer>
 
             <QRSubTitle isSubText>
-                {owner
-                    ? `Trying to login as @${owner.username}?`
-                    : qrCode ? `Scan this code with the Linkvite Mobile App to log in.`
-                        : "Ran into an issue loading the QR code. Please refresh the page to try again."
+                {qr.owner ? `Trying to login as @${qr.owner.username}?`
+                    : qr.loading ? "Trying to get a QR code, please wait..."
+                        : qr.code ? `Scan this code with the Linkvite Mobile App to log in.`
+                            : qr.error ? qr.error
+                                : "Oh no! Could not load QR code :("
                 }
             </QRSubTitle>
 
-            {owner
+            {qr.owner
                 ? <AlreadyRegistered
                     onClick={restartSession}
                 >

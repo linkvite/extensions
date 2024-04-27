@@ -179,6 +179,7 @@ export const QRSubTitle = styled(AppText)`
     max-width: 80%;
     margin-top: 1.5rem;
     text-align: center;
+    transition: all .3s ease-in-out;
 `;
 
 export const AlreadyRegistered = styled.button`
