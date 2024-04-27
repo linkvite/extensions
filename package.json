@@ -15,7 +15,7 @@
         "build:safari": "plasmo build --target=safari-mv3",
         "package:safari": "pnpm run build:safari --zip",
         "test:safari": "pnpm run build:safari && xcrun safari-web-extension-converter build/safari-mv3-prod",
-        "mobile:prepare": "pnpm run build:safari && node prepare.js",
+        "package:mobile": "pnpm run build:safari && node prepare.js",
         "lint": "eslint . --ext .ts --ext .tsx"
     },
     "dependencies": {
