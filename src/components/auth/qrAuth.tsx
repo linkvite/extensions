@@ -205,7 +205,7 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
                     : qr.loading ? "Trying to get a QR code, please wait..."
                         : qr.code ? `Scan this code with the Linkvite Mobile App to log in.`
                             : qr.error ? qr.error
-                                : "Oh no! Could not load QR code :("
+                                : "Ran into an issue loading the QR code. Please refresh the page to try again."
                 }
             </QRSubTitle>
 

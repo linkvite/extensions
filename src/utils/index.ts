@@ -1,5 +1,4 @@
 import { browser } from '~browser';
-import { storage } from './storage';
 import { handleLogout } from '~api';
 import { userActions } from '~stores';
 import type { Bookmark } from '@linkvite/js';
@@ -10,7 +9,6 @@ export * from './env';
 export const NIL_OBJECT_ID = "000000000000000000000000";
 
 export async function extLogout() {
-    storage.clear();
     userActions.clearData();
     await handleLogout();
 }

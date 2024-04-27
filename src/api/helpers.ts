@@ -1,7 +1,7 @@
 import { API_DOMAIN, NIL_OBJECT_ID } from "~utils";
 import type { Bookmark, Collection, ParsedLinkData } from "@linkvite/js";
 import type { AuthResponse, HTTPException } from "~types";
-import { authStore, userActions, userStore } from "~stores";
+import { authStore, userActions } from "~stores";
 import xior, { merge, XiorError, type XiorResponse } from "xior";
 import { persistAuthData, storage } from '~utils/storage';
 
@@ -121,25 +121,18 @@ export async function handleAuthentication({ body }: HandleAuthProps) {
         .catch(handleError);
 }
 
-type HandleLogout = {
-    token?: string;
-    silent?: boolean;
-}
+export async function handleLogout() {
+    await storage.clear();
+    await storage.clear(true);
+    await storage.removeAll();
 
-export async function handleLogout({ token, silent }: HandleLogout = {}) {
     userActions.clearData();
     authStore.accessToken.set("")
     authStore.refreshToken.set("");
 
-    await storage.remove("user");
-    await storage.remove("token");
-
-    if (silent) return;
-    const payload = { token, id: userStore.id.get() };
-    await api
-        .post(`/auth/logout`, payload)
+    return await api
+        .post(`${API_DOMAIN}/auth/logout`, {})
         .catch(handleServerError);
-
 }
 
 export async function handleParseLink({ url }: { url: string }) {
@@ -457,8 +450,6 @@ export async function handleCreateTabBookmarks({ data }: CreateTabBookmarkProps)
         const error = handleServerError(err);
         return Promise.reject(error);
     }
-
-    console.log({ tabs });
 
     return await api
         .post(endpoint, { tabs })
