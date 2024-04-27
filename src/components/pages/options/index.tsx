@@ -20,8 +20,8 @@ import {
 
 export function OptionsPage() {
     const { logout } = useAuth();
-    const user = useSelector(userStore);
     const settings = useSelector(settingStore);
+    const { name, username } = useSelector(userStore);
     const [collection, setCollection] = useState<Collection | null>(null);
     useEffect(() => {
         async function init() {
@@ -45,7 +45,7 @@ export function OptionsPage() {
                 <option value="system">System</option>
             </ThemeSelect>
 
-            <Label>Default Collection</Label>
+            <Label>Collection</Label>
             <AppDialog
                 minHeight={300}
                 title="Collection"
@@ -53,7 +53,7 @@ export function OptionsPage() {
                     <CollectionContainer>
                         {collection
                             ? collection.info.name
-                            : "Set Default Collection"
+                            : "No Collection Selected"
                         }
                     </CollectionContainer>
                 }
@@ -74,12 +74,6 @@ export function OptionsPage() {
                 <Label htmlFor="autoClose">Auto Close</Label>
             </AutoContainers>
 
-            <Label
-                style={{ marginTop: 15 }}
-            >
-                Logged in as: {user.username}
-            </Label>
-
             <AppDialog
                 title="Logout"
                 minHeight={100}
@@ -88,13 +82,20 @@ export function OptionsPage() {
                 }
             >
                 <AppText>Are you sure you want to logout?</AppText>
-                <LogoutButton
-                    onClick={logout}
-                    style={{ marginTop: 20 }}
-                >
+                <LogoutButton onClick={logout}>
                     Logout
                 </LogoutButton>
             </AppDialog>
+
+            <Label
+                style={{
+                    marginTop: 10,
+                    width: "100%",
+                    textAlign: "center",
+                }}
+            >
+                Logged in as {name || `@${username}`}
+            </Label>
         </OptionsContainer >
     )
 }

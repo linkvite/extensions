@@ -114,7 +114,7 @@ export const LogoutButton = styled.button<{ theme: ITheme }>`
     width: 100%;
     padding: 10px;
     outline: none;
-    margin-top: 10px;
+    margin-top: 20px;
     border-radius: 8px;
     color: ${Colors.light};
     font-weight: bold;

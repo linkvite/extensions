@@ -42,8 +42,7 @@ function IndexPopup() {
         autoClose,
         currentPage
     } = useSelector(settingStore);
-    const { id } = useSelector(userStore);
-
+    const { id, name, username } = useSelector(userStore);
     const [showBookmark, setShowBookmark] = useState(false);
     const [bookmark, setBookmark] = useState(makeBookmark());
     const [tab, setTab] = useState<browser.Tabs.Tab | null>(null);
@@ -151,10 +150,20 @@ function IndexPopup() {
                         />
 
                         {bookmarkExists ? null : (
-                            <PopupActions>
-                                <PopupAction onClick={() => updateView("local")} $active={view === "local"}>Local</PopupAction>
-                                <PopupAction onClick={() => updateView("api")} $active={view === "api"}>API</PopupAction>
-                            </PopupActions>
+                            <>
+                                <PopupActions>
+                                    <PopupAction onClick={() => updateView("local")} $active={view === "local"}>Local</PopupAction>
+                                    <PopupAction onClick={() => updateView("api")} $active={view === "api"}>API</PopupAction>
+                                </PopupActions>
+                                <AppText
+                                    isSubText
+                                    fontSize="xxs"
+                                    textAlign="center"
+                                    topSpacing="sm"
+                                >
+                                    Logged in as {name || `@${username}`}
+                                </AppText>
+                            </>
                         )}
                     </React.Fragment>
                 ) : currentPage === "options" ? <OptionsPage />
