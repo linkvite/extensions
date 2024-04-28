@@ -30,16 +30,8 @@ export const DarkTheme = {
 export type ITheme = typeof LightTheme | typeof DarkTheme;
 
 export const Fonts = {
-    _5xl: '4.5rem',
-    _4xl: '3.5rem',
-    _3xl: '3rem',
-    xxl: '2.25rem',
-    xl: '2rem',
-    lg: '1.75rem',
-    md: '1.45rem',
     sm: '1.25rem',
-    _sm: '1.15rem',
     xs: '1rem',
     xxs: '0.85rem',
     _3xs: '0.75rem',
-};
+} as const;
