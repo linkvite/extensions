@@ -69,12 +69,12 @@ async function handleClick({ linkUrl, srcUrl, menuItemId }: browser.Menus.OnClic
     }
 }
 
-export async function setupContextMenus() {
+export function setupContextMenus() {
     if (!browser.contextMenus) {
         console.error('browser.contextMenus is not available');
         return;
     }
 
-    create()
-    browser.contextMenus.onClicked.addListener(handleClick)
+    create();
+    browser.contextMenus.onClicked.addListener(handleClick);
 }

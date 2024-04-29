@@ -456,3 +456,24 @@ export async function handleCreateTabBookmarks({ data }: CreateTabBookmarkProps)
         .then(handleSuccess)
         .catch(handleError);
 }
+
+export async function handleFindBookmarks({ query, limit = 10 }: { query: string; limit?: number }) {
+    let endpoint = `/search?q=${query}`;
+    endpoint += `&sort=-updatedAt`;
+    endpoint += `&limit=${limit}`;
+    endpoint += `&path=bookmarks`;
+
+    function handleSuccess(res: XiorResponse) {
+        return res.data.data.bookmarks as Bookmark[];
+    }
+
+    function handleError(err: HTTPException) {
+        const error = handleServerError(err);
+        return Promise.reject(error);
+    }
+
+    return await api
+        .get(endpoint)
+        .then(handleSuccess)
+        .catch(handleError);
+}
