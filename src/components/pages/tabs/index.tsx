@@ -27,20 +27,18 @@ import {
     TabAddButtonContainer,
     TabSelectCollectionButton,
     TabEditButton,
-    TabListItemInfoBottom,
-    TabStarIcon,
     TabDescriptionInput,
 } from "./styles";
-import { closeTab } from "~router";
+// import { closeTab } from "~router";
 import { Colors } from "~utils/styles";
-import { settingStore } from "~stores";
+// import { settingStore } from "~stores";
 import { storage } from "~utils/storage";
 import { pluralize, subString } from "~utils";
 import { Spinner } from "~components/spinner";
 import { AiOutlineEdit } from "react-icons/ai";
 import type { Collection } from "@linkvite/js";
 import { FcOpenedFolder } from "react-icons/fc";
-import { useSelector } from "@legendapp/state/react";
+// import { useSelector } from "@legendapp/state/react";
 import { AppDialog } from "~components/primitives/dialog";
 import { CollectionsModal } from "~components/collections";
 import {
@@ -49,7 +47,6 @@ import {
     InputFieldLine,
     SelectCollectionImage
 } from "~components/bookmark/styles";
-import { TbStar, TbStarFilled } from "react-icons/tb";
 import { sendToBackground } from "@plasmohq/messaging";
 import type {
     TabsMessageResponse
@@ -58,7 +55,6 @@ import type { CreateTabBookmarkProps } from "~api";
 
 type Tab = browser.Tabs.Tab & {
     tags?: string[];
-    starred?: boolean;
     description?: string;
 }
 
@@ -71,9 +67,9 @@ export function NewTabsPage() {
         tabHovered: null as number | null,
     });
 
-    const {
-        autoClose,
-    } = useSelector(settingStore);
+    // const {
+    //     autoClose,
+    // } = useSelector(settingStore);
     const [tabs, setTabs] = useState<Tab[]>([]);
     const [selected, setSelected] = useState([] as number[]);
     const [collection, setCollection] = useState<Collection>();
@@ -120,21 +116,6 @@ export function NewTabsPage() {
         setTabs(updatedTabs);
     }, [tabs, state.tabHovered]);
 
-    const onStar = useCallback((id: number) => {
-        const updatedTabs = tabs.map(tab => {
-            if (tab.id === id) {
-                return {
-                    ...tab,
-                    starred: !tab.starred,
-                }
-            }
-
-            return tab;
-        });
-
-        setTabs(updatedTabs);
-    }, [tabs]);
-
     const onSave = useCallback(async () => {
         if (selected.length === 0) {
             toast.error('No tabs selected');
@@ -147,16 +128,17 @@ export function NewTabsPage() {
             .filter(tab => selected.includes(tab.id) && tab.url)
             .map(tab => ({
                 url: tab.url,
-                tags: tab?.tags,
-                starred: tab.starred,
-                collection: collection?.id,
-                description: tab?.description,
                 title: tab.title || "Untitled",
+                description: tab.description || "",
+                tags: (tab.tags || []).join(",") || "",
             }));
 
         const resp = await sendToBackground<CreateTabBookmarkProps, TabsMessageResponse>({
             name: "tabs",
-            body: { data }
+            body: {
+                tabs: data,
+                collection: collection?.id,
+            }
         });
 
         setState(prev => ({ ...prev, saving: false }));
@@ -167,10 +149,10 @@ export function NewTabsPage() {
         }
 
         toast.success(resp.message);
-        if (autoClose) {
-            closeTab();
-        }
-    }, [autoClose, collection?.id, selected, tabs]);
+        // if (autoClose) {
+        //     closeTab();
+        // }
+    }, [collection?.id, selected, tabs]);
 
     const requestTabsPermission = useCallback(async () => {
         if (hasTabsPermission) return;
@@ -243,97 +225,74 @@ export function NewTabsPage() {
                     {countText}
                 </TabPermissionHeader>
 
-                {tabs.map(tab => {
-                    const StarIcon = tab.starred ? TbStarFilled : TbStar;
-
-                    return (
-                        <TabListItem key={tab.id}
+                {tabs.map(tab => (
+                    <TabListItem key={tab.id}
+                        onClick={() => onSelect(tab.id)}
+                        onMouseEnter={() => onTabHover(tab.id)}
+                        onMouseLeave={() => onTabHover(tab.id)}
+                    >
+                        <TabListItemCheck
                             onClick={() => onSelect(tab.id)}
-                            onMouseEnter={() => onTabHover(tab.id)}
-                            onMouseLeave={() => onTabHover(tab.id)}
                         >
-                            <TabListItemCheck
-                                onClick={() => onSelect(tab.id)}
+                            {selected.includes(tab.id)
+                                ? <Checked color={Colors.primary} size={20} />
+                                : <Unchecked color={Colors.primary} size={20} />
+                            }
+                        </TabListItemCheck>
+
+                        <TabListItemInfo>
+                            <TabListItemTitle>
+                                {tab.title || "Untitled"}
+                            </TabListItemTitle>
+
+                            {tab.description
+                                ? <TabListItemDescription isSubText>
+                                    {tab.description}
+                                </TabListItemDescription>
+                                : null
+                            }
+
+                            <TabListItemUrl
+                                isSubText
                             >
-                                {selected.includes(tab.id)
-                                    ? <Checked color={Colors.primary} size={20} />
-                                    : <Unchecked color={Colors.primary} size={20} />
-                                }
-                            </TabListItemCheck>
+                                {subString(tab.url, 50)}
+                            </TabListItemUrl>
+                        </TabListItemInfo>
 
-                            <TabListItemInfo>
-                                <TabListItemTitle>
-                                    {tab.title || "Untitled"}
-                                </TabListItemTitle>
-
-                                {tab.description
-                                    ? <TabListItemDescription isSubText>
-                                        {tab.description}
-                                    </TabListItemDescription>
-                                    : null
-                                }
-
-                                <TabListItemInfoBottom
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        onStar(tab.id);
-                                    }}
+                        <AppDialog
+                            title="Edit Tab"
+                            minHeight={200}
+                            trigger={
+                                <TabEditButton
+                                    $hide={state.tabHovered !== tab.id}
                                 >
-                                    <TabStarIcon
-                                        $active={tab.starred}
-                                    >
-                                        <StarIcon size={18} />
-                                    </TabStarIcon>
-
-                                    <TabListItemUrl
-                                        isSubText
-                                    >
-                                        &#x2022;
-                                    </TabListItemUrl>
-
-                                    <TabListItemUrl
-                                        isSubText
-                                    >
-                                        {subString(tab.url, 50)}
-                                    </TabListItemUrl>
-                                </TabListItemInfoBottom>
-                            </TabListItemInfo>
-
-                            <AppDialog
-                                title="Edit Tab"
-                                minHeight={200}
-                                trigger={
-                                    <TabEditButton
-                                        $hide={state.tabHovered !== tab.id}
-                                    >
-                                        <AiOutlineEdit
-                                            size={20}
-                                            color={Colors.primary}
-                                        />
-                                    </TabEditButton>
-                                }
+                                    <AiOutlineEdit
+                                        size={20}
+                                        color={Colors.primary}
+                                    />
+                                </TabEditButton>
+                            }
+                        >
+                            <InputContainer
+                                style={{ backgroundColor: theme.trans_bg }}
                             >
-                                <InputContainer
-                                    style={{ backgroundColor: theme.trans_bg }}
-                                >
-                                    <InputField
-                                        value={tab.title}
-                                        placeholder={'Add a Title'}
-                                        onChange={(e) => onChangeText(e.target.value, 'title')}
-                                    />
+                                <InputField
+                                    value={tab.title}
+                                    placeholder={'Add a Title'}
+                                    onChange={(e) => onChangeText(e.target.value, 'title')}
+                                />
 
-                                    <InputFieldLine $isName />
+                                <InputFieldLine $isName />
 
-                                    <TabDescriptionInput
-                                        value={tab.description}
-                                        placeholder={'Add a Description'}
-                                        onChange={(e) => onChangeText(e.target.value, 'description')}
-                                    />
-                                </InputContainer>
-                            </AppDialog>
-                        </TabListItem>
-                    )
-                })}
+                                <TabDescriptionInput
+                                    value={tab.description}
+                                    placeholder={'Add a Description'}
+                                    onChange={(e) => onChangeText(e.target.value, 'description')}
+                                />
+                            </InputContainer>
+                        </AppDialog>
+                    </TabListItem>
+                ))}
             </TabList>
 
             <TabAddButtonContainer

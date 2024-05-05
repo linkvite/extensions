@@ -1,6 +1,5 @@
 import { rgba } from "polished";
 import styled from "styled-components";
-import { BookmarkStarIcon } from "~components/bookmark/styles";
 import { AppText } from "~components/text";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
 
@@ -80,12 +79,6 @@ export const TabListItemInfo = styled.div`
     width: calc(100% - 16px);
 `;
 
-
-export const TabListItemInfoBottom = styled.div`
-    display: flex;
-    align-items: center;
-`;
-
 export const TabListItemTitle = styled(AppText)`
     width: 100%;
     max-width: 100%;
@@ -113,7 +106,6 @@ export const TabListItemUrl = styled(AppText)`
     max-width: 100%;
     font-size: ${Fonts.xxs};
     margin-top: 0.25rem;
-    margin-left: 0.25rem;
 `;
 
 export const TabAddButtonContainer = styled.div<{ $active: boolean; theme: ITheme }>`
@@ -197,23 +189,6 @@ export const TabEditButton = styled.button<{ $hide: boolean }>`
     &:hover {
         cursor: pointer;
         scale: 1.1;
-    }
-`;
-
-export const TabStarIcon = styled(BookmarkStarIcon) <{ theme: ITheme; $active: boolean }>`
-    height: 20px;
-    width: 20px;
-    border: none;
-    margin-top: 0.25rem;
-    background-color: transparent;
-    transition: all 0.3s ease-in-out;
-    color: ${p => p.$active ? Colors.warning : p.theme.text_sub};
-
-    &:hover {
-        border: none;
-        cursor: pointer;
-        color: ${Colors.warning};
-        background-color: transparent;
     }
 `;
 

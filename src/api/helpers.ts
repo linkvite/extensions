@@ -420,30 +420,25 @@ export async function handleCreateCollection({ name }: { name: string }) {
 
 
 export type CreateTabBookmarkProps = {
-    data: ({
+    tabs: ({
         url: string;
         title: string;
-    } & UploadProps)[];
+        tags?: string;
+        description?: string;
+    })[];
+    collection?: string;
 }
 
-export async function handleCreateTabBookmarks({ data }: CreateTabBookmarkProps) {
+export async function handleCreateTabBookmarks({ tabs, collection }: CreateTabBookmarkProps) {
     const endpoint = `/bookmarks/tabs`;
 
-    const tabs = data.map(tab => {
-        const { collection: c, tags, ...rest } = tab;
-        const collection = c !== NIL_OBJECT_ID
-            ? tab.collection
-            : undefined;
-
-        return {
-            ...rest,
-            collection,
-            tags: tags?.join(","),
-        }
-    });
+    const body = {
+        tabs,
+        collection,
+    }
 
     function handleSuccess(res: XiorResponse) {
-        return res.data.data as Bookmark;
+        return Promise.resolve(res.data.message as string);
     }
 
     function handleError(err: HTTPException) {
@@ -452,7 +447,7 @@ export async function handleCreateTabBookmarks({ data }: CreateTabBookmarkProps)
     }
 
     return await api
-        .post(endpoint, { tabs })
+        .post(endpoint, body)
         .then(handleSuccess)
         .catch(handleError);
 }

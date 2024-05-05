@@ -11,8 +11,8 @@ const handler: PlasmoMessaging.MessageHandler<
     TabsMessageResponse
 > = async (req, res) => {
     try {
-        await handleCreateTabBookmarks({ ...req.body });
-        return res.send({ message: "Bookmark created successfully" });
+        const message = await handleCreateTabBookmarks({ ...req.body });
+        return res.send({ message });
     } catch (error) {
         return res.send({ error: String(error) });
     }
