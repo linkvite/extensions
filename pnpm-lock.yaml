@@ -23,7 +23,7 @@ specifiers:
   eslint-plugin-react: ^7.34.0
   htmlparser2: ^9.1.0
   immer: ^10.0.4
-  plasmo: 0.86.1
+  plasmo: 0.86.2
   polished: ^4.3.1
   prettier: 3.2.4
   qrcode.react: ^3.1.0
@@ -51,7 +51,7 @@ dependencies:
   centrifuge: 5.1.1
   htmlparser2: 9.1.0
   immer: 10.0.4
-  plasmo: 0.86.1_biqbaboplfbrettd7655fr4n2y
+  plasmo: 0.86.2_biqbaboplfbrettd7655fr4n2y
   polished: 4.3.1
   qrcode.react: 3.1.0_react@18.2.0
   react: 18.2.0
@@ -2069,8 +2069,8 @@ packages:
       nullthrows: 1.1.1
     dev: false
 
-  /@plasmohq/parcel-compressor-utf8/0.0.6_@parcel+core@2.9.3:
-    resolution: {integrity: sha512-dtbZXi2gAHyVhxqxF2SvJtwDOy02QYRjwCJYOFsQR79qwAiuUBaeQ47p++vFrqNX86mo1lUtZniJl63xNQi08w==}
+  /@plasmohq/parcel-compressor-utf8/0.1.0_@parcel+core@2.9.3:
+    resolution: {integrity: sha512-UxljXY+cUVO0ZdszoQRfQjbRjyWYIhGKCjFD48yOcnbSkOZmS5MPPhKrT79x+PMGSK5T6fUXaDjzqbnMb45MZw==}
     engines: {parcel: '>= 2.8.0'}
     dependencies:
       '@parcel/plugin': 2.9.3_@parcel+core@2.9.3
@@ -2078,8 +2078,8 @@ packages:
       - '@parcel/core'
     dev: false
 
-  /@plasmohq/parcel-config/0.40.6_vegmnuvoswdxuttpuhvewcem44:
-    resolution: {integrity: sha512-vHziUFcOa1pGsnEMsbmKNHh/KoiZQV6Fc1Ocw5nzXJv52wKBdF3MMpqAVphyBjhMLDyXUpI72ntNXhGBVVKo0g==}
+  /@plasmohq/parcel-config/0.40.7_vegmnuvoswdxuttpuhvewcem44:
+    resolution: {integrity: sha512-M1nOXLI8lPcI/ZS1G+UCfuXe0MWb4+sCnG5xTakm8eDRjH0Paq4pWYKXqi1Bl5V76quK9I3gjezgqEihUTAynQ==}
     dependencies:
       '@parcel/compressor-raw': 2.9.3_@parcel+core@2.9.3
       '@parcel/config-default': 2.9.3_rk5nrpt6mzvotn7khjyp27ftlu
@@ -2103,7 +2103,7 @@ packages:
       '@parcel/transformer-svg-react': 2.9.3_@parcel+core@2.9.3
       '@parcel/transformer-worklet': 2.9.3_@parcel+core@2.9.3
       '@plasmohq/parcel-bundler': 0.5.5
-      '@plasmohq/parcel-compressor-utf8': 0.0.6_@parcel+core@2.9.3
+      '@plasmohq/parcel-compressor-utf8': 0.1.0_@parcel+core@2.9.3
       '@plasmohq/parcel-namer-manifest': 0.3.12
       '@plasmohq/parcel-optimizer-encapsulate': 0.0.7
       '@plasmohq/parcel-optimizer-es': 0.4.0
@@ -6835,8 +6835,8 @@ packages:
     engines: {node: '>= 6'}
     dev: false
 
-  /plasmo/0.86.1_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-6qDWnQ8TVGLmGIWWOoXR0upCuNW6LnlrLEQ0b0EMRoApomps9q77908hNKJWbDlz5rqXOhcpecaVTQ0mx8lzCw==}
+  /plasmo/0.86.2_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-oFC8nQmhiule876jyehfZVUBPZV9YWUyfiRBHERBOlW+ezGtyZx/wvWWKE9MHmgE2Cm48H5+U9KcN+pYZNzB5g==}
     hasBin: true
     dependencies:
       '@expo/spawn-async': 1.7.2
@@ -6845,7 +6845,7 @@ packages:
       '@parcel/package-manager': 2.9.3_@parcel+core@2.9.3
       '@parcel/watcher': 2.2.0
       '@plasmohq/init': 0.7.0
-      '@plasmohq/parcel-config': 0.40.6_vegmnuvoswdxuttpuhvewcem44
+      '@plasmohq/parcel-config': 0.40.7_vegmnuvoswdxuttpuhvewcem44
       '@plasmohq/parcel-core': 0.1.8
       buffer: 6.0.3
       chalk: 5.3.0

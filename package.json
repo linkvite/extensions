@@ -30,7 +30,7 @@
         "centrifuge": "5.1.1",
         "htmlparser2": "^9.1.0",
         "immer": "^10.0.4",
-        "plasmo": "0.86.1",
+        "plasmo": "0.86.2",
         "polished": "^4.3.1",
         "qrcode.react": "^3.1.0",
         "react": "18.2.0",
