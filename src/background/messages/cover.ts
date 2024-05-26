@@ -3,28 +3,29 @@ import { handleUpdateBookmarkCover } from "~api";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
 
 export type UpdateCoverMessageRequest = {
-    id: string;
-    cover: string;
-    type: "default" | "custom";
-}
+	id: string;
+	cover: string;
+	type: "default" | "custom";
+};
 
-export type UpdateCoverMessageResponse = { bookmark: Bookmark } | { error: string };
+export type UpdateCoverMessageResponse =
+	| { bookmark: Bookmark }
+	| { error: string };
 
 const handler: PlasmoMessaging.MessageHandler<
-    UpdateCoverMessageRequest,
-    UpdateCoverMessageResponse
+	UpdateCoverMessageRequest,
+	UpdateCoverMessageResponse
 > = async (req, res) => {
-    try {
-        const bookmark = await handleUpdateBookmarkCover({
-            id: req.body.id,
-            cover: req.body.cover,
-            type: req.body.type
-        });
-        return res.send({ bookmark });
-    } catch (error) {
-        return res.send({ error: String(error) });
-    }
-}
+	try {
+		const bookmark = await handleUpdateBookmarkCover({
+			id: req.body.id,
+			cover: req.body.cover,
+			type: req.body.type,
+		});
+		return res.send({ bookmark });
+	} catch (error) {
+		return res.send({ error: String(error) });
+	}
+};
 
-// eslint-disable-next-line import/no-unused-modules
-export default handler
+export default handler;

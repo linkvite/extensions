@@ -1,213 +1,198 @@
-
 import { Colors } from "~utils/styles";
 import { storage } from "~utils/storage";
 import { IoMdClose } from "react-icons/io";
 import { AppText } from "~components/text";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
-    RecentTags,
-    RecentTagsClear,
-    RecentTagsHeader,
-    TagAddButton,
-    TagItem,
-    TagItemCloseButton,
-    TagItems,
-    TagsContainer,
-    TagsInput,
-    TagsInputContainer
+	RecentTags,
+	RecentTagsClear,
+	RecentTagsHeader,
+	TagAddButton,
+	TagItem,
+	TagItemCloseButton,
+	TagItems,
+	TagsContainer,
+	TagsInput,
+	TagsInputContainer,
 } from "./styles";
+import { convertToTags } from "~utils";
 
 type Props = {
-    tags: string[];
-    setTags: (tags: string[]) => void;
-}
+	tags: string;
+	setTags: (tags: string[]) => void;
+};
 
 export function TagsModal({ tags, setTags }: Props) {
-    const [tag, setTag] = useState("");
-    const [currentTag, setCurrentTag] = useState("");
-    const [recent, setRecent] = useState<string[]>([]);
+	const [tag, setTag] = useState("");
+	const [currentTag, setCurrentTag] = useState("");
+	const [recent, setRecent] = useState<string[]>([]);
 
-    const uniqueTags = useMemo(() => Array.from(new Set(tags)), [tags]);
+	const uniqueTags = useMemo(() => convertToTags(tags), [tags]);
 
-    useEffect(() => {
-        async function init() {
-            const tags = (await storage
-                .get<string[]>("recentTags") ?? [])
-                .slice(0, 5);
-            if (tags) setRecent(tags);
-        }
+	useEffect(() => {
+		async function init() {
+			const tags = ((await storage.get<string[]>("recentTags")) ?? []).slice(
+				0,
+				5,
+			);
+			if (tags) {
+				setRecent(tags);
+			}
+		}
 
-        init();
-    }, []);
+		init();
+	}, []);
 
-    function onRemoveTag(tag: string) {
-        if (!tag) return;
-        const newTags = uniqueTags.filter((t) => t !== tag);
-        setTags(newTags);
-    }
+	function onRemoveTag(tag: string) {
+		if (!tag) {
+			return;
+		}
+		const newTags = uniqueTags.filter((t) => t !== tag);
+		setTags(newTags);
+	}
 
-    function onPressTag(tag: string) {
-        if (!tag) return;
+	function onPressTag(tag: string) {
+		if (!tag) {
+			return;
+		}
 
-        const newTag = tag.trim().replace(/\s/g, '');
-        const split = newTag.split(',');
-        const unique = new Set([...uniqueTags, ...split]);
+		const newTags = convertToTags(tag)
+		const unique = new Set([...uniqueTags, ...newTags]);
 
-        setTags(Array.from(unique));
-        setCurrentTag(currentTag === tag ? "" : tag);
+		setTags(Array.from(unique));
+		setCurrentTag(currentTag === tag ? "" : tag);
 
-        setTag("");
+		setTag("");
 
-        for (const t of split) addToRecent(t);
-    }
+		for (const t of newTags) { addToRecent(t); }
+	}
 
-    async function addToRecent(tag: string) {
-        if (!tag || recent.includes(tag)) return;
+	async function addToRecent(tag: string) {
+		if (!tag || recent.includes(tag)) { return; }
 
-        const oldRecent = (await storage
-            .get<string[]>("recentTags") ?? [])
-            .slice(0, 4);
-        const newRecent = Array.from(new Set([tag, ...oldRecent]))
+		const oldRecent = ((await storage.get<string[]>("recentTags")) ?? []).slice(
+			0,
+			4,
+		);
+		const newRecent = Array.from(new Set([tag, ...oldRecent]));
 
-        setRecent(newRecent);
-        await storage.set("recentTags", newRecent);
-    }
+		setRecent(newRecent);
+		await storage.set("recentTags", newRecent);
+	}
 
-    function onSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        if (!tag) return;
+	function onSubmit(e: FormEvent) {
+		e.preventDefault();
+		if (!tag) { return; }
 
-        onPressTag(tag);
-    }
+		onPressTag(tag);
+	}
 
-    async function clearRecentTags() {
-        setRecent([]);
-        await storage.remove("recentTags");
-    }
+	async function clearRecentTags() {
+		setRecent([]);
+		await storage.remove("recentTags");
+	}
 
-    return (
-        <TagsContainer onSubmit={onSubmit}>
-            <TagsInputContainer>
-                <TagsInput
-                    required
-                    type='text'
-                    id='tag'
-                    name='tag'
-                    value={tag}
-                    onChange={(e) => setTag(e.target.value)}
-                    placeholder='eg: "Books" or "Read, Books" for multiple tags'
-                />
+	return (
+		<TagsContainer onSubmit={onSubmit}>
+			<TagsInputContainer>
+				<TagsInput
+					required
+					type="text"
+					id="tag"
+					name="tag"
+					value={tag}
+					onChange={(e) => setTag(e.target.value)}
+					placeholder='eg: "Books" or "Read, Books" for multiple tags'
+				/>
 
-                <TagAddButton
-                    type='submit'
-                    $active={!!tag}
-                    aria-disabled={!tag}
-                >
-                    Add
-                </TagAddButton>
-            </TagsInputContainer>
+				<TagAddButton type="submit" $active={!!tag} aria-disabled={!tag}>
+					Add
+				</TagAddButton>
+			</TagsInputContainer>
 
-            <TagItems>
-                {tags.length ? tags.map((tag) => (
-                    <Tag
-                        key={tag}
-                        tag={tag}
-                        currentTag={currentTag}
-                        onRemoveTag={onRemoveTag}
-                        onPressTag={setCurrentTag}
-                    />
-                )) : (
-                    <AppText
-                        isSubText
-                        fontSize="xxs"
-                        topSpacing="md"
-                        width="100%"
-                        maxWidth="100%"
-                        textAlign="center"
-                    >
-                        No tags added yet
+			<TagItems>
+				{uniqueTags.length ? (
+					uniqueTags.map((tag) => (
+						<Tag
+							key={tag}
+							tag={tag}
+							currentTag={currentTag}
+							onRemoveTag={onRemoveTag}
+							onPressTag={setCurrentTag}
+						/>
+					))
+				) : (
+					<AppText
+						isSubText
+						fontSize="xxs"
+						topSpacing="md"
+						width="100%"
+						maxWidth="100%"
+						textAlign="center"
+					>
+						No tags added yet
+						<br />
+						<br />
+						&#8505; double click a tag to remove it
+					</AppText>
+				)}
+			</TagItems>
 
-                        <br />
-                        <br />
+			{recent.length ? (
+				<RecentTags>
+					<RecentTagsHeader>
+						<AppText isSubText fontSize="xxs">
+							Recent tags
+						</AppText>
 
-                        &#8505; double click a tag to remove it
-                    </AppText>
-                )}
-            </TagItems>
+						<RecentTagsClear type="button" onClick={clearRecentTags}>
+							Clear
+						</RecentTagsClear>
+					</RecentTagsHeader>
 
-            {recent.length ? (
-                <RecentTags>
-                    <RecentTagsHeader>
-                        <AppText
-                            isSubText
-                            fontSize="xxs"
-                        >
-                            Recent tags
-                        </AppText>
-
-                        <RecentTagsClear
-                            type="button"
-                            onClick={clearRecentTags}
-                        >
-                            Clear
-                        </RecentTagsClear>
-                    </RecentTagsHeader>
-
-                    <TagItems style={{ marginTop: 5 }}>
-                        {recent.map((tag) => (
-                            <Tag
-                                key={tag}
-                                tag={tag}
-                                onPressTag={onPressTag}
-                            />
-                        ))}
-                    </TagItems>
-                </RecentTags>
-            ) : null}
-        </TagsContainer>
-    )
+					<TagItems style={{ marginTop: 5 }}>
+						{recent.map((tag) => (
+							<Tag key={tag} tag={tag} onPressTag={onPressTag} />
+						))}
+					</TagItems>
+				</RecentTags>
+			) : null}
+		</TagsContainer>
+	);
 }
 
 type TagItemProps = {
-    tag: string;
-    currentTag?: string;
-    onPressTag: (tag: string) => void;
-    onRemoveTag?: (tag: string) => void;
-}
+	tag: string;
+	currentTag?: string;
+	onPressTag: (tag: string) => void;
+	onRemoveTag?: (tag: string) => void;
+};
 
 function Tag({ tag, currentTag, onPressTag, onRemoveTag }: TagItemProps) {
-    const [closeHovered, setCloseHovered] = useState(false);
-    return (
-        <TagItem
-            type="button"
-            $closeHovered={closeHovered}
-            onClick={() => onPressTag(tag)}
-            onDoubleClick={() => onRemoveTag?.(tag)}
-        >
-            <AppText
-                color="light"
-                fontSize="xxs"
-            >
-                {tag}
-            </AppText>
+	const [closeHovered, setCloseHovered] = useState(false);
+	return (
+		<TagItem
+			type="button"
+			$closeHovered={closeHovered}
+			onClick={() => onPressTag(tag)}
+			onDoubleClick={() => onRemoveTag?.(tag)}
+		>
+			<AppText color="light" fontSize="xxs">
+				{tag}
+			</AppText>
 
-            {currentTag && currentTag === tag
-                ? <TagItemCloseButton
-                    role="button"
-                    aria-label="remove tag"
-                    tabIndex={0}
-                    onClick={() => onRemoveTag?.(tag)}
-                    onMouseEnter={() => setCloseHovered(true)}
-                    onMouseLeave={() => setCloseHovered(false)}
-                >
-                    <IoMdClose
-                        size={14}
-                        name="ios-close"
-                        color={Colors.light}
-                    />
-                </TagItemCloseButton>
-                : null
-            }
-        </TagItem>
-    )
+			{currentTag && currentTag === tag ? (
+				<TagItemCloseButton
+					role="button"
+					aria-label="remove tag"
+					tabIndex={0}
+					onClick={() => onRemoveTag?.(tag)}
+					onMouseEnter={() => setCloseHovered(true)}
+					onMouseLeave={() => setCloseHovered(false)}
+				>
+					<IoMdClose size={14} name="ios-close" color={Colors.light} />
+				</TagItemCloseButton>
+			) : null}
+		</TagItem>
+	);
 }

@@ -11,7 +11,7 @@ export const ViewBookmarkContainer = styled.div`
     align-items: center;
 `;
 
-export const InputContainer = styled.div<{ theme: ITheme, $isURL?: boolean }>`
+export const InputContainer = styled.div<{ theme: ITheme; $isURL?: boolean }>`
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -19,11 +19,11 @@ export const InputContainer = styled.div<{ theme: ITheme, $isURL?: boolean }>`
     justify-content: center;
     padding: 10px;
     border-radius: 10px;
-    background-color: ${p => p.theme.background_sub};
+    background-color: ${(p) => p.theme.background_sub};
     margin-top: 15px;
 `;
 
-export const InputField = styled.input <{ theme: ITheme }>`
+export const InputField = styled.input<{ theme: ITheme }>`
     width: 100%;
     height: auto;
     max-height: 100px;
@@ -34,11 +34,11 @@ export const InputField = styled.input <{ theme: ITheme }>`
     justify-content: center;
     background-color: transparent;
     font-size: ${Fonts.xs};
-    color: ${p => p.theme.text};
+    color: ${(p) => p.theme.text};
     border: none;
 
     &::placeholder {
-        color: ${p => p.theme.text_sub};
+        color: ${(p) => p.theme.text_sub};
     }
 
     &:focus {
@@ -46,14 +46,14 @@ export const InputField = styled.input <{ theme: ITheme }>`
     }
 `;
 
-export const InputFieldLine = styled.div<{ theme: ITheme, $isName?: boolean }>`
+export const InputFieldLine = styled.div<{ theme: ITheme; $isName?: boolean }>`
     width: 98%;
     height: .75px;
-    background-color: ${p => p.theme.trans_bg_opp};
-    margin: ${p => p.$isName ? '5px 0 5px 0' : '0 0 0 auto'};
+    background-color: ${(p) => p.theme.trans_bg_opp};
+    margin: ${(p) => (p.$isName ? "5px 0 5px 0" : "0 0 0 auto")};
 `;
 
-export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme; }>`
+export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme }>`
     width: 100%;
     min-width: 150px;
     height: 150px;
@@ -63,7 +63,7 @@ export const BookmarkCoverMainContainer = styled.div<{ theme: ITheme; }>`
     align-items: flex-start;
     justify-content: space-between;
     border-radius: 10px;
-    background-color: ${p => p.theme.background_sub};
+    background-color: ${(p) => p.theme.background_sub};
 `;
 
 export const BookmarkCoverContainer = styled.div`
@@ -74,14 +74,14 @@ export const BookmarkCoverContainer = styled.div`
     height: 100%;
     width: 100%;
     border-radius: 10px;
-`
+`;
 
-export const BookmarkNewImage = styled.img <{ theme: ITheme }>`
+export const BookmarkNewImage = styled.img<{ theme: ITheme }>`
     width: 100%;
     height: 100%;
     border-radius: 8px;
     object-fit: cover;
-    background-color: ${p => p.theme.trans_bg};
+    background-color: ${(p) => p.theme.trans_bg};
 `;
 
 export const BookmarkNewImageIcon = styled.div`
@@ -109,7 +109,7 @@ export const BookmarkSubmitButton = styled.button`
         opacity: ${p.disabled ? 0.5 : 1};
 
         &:hover {
-            cursor: ${p.disabled ? 'not-allowed' : 'pointer'};
+            cursor: ${p.disabled ? "not-allowed" : "pointer"};
             opacity: ${p.disabled ? 0.5 : 0.9};
         }
     `};
@@ -121,7 +121,10 @@ export const BookmarkSubmitButtonText = styled(AppText)`
     font-size: ${Fonts.xs};
 `;
 
-export const BookmarkDeleteButton = styled.button<{ theme: ITheme; disabled?: boolean }>`
+export const BookmarkDeleteButton = styled.button<{
+	theme: ITheme;
+	disabled?: boolean;
+}>`
     border: none;
     margin-top: 15px;
     margin-bottom: 5px;
@@ -136,12 +139,12 @@ export const BookmarkDeleteButton = styled.button<{ theme: ITheme; disabled?: bo
     text-decoration: underline;
     transition: all 0.3s ease-in-out;
     align-self: center;
-    opacity: ${p => p.disabled ? 0.5 : 1};
+    opacity: ${(p) => (p.disabled ? 0.5 : 1)};
 
     &:hover {
-        opacity: ${p => p.disabled ? 0.5 : 1};
-        cursor: ${p => p.disabled ? 'not-allowed' : 'pointer'};
-        color: ${p => p.disabled ? Colors.error : p.theme.text};
+        opacity: ${(p) => (p.disabled ? 0.5 : 1)};
+        cursor: ${(p) => (p.disabled ? "not-allowed" : "pointer")};
+        color: ${(p) => (p.disabled ? Colors.error : p.theme.text)};
     }
 `;
 
@@ -161,7 +164,7 @@ export const BookmarkActionsSubContainer = styled.div<{ $isImage?: boolean }>`
     height: 100%;
     flex-direction: column;
     justify-content: space-evenly;
-    width: ${p => p.$isImage ? '40%' : 'calc(60% - 15px)'};
+    width: ${(p) => (p.$isImage ? "40%" : "calc(60% - 15px)")};
 `;
 
 export const BookmarkAction = styled.button<{ theme: ITheme }>`
@@ -176,11 +179,11 @@ export const BookmarkAction = styled.button<{ theme: ITheme }>`
     outline: none;
     border: 1px solid transparent;
     transition: all 0.3s ease-in-out;
-    background-color: ${p => p.theme.background_sub};
+    background-color: ${(p) => p.theme.background_sub};
 
     &:hover {
         cursor: pointer;
-        border-color: ${p => rgba(p.theme.trans_bg, 0.5)};
+        border-color: ${(p) => rgba(p.theme.trans_bg, 0.5)};
     }
 `;
 
@@ -207,7 +210,7 @@ export const BookmarkActionIcon = styled.div<{ bg?: string }>`
     height: 30px;
     width: 30px;
     padding: 3px 4px;
-    background-color: ${p => p.bg || Colors.primary};
+    background-color: ${(p) => p.bg || Colors.primary};
 `;
 
 export const BookmarkStarIcon = styled.button<{ theme: ITheme }>`
@@ -222,12 +225,12 @@ export const BookmarkStarIcon = styled.button<{ theme: ITheme }>`
     justify-content: center;
     transition: all 0.3s ease-in-out;
     border: 1px solid transparent;
-    background-color: ${p => p.theme.background_sub};
+    background-color: ${(p) => p.theme.background_sub};
     outline: none;
     transition: all 0.3s ease-in-out;
 
     &:hover {
         cursor: pointer;
-        border-color: ${p => rgba(p.theme.trans_bg, 0.5)};
+        border-color: ${(p) => rgba(p.theme.trans_bg, 0.5)};
     }
 `;

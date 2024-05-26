@@ -1,4 +1,4 @@
-export const APP_DOMAIN = "https://app.linkvite.io"
+export const APP_DOMAIN = "https://app.linkvite.io";
 export const API_DOMAIN = "https://api.linkvite.io/v1";
 export const WS_ENDPOINT = "wss://ws.linkvite.io/connection/websocket";
 const ASSETS_DOMAIN = "https://assets.linkvite.io";

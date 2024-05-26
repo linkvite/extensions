@@ -1,5 +1,5 @@
 import styled, { keyframes } from "styled-components";
-import * as RadixDialog from '@radix-ui/react-dialog';
+import * as RadixDialog from "@radix-ui/react-dialog";
 import { Fonts, type ITheme } from "~utils/styles";
 
 export const DialogRoot = styled(RadixDialog.Root)`
@@ -41,8 +41,11 @@ const contentShow = keyframes`
     }
 `;
 
-export const DialogContent = styled(RadixDialog.Content) <{ theme: ITheme; min?: number }>`
-    background-color: ${p => p.theme.background_sub};
+export const DialogContent = styled(RadixDialog.Content)<{
+	theme: ITheme;
+	min?: number;
+}>`
+    background-color: ${(p) => p.theme.background_sub};
     border-radius: 0.5rem;
     box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px;
     position: fixed;
@@ -53,7 +56,7 @@ export const DialogContent = styled(RadixDialog.Content) <{ theme: ITheme; min?:
     width: 90vw;
     max-width: 400px;
     max-height: 600px;
-    min-height: ${p => p.min ? p.min + 'px' : 'auto'};
+    min-height: ${(p) => (p.min ? p.min + "px" : "auto")};
     animation: ${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1);
 
     &:focus {
@@ -64,7 +67,7 @@ export const DialogContent = styled(RadixDialog.Content) <{ theme: ITheme; min?:
 export const DialogTitle = styled.p<{ theme: ITheme }>`
     margin: 0;
     font-weight: 500;
-    color: ${p => p.theme.text};
+    color: ${(p) => p.theme.text};
     font-size: ${Fonts.sm};
     margin-bottom: 15px;
 `;
@@ -72,7 +75,7 @@ export const DialogTitle = styled.p<{ theme: ITheme }>`
 export const DialogDescription = styled.p<{ theme: ITheme }>`
     margin-top: -5px;
     margin-bottom: 5px;
-    color: ${p => p.theme.text_sub};
+    color: ${(p) => p.theme.text_sub};
     font-size: ${Fonts.xxs};
     line-height: 1.5;
 `;
@@ -90,11 +93,11 @@ export const DialogClose = styled.button<{ theme: ITheme }>`
     border: none;
     padding: 5px;
     background-color: transparent;
-    color: ${p => p.theme.text_sub};
+    color: ${(p) => p.theme.text_sub};
     transition: all 0.3s ease-in-out;
 
     &:hover {
         cursor: pointer;
-        color: ${p => p.theme.text};
+        color: ${(p) => p.theme.text};
     }
 `;

@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
-import * as RadixDropdownMenu from '@radix-ui/react-dropdown-menu';
+import * as RadixDropdownMenu from "@radix-ui/react-dropdown-menu";
 
 const menuStyles = `
     width: 100%;
@@ -73,36 +73,43 @@ export const DropdownMenuTrigger = styled(RadixDropdownMenu.Trigger)`
     }
 `;
 
-export const DropdownMenuContent = styled(RadixDropdownMenu.Content) <{ theme: ITheme }>`
+export const DropdownMenuContent = styled(RadixDropdownMenu.Content)<{
+	theme: ITheme;
+}>`
     ${menuStyles}
 
-    border: 1px solid ${p => p.theme.trans_bg};
-    background-color: ${p => p.theme.background};
+    border: 1px solid ${(p) => p.theme.trans_bg};
+    background-color: ${(p) => p.theme.background};
     min-width: 200px;
 `;
 
-export const DropdownMenuSubContent = styled(RadixDropdownMenu.SubContent) <{ theme: ITheme }>`
+export const DropdownMenuSubContent = styled(RadixDropdownMenu.SubContent)<{
+	theme: ITheme;
+}>`
     ${menuStyles}
-    background-color: ${p => p.theme.background};
-    border: 1px solid ${p => p.theme.trans_bg};
+    background-color: ${(p) => p.theme.background};
+    border: 1px solid ${(p) => p.theme.trans_bg};
 `;
 
-export const DropdownMenuItem = styled(RadixDropdownMenu.Item) <{ $destructive?: boolean; theme: ITheme }>`
+export const DropdownMenuItem = styled(RadixDropdownMenu.Item)<{
+	$destructive?: boolean;
+	theme: ITheme;
+}>`
     ${menuItemStyles}
 
-    color: ${p => p.$destructive ? Colors.error : p.theme.text};
+    color: ${(p) => (p.$destructive ? Colors.error : p.theme.text)};
 
     &[data-disabled] {
         opacity: 0.5;
     }
 
     &[data-highlighted] {
-        color: ${p => p.theme.text};
-        background-color: ${p => p.theme.trans_bg};
+        color: ${(p) => p.theme.text};
+        background-color: ${(p) => p.theme.trans_bg};
     }
 
     &[data-highlighted] > .lv-context-menu-right-slot {
-        color: ${p => p.theme.text};
+        color: ${(p) => p.theme.text};
     }
     
     &[data-disabled] .lv-context-menu-right-slot {
@@ -114,47 +121,55 @@ export const DropdownMenuItemIcon = styled.div`
     margin-right: 10px;
 `;
 
-export const DropdownMenuSubTrigger = styled(RadixDropdownMenu.SubTrigger) <{ theme: ITheme }>`
+export const DropdownMenuSubTrigger = styled(RadixDropdownMenu.SubTrigger)<{
+	theme: ITheme;
+}>`
     ${menuItemStyles}
 
     &[data-state='open'] {
-        background-color: ${p => p.theme.trans_bg};
-        color: ${p => p.theme.text};
+        background-color: ${(p) => p.theme.trans_bg};
+        color: ${(p) => p.theme.text};
     }
 
     &[data-disabled] {
-        color: ${p => p.theme.text_sub};
+        color: ${(p) => p.theme.text_sub};
     } 
 
     &[data-highlighted] {
-        background-color: ${p => p.theme.trans_bg};
-        color: ${p => p.theme.text};
+        background-color: ${(p) => p.theme.trans_bg};
+        color: ${(p) => p.theme.text};
     }
 `;
 
-export const DropdownMenuLabel = styled(RadixDropdownMenu.Label) <{ theme: ITheme }>`
+export const DropdownMenuLabel = styled(RadixDropdownMenu.Label)<{
+	theme: ITheme;
+}>`
     padding-left: 10px;
     font-size: ${Fonts._3xs};
     line-height: 25px;
-    color: ${p => p.theme.text_sub};
+    color: ${(p) => p.theme.text_sub};
 `;
 
-export const DropdownMenuSeparator = styled(RadixDropdownMenu.Separator) <{ theme: ITheme }>`
+export const DropdownMenuSeparator = styled(RadixDropdownMenu.Separator)<{
+	theme: ITheme;
+}>`
     height: 1px;
     margin: 5px;
-    background-color: ${p => p.theme.trans_bg};
+    background-color: ${(p) => p.theme.trans_bg};
 `;
 
 export const DropdownMenuRightSlot = styled.div<{ $destructive?: boolean }>`
     margin-left: auto;
     opacity: 0.7;
-    color: ${p => p.$destructive ? Colors.error : p.theme.text};
+    color: ${(p) => (p.$destructive ? Colors.error : p.theme.text)};
 `;
 
 export const DropdownMenuChevron = styled.div`
     margin-top: 5px;
 `;
 
-export const DropdownMenuArrow = styled(RadixDropdownMenu.Arrow) <{ theme: ITheme }>`
-    fill: ${p => p.theme.trans_bg};
+export const DropdownMenuArrow = styled(RadixDropdownMenu.Arrow)<{
+	theme: ITheme;
+}>`
+    fill: ${(p) => p.theme.trans_bg};
 `;

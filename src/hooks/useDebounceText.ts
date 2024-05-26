@@ -5,17 +5,17 @@ import { useEffect, useState } from "react";
  * @returns [text, setQuery]
  */
 export function useDebounceText(str = "") {
-    const [text, setText] = useState(str);
-    const [query, setQuery] = useState('');
+	const [text, setText] = useState(str);
+	const [query, setQuery] = useState("");
 
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            const trimmed = text.trim();
-            setQuery(trimmed);
-        }, 300);
+	useEffect(() => {
+		const timeout = setTimeout(() => {
+			const trimmed = text.trim();
+			setQuery(trimmed);
+		}, 300);
 
-        return () => clearTimeout(timeout);
-    }, [text])
+		return () => clearTimeout(timeout);
+	}, [text]);
 
-    return { query, text, setText };
+	return { query, text, setText };
 }

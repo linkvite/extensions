@@ -6,7 +6,7 @@ export const PopupContainer = styled.div<{ $autoSave?: boolean }>`
     height: 100%;
     min-width: 576px;
     position: relative;
-    min-height: ${p => p.$autoSave ? 150 : 600}px;
+    min-height: ${(p) => (p.$autoSave ? 150 : 600)}px;
 `;
 
 export const PopupLoadingContainer = styled(PopupContainer)`
@@ -23,7 +23,7 @@ export const PopupActions = styled.div`
     position: sticky;
     bottom: 10px;
     left: 0;
-    background-color: ${p => p.theme.background_sub};
+    background-color: ${(p) => p.theme.background_sub};
     padding: 5px;
     border-radius: .5rem;
     align-items: center;
@@ -42,7 +42,8 @@ export const PopupAction = styled.button<{ $active: boolean; theme: ITheme }>`
     color: ${Colors.light};
     font-weight: 600;
     transition: all 0.2s ease-in-out;
-    background-color: ${p => p.$active ? Colors.primary : p.theme.background_sub};
+    background-color: ${(p) =>
+			p.$active ? Colors.primary : p.theme.background_sub};
 
     &:hover {
         cursor: pointer;

@@ -26,7 +26,7 @@ export const AuthDescription = styled(AppText)`
     max-width: 100%;
     width: 100%;
     margin-top: .5rem;
-    color: ${p => p.theme.text_sub};
+    color: ${(p) => p.theme.text_sub};
     
 `;
 
@@ -41,17 +41,23 @@ export const AuthErrorText = styled(AppText)`
     color: ${Colors.error};
 `;
 
-export const AuthInputContainer = styled.div<{ $first?: boolean; theme: ITheme }>`
+export const AuthInputContainer = styled.div<{
+	$first?: boolean;
+	theme: ITheme;
+}>`
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    color: ${p => p.theme.text_sub};
-    margin-top: ${p => p.$first ? "1rem" : "0"};
+    color: ${(p) => p.theme.text_sub};
+    margin-top: ${(p) => (p.$first ? "1rem" : "0")};
 `;
 
-export const AuthInputField = styled.input<{ $hasError?: boolean; theme: ITheme }>`
+export const AuthInputField = styled.input<{
+	$hasError?: boolean;
+	theme: ITheme;
+}>`
     width: 100%;
     border: none;
     margin-top: .25rem;
@@ -68,17 +74,23 @@ export const AuthInputField = styled.input<{ $hasError?: boolean; theme: ITheme 
     }
 
     &::placeholder {
-        color: ${p => p.theme.text_sub};
+        color: ${(p) => p.theme.text_sub};
     }
 
-    color: ${p => p.theme.text};
-    border: 1px solid ${p => (p.$hasError ? Colors.error : rgba(p.theme.trans_bg, settingStore.theme.get() === "dark" ? 0.5 : 1))};
+    color: ${(p) => p.theme.text};
+    border: 1px solid ${(p) =>
+			p.$hasError
+				? Colors.error
+				: rgba(p.theme.trans_bg, settingStore.theme.get() === "dark" ? 0.5 : 1)};
 `;
 
-export const AuthInputLabel = styled.label<{ $second?: boolean; theme: ITheme }>`
+export const AuthInputLabel = styled.label<{
+	$second?: boolean;
+	theme: ITheme;
+}>`
     font-size: ${Fonts.xxs};
-    color: ${p => p.theme.text_sub};
-    margin-top: ${p => p.$second ? ".75rem" : "0"};
+    color: ${(p) => p.theme.text_sub};
+    margin-top: ${(p) => (p.$second ? ".75rem" : "0")};
 `;
 
 export const AuthPasswordIcon = styled.div`
@@ -115,19 +127,22 @@ export const AuthSignUpContainer = styled.div`
     margin-bottom: 1.25rem;
 `;
 
-export const AuthSignUpText = styled.button<{ $second?: boolean; theme: ITheme }>`
+export const AuthSignUpText = styled.button<{
+	$second?: boolean;
+	theme: ITheme;
+}>`
     padding: 0;
     font-size: ${Fonts.xxs};
     border: 1px solid transparent;
     background-color: transparent;
     transition: all .3s ease-in-out;
-    margin-left: ${p => p.$second ? "0.25rem" : "0"};
-    color: ${p => p.theme.text_sub};
-    text-decoration: ${p => p.$second ? "underline" : "none"};
+    margin-left: ${(p) => (p.$second ? "0.25rem" : "0")};
+    color: ${(p) => p.theme.text_sub};
+    text-decoration: ${(p) => (p.$second ? "underline" : "none")};
 
     &:hover {
-        cursor: ${p => p.$second ? "pointer" : "default"};
-        color: ${p => p.$second ? p.theme.text : p.theme.text_sub};
+        cursor: ${(p) => (p.$second ? "pointer" : "default")};
+        color: ${(p) => (p.$second ? p.theme.text : p.theme.text_sub)};
     }
 `;
 
@@ -137,12 +152,12 @@ const Centered = styled.div`
     justify-content: center;
 `;
 
-export const AuthQrContainer = styled(Centered) <{ $notModal?: boolean }>`
+export const AuthQrContainer = styled(Centered)<{ $notModal?: boolean }>`
     flex-direction: column;
     width: 100%;
 `;
 
-export const QRContainer = styled(Centered) <{ $qr?: boolean }>`
+export const QRContainer = styled(Centered)<{ $qr?: boolean }>`
     border-radius: .75rem;
     margin-top: 2rem;
     width: 22rem;
@@ -150,8 +165,8 @@ export const QRContainer = styled(Centered) <{ $qr?: boolean }>`
     padding: 1rem;
     max-width: 90%;
     max-height: 90%;
-    background-color: ${p => p.$qr ? Colors.light : "transparent"};
-    box-shadow: ${p => p.$qr ? "0 0.1rem 0.5rem rgba(0,0,0,0.1);" : "none"};
+    background-color: ${(p) => (p.$qr ? Colors.light : "transparent")};
+    box-shadow: ${(p) => (p.$qr ? "0 0.1rem 0.5rem rgba(0,0,0,0.1);" : "none")};
 `;
 
 const slideUp = keyframes`

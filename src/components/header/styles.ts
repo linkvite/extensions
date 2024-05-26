@@ -1,7 +1,10 @@
 import styled from "styled-components";
 import { Colors, type ITheme } from "~utils/styles";
 
-export const LinkviteLogo = styled.div<{ theme: ITheme; $hasButtons?: boolean }>`
+export const LinkviteLogo = styled.div<{
+	theme: ITheme;
+	$hasButtons?: boolean;
+}>`
     width: 100%;
     display: flex;
     z-index: 5;
@@ -13,7 +16,7 @@ export const LinkviteLogo = styled.div<{ theme: ITheme; $hasButtons?: boolean }>
     a {
         font-weight: bold;
         text-decoration: none;
-        color: ${p => p.theme.text};
+        color: ${(p) => p.theme.text};
         font-size: 1.15rem;
         display: flex;
         align-items: center;
@@ -35,10 +38,10 @@ export const HeaderButton = styled.button<{ theme: ITheme }>`
     padding: 5px 10px;
     margin-left: 5px;
     border-radius: .25rem;
-    color: ${p => p.theme.text};
+    color: ${(p) => p.theme.text};
     transition: all .3s ease-in-out;
     background-color: transparent;
-    background-color: ${p => p.theme.trans_bg};
+    background-color: ${(p) => p.theme.trans_bg};
 
     &:hover {
         cursor: pointer;

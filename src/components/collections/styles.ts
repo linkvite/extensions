@@ -4,19 +4,19 @@ import { AppText } from "~components/text";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
 import { SelectCollectionImage } from "~components/bookmark/styles";
 
-export const CollectionsContainer = styled.div<{ theme: ITheme; }>`
+export const CollectionsContainer = styled.div<{ theme: ITheme }>`
     width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
     flex-wrap: wrap;
-    color: ${p => p.theme.text_sub};
-    background-color: ${p => p.theme.background_sub};
+    color: ${(p) => p.theme.text_sub};
+    background-color: ${(p) => p.theme.background_sub};
 `;
 
-export const EmptyCollectionsText = styled(AppText) <{ theme: ITheme }>`
-    color: ${p => p.theme.text_sub};
+export const EmptyCollectionsText = styled(AppText)<{ theme: ITheme }>`
+    color: ${(p) => p.theme.text_sub};
     text-align: center;
     max-width: 100%;
     margin-top: 10px;
@@ -32,21 +32,27 @@ export const CollectionItems = styled.div<{ theme: ITheme }>`
     height: 250px;
 `;
 
-export const CollectionItem = styled.button<{ theme: ITheme; $current: boolean }>`
+export const CollectionItem = styled.button<{
+	theme: ITheme;
+	$current: boolean;
+}>`
     width: 100%;
     padding: 5px 8px;
     margin-bottom: 15px;
     display: flex;
     align-items: center;
     border-radius: 8px;
-    color: ${p => p.theme.text};
+    color: ${(p) => p.theme.text};
     transition: all 0.3s ease-in-out;
-    border: 1px solid ${p => p.$current ? rgba(Colors.primary, 0.6) : "transparent"};
-    background-color: ${p => p.$current ? rgba(Colors.primary, 0.1) : p.theme.trans_bg};
+    border: 1px solid ${(p) =>
+			p.$current ? rgba(Colors.primary, 0.6) : "transparent"};
+    background-color: ${(p) =>
+			p.$current ? rgba(Colors.primary, 0.1) : p.theme.trans_bg};
 
     &:hover {
-        border: 1px solid ${p => p.$current ? rgba(Colors.primary, 0.6) : rgba(p.theme.text_sub, 0.5)};
-        cursor: ${p => p.$current ? "default" : "pointer"};
+        border: 1px solid ${(p) =>
+					p.$current ? rgba(Colors.primary, 0.6) : rgba(p.theme.text_sub, 0.5)};
+        cursor: ${(p) => (p.$current ? "default" : "pointer")};
     }
 
     &:focus {
@@ -59,9 +65,9 @@ export const CollectionItemIcon = styled(SelectCollectionImage)`
     margin-right: 10px;
 `;
 
-export const CollectionItemName = styled(AppText) <{ theme: ITheme }>`
+export const CollectionItemName = styled(AppText)<{ theme: ITheme }>`
     font-size: ${Fonts.xs};
-    color: ${p => p.theme.text};
+    color: ${(p) => p.theme.text};
     font-weight: normal;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -79,14 +85,14 @@ export const CollectionMineOnly = styled.div`
 `;
 
 export const CollectionMineOnlyLabel = styled.label<{ theme: ITheme }>`
-    color: ${p => p.theme.text_sub};
+    color: ${(p) => p.theme.text_sub};
     font-size: ${Fonts.xs};
     margin-right: 5px;
     transition: all 0.3s ease-in-out;
 
     &:hover {
         cursor: pointer;
-        color: ${p => p.theme.text};
+        color: ${(p) => p.theme.text};
     }
 `;
 
@@ -95,7 +101,7 @@ export const CollectionMineOnlyInput = styled.input<{ theme: ITheme }>`
     height: 15px;
     outline: none;
     border-radius: 3px;
-    border: 1px solid ${p => p.theme.text_sub};
+    border: 1px solid ${(p) => p.theme.text_sub};
     background-color: transparent;
     transition: all 0.3s ease-in-out;
 
@@ -113,7 +119,7 @@ export const CollectionMineOnlyInput = styled.input<{ theme: ITheme }>`
     }
 `;
 
-export const RemoveCollection = styled.button <{ theme: ITheme }>`
+export const RemoveCollection = styled.button<{ theme: ITheme }>`
     border: none;
     outline: none;
     padding: 0;
@@ -123,12 +129,12 @@ export const RemoveCollection = styled.button <{ theme: ITheme }>`
     font-size: ${Fonts.xxs};
     text-decoration: underline;
     background-color: transparent;
-    color: ${p => p.theme.text_sub};
+    color: ${(p) => p.theme.text_sub};
     transition: all 0.3s ease-in-out;
 
     &:hover {
         cursor: pointer;
-        color: ${p => p.theme.text};
+        color: ${(p) => p.theme.text};
     }
 `;
 
@@ -147,11 +153,11 @@ export const CreateCollectionButton = styled.button<{ theme: ITheme }>`
     background-color: transparent;
     text-decoration: underline;
     text-decoration-offset: 0.2rem;
-    color: ${p => p.theme.text_sub};
+    color: ${(p) => p.theme.text_sub};
     transition: all 0.3s ease-in-out;
 
     &:hover {
         cursor: pointer;
-        color: ${p => p.theme.text};
+        color: ${(p) => p.theme.text};
     }
 `;

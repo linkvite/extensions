@@ -1,4 +1,4 @@
-export { }
+export {};
 import { setupOmnibox } from "~omnibox";
 import { setupContextMenus } from "~contextMenus";
 

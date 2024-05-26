@@ -52,14 +52,14 @@ export const TabListItem = styled.li<{ theme: ITheme }>`
     justify-content: space-between;
     width: 100%;
     padding: .5rem;
-    border-bottom: .5px solid ${p => p.theme.background_sub};
+    border-bottom: .5px solid ${(p) => p.theme.background_sub};
     cursor: pointer;
     transition: all 0.3s ease-in-out;
     border-radius: 0.5rem;
     position: relative;
 
     &:hover {
-        background-color: ${p => p.theme.trans_bg};
+        background-color: ${(p) => p.theme.trans_bg};
     }
 `;
 
@@ -108,7 +108,10 @@ export const TabListItemUrl = styled(AppText)`
     margin-top: 0.25rem;
 `;
 
-export const TabAddButtonContainer = styled.div<{ $active: boolean; theme: ITheme }>`
+export const TabAddButtonContainer = styled.div<{
+	$active: boolean;
+	theme: ITheme;
+}>`
     border: none;
     cursor: pointer;
     border-radius: 0.5rem;
@@ -118,8 +121,8 @@ export const TabAddButtonContainer = styled.div<{ $active: boolean; theme: IThem
     bottom: 2%;
     right: 3%;
     display: flex;
-    background-color: ${p => p.theme.background_sub};
-    transform: translateX(${p => p.$active ? 0 : 200}%);
+    background-color: ${(p) => p.theme.background_sub};
+    transform: translateX(${(p) => (p.$active ? 0 : 200)}%);
 `;
 
 export const TabAddButton = styled.button<{ $active: boolean }>`
@@ -133,7 +136,7 @@ export const TabAddButton = styled.button<{ $active: boolean }>`
     display: flex;
     flex-direction: row;
     transition: all 0.3s ease-in-out;
-    transform: translateX(${p => p.$active ? 0 : 200}%);
+    transform: translateX(${(p) => (p.$active ? 0 : 200)}%);
     font-weight: 500;
     font-size: ${Fonts.xs};
 
@@ -143,7 +146,7 @@ export const TabAddButton = styled.button<{ $active: boolean }>`
     }
 `;
 
-export const TabSelectCollectionButton = styled.button<{ $hide: boolean, }>`
+export const TabSelectCollectionButton = styled.button<{ $hide: boolean }>`
     padding: 0;
     margin: 0;
     background-color: transparent;
@@ -158,9 +161,9 @@ export const TabSelectCollectionButton = styled.button<{ $hide: boolean, }>`
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease-in-out;
-    width: ${p => p.$hide ? "0" : "40px"};
-    opacity: ${p => p.$hide ? 0 : 1};
-    visibility: ${p => p.$hide ? "hidden" : "visible"};
+    width: ${(p) => (p.$hide ? "0" : "40px")};
+    opacity: ${(p) => (p.$hide ? 0 : 1)};
+    visibility: ${(p) => (p.$hide ? "hidden" : "visible")};
 
     &:hover {
         cursor: pointer;
@@ -182,7 +185,7 @@ export const TabEditButton = styled.button<{ $hide: boolean }>`
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease-in-out;
-    opacity: ${p => p.$hide ? 0 : 1};
+    opacity: ${(p) => (p.$hide ? 0 : 1)};
     position: absolute;
     right: 10px;
 
@@ -207,12 +210,12 @@ export const TabDescriptionInput = styled.textarea<{ theme: ITheme }>`
     align-items: center;
     justify-content: center;
     background-color: transparent;
-    color: ${p => p.theme.text};
+    color: ${(p) => p.theme.text};
     font-size: 14px;
     line-height: 1.5;
 
     &::placeholder {
-        color: ${p => p.theme.text_sub};
+        color: ${(p) => p.theme.text_sub};
     }
 
     &:focus {

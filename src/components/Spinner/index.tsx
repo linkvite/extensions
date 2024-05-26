@@ -1,11 +1,10 @@
-import React from "react";
 import styled from "styled-components";
 import { Colors } from "~utils/styles";
 import { ClassicSpinner } from "react-spinners-kit";
 
 interface ISpinnerProps {
-    size?: number;
-    color?: string;
+	size?: number;
+	color?: string;
 }
 
 const SpinnerContainer = styled.div`
@@ -16,12 +15,9 @@ const SpinnerContainer = styled.div`
 `;
 
 export function Spinner({ size = 20, color = Colors.light }: ISpinnerProps) {
-    return (
-        <SpinnerContainer>
-            <ClassicSpinner
-                size={size}
-                color={color}
-            />
-        </SpinnerContainer>
-    );
+	return (
+		<SpinnerContainer>
+			<ClassicSpinner size={size} color={color} />
+		</SpinnerContainer>
+	);
 }

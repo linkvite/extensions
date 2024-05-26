@@ -1,35 +1,36 @@
 import { handleBookmarkExists } from "~api";
-import type { PlasmoMessaging } from "@plasmohq/messaging"
+import type { PlasmoMessaging } from "@plasmohq/messaging";
 import type { Bookmark } from "@linkvite/js";
 
 export type ExistsMessageRequest = {
-    url: string;
-}
+	url: string;
+};
 
-export type ExistsMessageResponse = {
-    exists: false;
-} | {
-    exists: true;
-    bookmark: Bookmark;
-}
+export type ExistsMessageResponse =
+	| {
+			exists: false;
+	  }
+	| {
+			exists: true;
+			bookmark: Bookmark;
+	  };
 
 const handler: PlasmoMessaging.MessageHandler<
-    ExistsMessageRequest,
-    ExistsMessageResponse
+	ExistsMessageRequest,
+	ExistsMessageResponse
 > = async (req, res) => {
-    try {
-        const data = await handleBookmarkExists({
-            url: req.body.url
-        });
+	try {
+		const data = await handleBookmarkExists({
+			url: req.body.url,
+		});
 
-        return res.send({
-            exists: data.exists,
-            bookmark: data.bookmark
-        });
-    } catch (error) {
-        return res.send({ exists: false });
-    }
-}
+		return res.send({
+			exists: data.exists,
+			bookmark: data.bookmark,
+		});
+	} catch (_) {
+		return res.send({ exists: false });
+	}
+};
 
-// eslint-disable-next-line import/no-unused-modules
-export default handler
+export default handler;

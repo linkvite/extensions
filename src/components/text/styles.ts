@@ -1,16 +1,16 @@
 import styled, { css } from "styled-components";
 import {
-    getTextColor,
-    calculateTextAlign,
-    calculateTextDecoration,
-    calculateMargin,
-    calculateTextTransform,
-    calculateFontSize,
-    calculateFontWeight,
-    calculateLineHeight,
-    calculateLetterSpacing,
-    calculateWidth,
-    calculateMaxWidth
+	getTextColor,
+	calculateTextAlign,
+	calculateTextDecoration,
+	calculateMargin,
+	calculateTextTransform,
+	calculateFontSize,
+	calculateFontWeight,
+	calculateLineHeight,
+	calculateLetterSpacing,
+	calculateWidth,
+	calculateMaxWidth,
 } from "./helpers";
 import type { StyledTextProps } from "./types";
 

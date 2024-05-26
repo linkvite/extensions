@@ -1,0 +1,93 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.7.3/schema.json",
+	"organizeImports": { "enabled": true },
+	"files": {
+		"ignore": [
+			"**/*.d.ts",
+			"**/.plasmo/**",
+			"**/build/**",
+			"**/node_modules/**"
+		]
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": false,
+			"a11y": {
+				"useAltText": "error",
+				"noBlankTarget": "error"
+			},
+			"complexity": {
+				"noBannedTypes": "error",
+				"noUselessTernary": "error",
+				"noUselessTypeConstraint": "error"
+			},
+			"correctness": {
+				"noUnusedImports": "error",
+				"noChildrenProp": "error",
+				"noPrecisionLoss": "error",
+				"noUnusedVariables": "warn",
+				"useHookAtTopLevel": "error",
+				"useJsxKeyInIterable": "error",
+				"useExhaustiveDependencies": "error"
+			},
+			"security": { "noDangerouslySetInnerHtml": "error" },
+			"style": {
+				"useConst": "error",
+				"useImportType": "error",
+				"noInferrableTypes": "error",
+				"noNamespace": "error",
+				"noUselessElse": "error",
+				"useBlockStatements": "error",
+				"noNonNullAssertion": "warn",
+				"useCollapsedElseIf": "error",
+				"useAsConstAssertion": "error"
+			},
+			"suspicious": {
+				"noArrayIndexKey": "error",
+				"noCommentText": "error",
+				"noDuplicateJsxProps": "error",
+				"noEmptyBlockStatements": "error",
+				"noExplicitAny": "warn",
+				"noExtraNonNullAssertion": "error",
+				"noMisleadingInstantiator": "error",
+				"useNamespaceKeyword": "error"
+			}
+		}
+	},
+	"overrides": [
+		{
+			"include": ["*.ts", "*.tsx", "*.mts", "*.cts"],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noConstAssign": "off",
+						"noGlobalObjectCalls": "off",
+						"noInvalidConstructorSuper": "off",
+						"noNewSymbol": "off",
+						"noSetterReturn": "off",
+						"noUndeclaredVariables": "warn",
+						"noUnreachable": "warn",
+						"noUnreachableSuper": "off"
+					},
+					"style": {
+						"noArguments": "error",
+						"noVar": "error",
+						"useConst": "error"
+					},
+					"suspicious": {
+						"noDuplicateClassMembers": "error",
+						"noDuplicateObjectKeys": "error",
+						"noDuplicateParameters": "error",
+						"noFunctionAssign": "off",
+						"noImportAssign": "off",
+						"noRedeclare": "error",
+						"noUnsafeNegation": "error",
+						"useGetterReturn": "off",
+						"useValidTypeof": "error"
+					}
+				}
+			}
+		}
+	]
+}

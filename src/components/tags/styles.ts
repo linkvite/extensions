@@ -11,21 +11,21 @@ export const TagsContainer = styled.form<{ theme: ITheme }>`
     justify-content: flex-start;
     flex-wrap: wrap;
     margin-top: 10px;
-    color: ${p => p.theme.text_sub};
-    background-color: ${p => p.theme.background_sub};
+    color: ${(p) => p.theme.text_sub};
+    background-color: ${(p) => p.theme.background_sub};
 `;
 
-export const TagsInputContainer = styled.div<{ theme: ITheme; }>`
+export const TagsInputContainer = styled.div<{ theme: ITheme }>`
     width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    color: ${p => p.theme.text_sub};
+    color: ${(p) => p.theme.text_sub};
     border-radius: 8px;
     padding: 8px 8px;
-    border: 1px solid ${p => p.theme.trans_bg};
-    background-color: ${p => p.theme.background_sub};
+    border: 1px solid ${(p) => p.theme.trans_bg};
+    background-color: ${(p) => p.theme.background_sub};
     transition: all 0.3s ease-in-out;
 
     &:focus-within {
@@ -43,7 +43,7 @@ export const TagsInput = styled(AuthInputField)`
     border-radius: 0px;
 
     &::placeholder {
-        color: ${p => p.theme.text_sub};
+        color: ${(p) => p.theme.text_sub};
     }
 
     &:focus {
@@ -57,14 +57,14 @@ export const TagAddButton = styled.button<{ theme: ITheme; $active: boolean }>`
     padding: 5px 10px;
     width: 15%;
     border-radius: 5px;
-    color: ${p => p.theme.text};
+    color: ${(p) => p.theme.text};
     transition: all 0.3s ease-in-out;
     background-color: ${Colors.primary};
-    opacity: ${p => p.$active ? 1 : 0.7};
+    opacity: ${(p) => (p.$active ? 1 : 0.7)};
 
     &:hover {
-        opacity: ${p => p.$active ? 0.9 : 0.7};
-        cursor: ${p => p.$active ? 'pointer' : 'not-allowed'};
+        opacity: ${(p) => (p.$active ? 0.9 : 0.7)};
+        cursor: ${(p) => (p.$active ? "pointer" : "not-allowed")};
     }
 `;
 
@@ -90,11 +90,13 @@ export const TagItem = styled.button<{ theme: ITheme; $closeHovered: boolean }>`
     flex-direction: row;
     border: 1px solid transparent;
     transition: all 0.3s ease-in-out;
-    background-color: ${p => p.$closeHovered ? Colors.error : p.theme.trans_bg};
+    background-color: ${(p) =>
+			p.$closeHovered ? Colors.error : p.theme.trans_bg};
 
     &:hover {
         cursor: pointer;
-        border: 1px solid ${p => p.$closeHovered ? "transparent" : rgba(p.theme.text_sub, 0.5)};
+        border: 1px solid ${(p) =>
+					p.$closeHovered ? "transparent" : rgba(p.theme.text_sub, 0.5)};
     }
 `;
 
@@ -137,7 +139,7 @@ export const RecentTagsClear = styled.button<{ theme: ITheme }>`
     border: none;
     padding: 0;
     background-color: transparent;
-    color: ${p => p.theme.text_sub};
+    color: ${(p) => p.theme.text_sub};
     text-decoration: underline;
     transition: all 0.3s ease-in-out;
 

@@ -1,27 +1,23 @@
-import {
-    handleCreateFile,
-    type FileBookmarkProps,
-} from "~api";
-import type { PlasmoMessaging } from "@plasmohq/messaging"
+import { handleCreateFile, type FileBookmarkProps } from "~api";
+import type { PlasmoMessaging } from "@plasmohq/messaging";
 
 export type CreateFileMessageRequest = {
-    data: FileBookmarkProps;
-}
+	data: FileBookmarkProps;
+};
 
 export type CreateFileMessageResponse = { message: string } | { error: string };
 
 const handler: PlasmoMessaging.MessageHandler<
-    CreateFileMessageRequest,
-    CreateFileMessageResponse
+	CreateFileMessageRequest,
+	CreateFileMessageResponse
 > = async (req, res) => {
-    try {
-        await handleCreateFile({ ...req.body.data });
-        return res.send({ message: "Bookmark created successfully" });
-    } catch (error) {
-        console.error("Failed to create bookmark.", error);
-        return res.send({ error: String(error) });
-    }
-}
+	try {
+		await handleCreateFile({ ...req.body.data });
+		return res.send({ message: "Bookmark created successfully" });
+	} catch (error) {
+		console.error("Failed to create bookmark.", error);
+		return res.send({ error: String(error) });
+	}
+};
 
-// eslint-disable-next-line import/no-unused-modules
-export default handler
+export default handler;
