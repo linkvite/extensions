@@ -1,6 +1,6 @@
 export {};
-import { setupOmnibox } from "~omnibox";
 import { setupContextMenus } from "~contextMenus";
+import { setupOmnibox } from "~omnibox";
 
 setupOmnibox();
 setupContextMenus();

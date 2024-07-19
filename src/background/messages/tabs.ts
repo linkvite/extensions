@@ -1,5 +1,5 @@
-import { handleCreateTabBookmarks, type CreateTabBookmarkProps } from "~api";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
+import { type CreateTabBookmarkProps, handleCreateTabBookmarks } from "~api";
 
 export type TabsMessageResponse = { message: string } | { error: string };
 

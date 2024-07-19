@@ -1,7 +1,7 @@
 import { rgba } from "polished";
 import styled from "styled-components";
-import { Colors, type ITheme } from "~utils/styles";
 import { AuthInputField } from "~components/auth/styles";
+import { Colors, type ITheme } from "~utils/styles";
 
 export const TagsContainer = styled.form<{ theme: ITheme }>`
     width: 100%;

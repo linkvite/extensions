@@ -1,15 +1,15 @@
 import "./styles.css";
-import { useTheme } from "~hooks";
-import { AuthProvider } from "./auth";
-import { Toaster } from "react-hot-toast";
 import isPropValid from "@emotion/is-prop-valid";
-import { LogoAndTitle } from "~components/header";
-import { persistStateObservers } from "~utils/storage";
-import { GlobalStyle, MountedComponent, RootComponent } from "./styles";
-import { ThemeProvider, StyleSheetManager } from "styled-components";
 import { ObservablePersistLocalStorage } from "@legendapp/state/persist-plugins/local-storage";
-import type { StyledTarget } from "styled-components/dist/types";
 import type { ReactNode } from "react";
+import { Toaster } from "react-hot-toast";
+import { StyleSheetManager, ThemeProvider } from "styled-components";
+import type { StyledTarget } from "styled-components/dist/types";
+import { LogoAndTitle } from "~components/header";
+import { useTheme } from "~hooks";
+import { persistStateObservers } from "~utils/storage";
+import { AuthProvider } from "./auth";
+import { GlobalStyle, MountedComponent, RootComponent } from "./styles";
 
 persistStateObservers({
 	pluginLocal: ObservablePersistLocalStorage,

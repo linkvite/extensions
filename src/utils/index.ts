@@ -1,7 +1,7 @@
-import { browser } from "~browser";
-import { handleLogout } from "~api";
-import { userActions } from "~stores";
 import type { Bookmark } from "@linkvite/js";
+import { handleLogout } from "~api";
+import { browser } from "~browser";
+import { userActions } from "~stores";
 import { COVER_URL, FAVICON_URL } from "./env";
 
 export * from "./env";

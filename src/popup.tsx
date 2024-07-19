@@ -1,15 +1,5 @@
-import { browser } from "~browser";
-import toast from "react-hot-toast";
-import { useViewBookmark } from "~hooks";
-import { AppText } from "~components/text";
-import { Spinner } from "~components/spinner";
-import { useAutoSave } from "~hooks/useAutoSave";
-import { settingStore, userStore } from "~stores";
-import { PageProvider } from "~components/wrapper";
-import { BookmarkView } from "~components/bookmark";
-import { getCurrentTab, makeBookmark } from "~utils";
 import { useSelector } from "@legendapp/state/react";
-import { OptionsPage } from "~components/pages/options";
+import { sendToBackground } from "@plasmohq/messaging";
 import {
 	Fragment,
 	useCallback,
@@ -18,6 +8,25 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import toast from "react-hot-toast";
+import type { CreateBookmarkProps } from "~api";
+import type {
+	CreateMessageRequest,
+	CreateMessageResponse,
+} from "~background/messages/create";
+import { browser } from "~browser";
+import { BookmarkView } from "~components/bookmark";
+import { NewImagePage } from "~components/pages/image";
+import { NewLinkPage } from "~components/pages/link";
+import { OptionsPage } from "~components/pages/options";
+import { NewTabsPage } from "~components/pages/tabs";
+import { Spinner } from "~components/spinner";
+import { AppText } from "~components/text";
+import { PageProvider } from "~components/wrapper";
+import { useViewBookmark } from "~hooks";
+import { useAutoSave } from "~hooks/useAutoSave";
+import { closeTab } from "~router";
+import { settingStore, userStore } from "~stores";
 import {
 	AutoSaveContainer,
 	PopupAction,
@@ -25,16 +34,7 @@ import {
 	PopupContainer,
 	PopupLoadingContainer,
 } from "~styles";
-import { closeTab } from "~router";
-import type { CreateBookmarkProps } from "~api";
-import { NewTabsPage } from "~components/pages/tabs";
-import { NewLinkPage } from "~components/pages/link";
-import { NewImagePage } from "~components/pages/image";
-import { sendToBackground } from "@plasmohq/messaging";
-import type {
-	CreateMessageRequest,
-	CreateMessageResponse,
-} from "~background/messages/create";
+import { getCurrentTab, makeBookmark } from "~utils";
 
 function IndexPopup() {
 	const { autoSave, autoClose, currentPage } = useSelector(settingStore);

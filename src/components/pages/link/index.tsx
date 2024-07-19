@@ -1,8 +1,15 @@
-import { Fragment, useState } from "react";
-import toast from "react-hot-toast";
-import { useCallback, useEffect } from "react";
-import { sendToBackground } from "@plasmohq/messaging";
+import { useSelector } from "@legendapp/state/react";
 import type { Bookmark } from "@linkvite/js";
+import { sendToBackground } from "@plasmohq/messaging";
+import { produce } from "immer";
+import { Fragment, useState } from "react";
+import { useCallback, useEffect } from "react";
+import toast from "react-hot-toast";
+import type { CreateBookmarkProps } from "~api";
+import type {
+	CreateMessageRequest,
+	CreateMessageResponse,
+} from "~background/messages/create";
 import type {
 	ExistsMessageRequest,
 	ExistsMessageResponse,
@@ -12,17 +19,10 @@ import type {
 	ParseMessageResponse,
 } from "~background/messages/parse";
 import { BookmarkView } from "~components/bookmark";
-import { produce } from "immer";
-import { closeTab } from "~router";
 import { Spinner } from "~components/spinner";
-import type { CreateBookmarkProps } from "~api";
-import type {
-	CreateMessageRequest,
-	CreateMessageResponse,
-} from "~background/messages/create";
-import { makeBookmark } from "~utils";
-import { useSelector } from "@legendapp/state/react";
+import { closeTab } from "~router";
 import { settingStore } from "~stores";
+import { makeBookmark } from "~utils";
 
 export function NewLinkPage({ params }: { params: URL }) {
 	const [exists, setExists] = useState(false);

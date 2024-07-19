@@ -1,5 +1,5 @@
-import { handleCreateBookmark, type CreateBookmarkProps } from "~api";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
+import { type CreateBookmarkProps, handleCreateBookmark } from "~api";
 
 export type CreateMessageRequest = {
 	data: CreateBookmarkProps;

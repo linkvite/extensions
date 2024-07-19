@@ -1,6 +1,6 @@
-import { handleParseLink } from "~api";
 import type { ParsedLinkData } from "@linkvite/js";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
+import { handleParseLink } from "~api";
 
 export type ParseMessageRequest = {
 	url: string;

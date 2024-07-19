@@ -1,6 +1,6 @@
-import { handleBookmarkExists } from "~api";
-import type { PlasmoMessaging } from "@plasmohq/messaging";
 import type { Bookmark } from "@linkvite/js";
+import type { PlasmoMessaging } from "@plasmohq/messaging";
+import { handleBookmarkExists } from "~api";
 
 export type ExistsMessageRequest = {
 	url: string;

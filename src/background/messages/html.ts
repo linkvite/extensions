@@ -1,5 +1,5 @@
-import { browser } from "~browser";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
+import { browser } from "~browser";
 
 export type ParseHTMLMessageRequest = {
 	id: number;

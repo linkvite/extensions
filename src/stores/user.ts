@@ -1,5 +1,5 @@
+import { batch, observable } from "@legendapp/state";
 import type { User } from "@linkvite/js";
-import { observable, batch } from "@legendapp/state";
 
 const userData = {
 	id: "",

@@ -1,5 +1,5 @@
-import { route } from "~router";
 import { browser } from "~browser";
+import { route } from "~router";
 import { getCurrentTab } from "~utils";
 
 type Menu = {

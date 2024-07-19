@@ -1,12 +1,16 @@
-import { useTheme } from "~hooks";
-import { QRCodeSVG } from "qrcode.react";
-import { Colors } from "~utils/styles";
-import type { AuthResponse } from "~types";
-import { Spinner } from "~components/spinner";
-import { API_DOMAIN, QR_LOGO_URL, WS_ENDPOINT, parseQRAuth } from "~utils";
-import type { OnLogin } from "~components/wrapper/auth";
-import { useState, useCallback, useRef } from "react";
+import { useEffectOnce } from "@legendapp/state/react";
 import { Centrifuge, type ServerPublicationContext } from "centrifuge";
+import { QRCodeSVG } from "qrcode.react";
+import { useCallback, useRef, useState } from "react";
+import toast from "react-hot-toast";
+import { Spinner } from "~components/spinner";
+import { AppText } from "~components/text";
+import type { OnLogin } from "~components/wrapper/auth";
+import { useTheme } from "~hooks";
+import type { AuthResponse } from "~types";
+import { API_DOMAIN, QR_LOGO_URL, WS_ENDPOINT, parseQRAuth } from "~utils";
+import { persistAuthData } from "~utils/storage";
+import { Colors } from "~utils/styles";
 import {
 	AlreadyRegistered,
 	AuthQrContainer,
@@ -14,10 +18,6 @@ import {
 	QRContainer,
 	QRSubTitle,
 } from "./styles";
-import { persistAuthData } from "~utils/storage";
-import toast from "react-hot-toast";
-import { useEffectOnce } from "@legendapp/state/react";
-import { AppText } from "~components/text";
 
 type QROwner = {
 	avatar: string;

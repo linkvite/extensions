@@ -1,6 +1,6 @@
-import { handleCreateCollection } from "~api";
 import type { Collection } from "@linkvite/js";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
+import { handleCreateCollection } from "~api";
 
 export type CreateCollectionRequest = {
 	name: string;

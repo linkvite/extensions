@@ -1,8 +1,8 @@
-import { API_DOMAIN } from "~utils";
 import type { Bookmark, Collection, ParsedLinkData } from "@linkvite/js";
-import type { AuthResponse, HTTPException } from "~types";
-import { authStore, userActions } from "~stores";
 import xior, { merge, type XiorError, type XiorResponse } from "xior";
+import { authStore, userActions } from "~stores";
+import type { AuthResponse, HTTPException } from "~types";
+import { API_DOMAIN } from "~utils";
 import { persistAuthData, storage } from "~utils/storage";
 
 export const api = xior.create({
@@ -43,10 +43,14 @@ api.interceptors.response.use(
 );
 
 api.interceptors.request.use(async (config) => {
-	if (config.url?.includes("/auth/login")) { return config; }
+	if (config.url?.includes("/auth/login")) {
+		return config;
+	}
 
 	const accessToken = authStore.accessToken.get();
-	if (!accessToken) { return config; }
+	if (!accessToken) {
+		return config;
+	}
 
 	return merge(config, {
 		headers: {
@@ -291,7 +295,7 @@ export async function handleCreateFile({
 	});
 
 	function handleSuccess(res: XiorResponse) {
-		return res.data.data as Bookmark;
+		return Promise.resolve(res.data.message as string);
 	}
 
 	function handleError(err: HTTPException) {

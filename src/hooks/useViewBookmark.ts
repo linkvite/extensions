@@ -1,15 +1,15 @@
-import { produce } from "immer";
-import type { browser } from "~browser";
-import { sendToBackground } from "@plasmohq/messaging";
-import { parseHTML, type ParsedHTML } from "~utils/parser";
+import { useSelector } from "@legendapp/state/react";
 import type { Bookmark, ParsedLinkData } from "@linkvite/js";
+import { sendToBackground } from "@plasmohq/messaging";
+import { produce } from "immer";
 import {
+	type Dispatch,
+	type SetStateAction,
 	useCallback,
 	useEffect,
 	useState,
-	type SetStateAction,
-	type Dispatch,
 } from "react";
+import toast from "react-hot-toast";
 import type {
 	ExistsMessageRequest,
 	ExistsMessageResponse,
@@ -22,9 +22,9 @@ import type {
 	ParseMessageRequest,
 	ParseMessageResponse,
 } from "~background/messages/parse";
-import toast from "react-hot-toast";
+import type { browser } from "~browser";
 import { settingStore } from "~stores";
-import { useSelector } from "@legendapp/state/react";
+import { type ParsedHTML, parseHTML } from "~utils/parser";
 
 type ViewProps = {
 	title?: string;

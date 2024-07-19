@@ -1,5 +1,5 @@
-import { handleCreateLinkBookmark } from "~api";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
+import { handleCreateLinkBookmark } from "~api";
 
 export type CreateBookmarkRequest = {
 	url: string;

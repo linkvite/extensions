@@ -1,5 +1,5 @@
-import styled, { keyframes } from "styled-components";
 import * as RadixDialog from "@radix-ui/react-dialog";
+import styled, { keyframes } from "styled-components";
 import { Fonts, type ITheme } from "~utils/styles";
 
 export const DialogRoot = styled(RadixDialog.Root)`

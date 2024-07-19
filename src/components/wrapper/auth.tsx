@@ -1,19 +1,19 @@
-import {
-	useCallback,
-	useMemo,
-	useContext,
-	useState,
-	createContext,
-	useEffect,
-	type ReactNode,
-} from "react";
-import type { User } from "@linkvite/js";
 import { observer } from "@legendapp/state/react";
+import type { User } from "@linkvite/js";
+import { sendToBackground } from "@plasmohq/messaging";
+import {
+	type ReactNode,
+	createContext,
+	useCallback,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
+import type { InitResponse } from "~background/messages/init";
+import { Login } from "~components/auth";
 import { authStore, userActions } from "~stores";
 import { extLogout } from "~utils";
-import { Login } from "~components/auth";
-import { sendToBackground } from "@plasmohq/messaging";
-import type { InitResponse } from "~background/messages/init";
 
 export type OnLogin = (user: User, token: string) => void;
 

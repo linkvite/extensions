@@ -1,5 +1,5 @@
-import { api } from "~api";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
+import { api } from "~api";
 
 export type DeleteMessageRequest = {
 	id: string;

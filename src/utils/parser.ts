@@ -1,5 +1,5 @@
-import { browser } from "~browser";
 import * as htmlparser from "htmlparser2";
+import { browser } from "~browser";
 import { COVER_URL, normalize } from "~utils";
 
 export type ParsedHTML = {

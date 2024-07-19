@@ -1,21 +1,21 @@
+import { useSelector } from "@legendapp/state/react";
+import type { Collection } from "@linkvite/js";
+import { useEffect, useState } from "react";
+import { CollectionsModal } from "~components/collections";
+import { AppDialog } from "~components/primitives/dialog";
+import { AppText } from "~components/text";
+import { useAuth } from "~components/wrapper/auth";
+import { settingStore, userStore } from "~stores";
 import type { Theme } from "~types";
 import { storage } from "~utils/storage";
-import { AppText } from "~components/text";
-import type { Collection } from "@linkvite/js";
-import { settingStore, userStore } from "~stores";
-import { useAuth } from "~components/wrapper/auth";
-import { useEffect, useState } from "react";
-import { useSelector } from "@legendapp/state/react";
-import { AppDialog } from "~components/primitives/dialog";
-import { CollectionsModal } from "~components/collections";
 import {
-	OptionsContainer,
-	Label,
-	ThemeSelect,
-	CollectionContainer,
-	AutoContainers,
 	AutoCheckInput,
+	AutoContainers,
+	CollectionContainer,
+	Label,
 	LogoutButton,
+	OptionsContainer,
+	ThemeSelect,
 } from "./styles";
 
 export function OptionsPage() {

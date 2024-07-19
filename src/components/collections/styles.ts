@@ -1,8 +1,8 @@
 import { rgba } from "polished";
 import styled from "styled-components";
+import { SelectCollectionImage } from "~components/bookmark/styles";
 import { AppText } from "~components/text";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
-import { SelectCollectionImage } from "~components/bookmark/styles";
 
 export const CollectionsContainer = styled.div<{ theme: ITheme }>`
     width: 100%;

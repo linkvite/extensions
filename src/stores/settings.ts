@@ -1,5 +1,5 @@
-import type { Theme } from "~types";
 import { observable } from "@legendapp/state";
+import type { Theme } from "~types";
 
 const defaultProps = {
 	autoSave: false,

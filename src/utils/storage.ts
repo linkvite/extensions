@@ -1,14 +1,14 @@
-import type { User } from "@linkvite/js";
-import { Storage } from "@plasmohq/storage";
-import { authStore, settingStore, userActions, userStore } from "~stores";
 import type {
 	ClassConstructor,
 	ObservablePersistLocal,
 } from "@legendapp/state";
 import {
-	persistObservable,
 	configureObservablePersistence,
+	persistObservable,
 } from "@legendapp/state/persist";
+import type { User } from "@linkvite/js";
+import { Storage } from "@plasmohq/storage";
+import { authStore, settingStore, userActions, userStore } from "~stores";
 
 export const storage = new Storage();
 

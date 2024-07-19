@@ -1,18 +1,18 @@
-import { produce } from "immer";
-import { closeTab } from "~router";
-import toast from "react-hot-toast";
-import { makeBookmark } from "~utils";
+import { useSelector } from "@legendapp/state/react";
 import type { Bookmark } from "@linkvite/js";
-import type { FileBookmarkProps } from "~api";
-import { BookmarkView } from "~components/bookmark";
 import { sendToBackground } from "@plasmohq/messaging";
+import { produce } from "immer";
 import { useCallback, useMemo, useState } from "react";
+import toast from "react-hot-toast";
+import type { FileBookmarkProps } from "~api";
 import type {
 	CreateFileMessageRequest,
 	CreateFileMessageResponse,
 } from "~background/messages/file";
-import { useSelector } from "@legendapp/state/react";
+import { BookmarkView } from "~components/bookmark";
+import { closeTab } from "~router";
 import { settingStore } from "~stores";
+import { makeBookmark } from "~utils";
 
 export function NewImagePage({ params }: { params: URL }) {
 	const { autoClose } = useSelector(settingStore);

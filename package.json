@@ -1,77 +1,72 @@
 {
-    "name": "linkvite-extension",
-    "displayName": "Linkvite",
-    "version": "0.1.3",
-    "description": "The easiest way to save and organize your bookmarks.",
-    "author": "Linkvite <support@linkvite.io>",
-    "homepage_url": "https://app.linkvite.io",
-    "scripts": {
-        "dev": "plasmo dev",
-        "build": "plasmo build",
-        "package": "pnpm run build --zip",
-        "dev:firefox": "plasmo dev --target=firefox-mv3",
-        "build:firefox": "plasmo build --target=firefox-mv3",
-        "package:firefox": "pnpm run build:firefox --zip",
-        "build:safari": "plasmo build --target=safari-mv3",
-        "package:safari": "pnpm run build:safari --zip",
-        "test:safari": "pnpm run build:safari && xcrun safari-web-extension-converter build/safari-mv3-prod",
-        "package:mobile": "pnpm run build:safari && node prepare.js",
-        "lint": "biome lint .",
-        "link:check": "biome check ."
-    },
-    "dependencies": {
-        "@emotion/is-prop-valid": "^1.2.2",
-        "@legendapp/state": "^2.1.8",
-        "@linkvite/js": "^1.0.0",
-        "@plasmohq/messaging": "^0.6.2",
-        "@plasmohq/storage": "^1.9.3",
-        "@radix-ui/react-dialog": "^1.0.5",
-        "@radix-ui/react-dropdown-menu": "^2.0.6",
-        "@radix-ui/react-popover": "^1.0.7",
-        "centrifuge": "5.1.1",
-        "htmlparser2": "^9.1.0",
-        "immer": "^10.0.4",
-        "plasmo": "0.86.3",
-        "polished": "^4.3.1",
-        "qrcode.react": "^3.1.0",
-        "react": "18.2.0",
-        "react-dom": "18.2.0",
-        "react-hot-toast": "^2.4.1",
-        "react-icons": "^5.0.1",
-        "react-spinners-kit": "^1.9.1",
-        "react-use-websocket": "^4.8.1",
-        "styled-components": "^6.1.8",
-        "use-dark-mode": "^2.3.1",
-        "xior": "^0.0.10"
-    },
-    "devDependencies": {
-        "@biomejs/biome": "1.7.3",
-        "@ianvs/prettier-plugin-sort-imports": "4.1.1",
-        "@types/chrome": "0.0.258",
-        "@types/node": "20.11.5",
-        "@types/react": "18.2.48",
-        "@types/react-dom": "18.2.18",
-        "@types/webextension-polyfill": "^0.10.7",
-        "prettier": "3.2.4",
-        "typescript": "5.3.3",
-        "webextension-polyfill": "^0.10.0"
-    },
-    "manifest": {
-        "omnibox": {
-            "keyword": "lv"
-        },
-        "options_page": "popup.html?page=options",
-        "permissions": [
-            "storage",
-            "activeTab",
-            "scripting",
-            "contextMenus"
-        ],
-        "optional_permissions": [
-            "tabs"
-        ],
-        "host_permissions": [
-            "<all_urls>"
-        ]
-    }
+	"name": "linkvite-extension",
+	"displayName": "Linkvite",
+	"version": "0.1.4",
+	"description": "The easiest way to save and organize your bookmarks.",
+	"author": "Linkvite <support@linkvite.io>",
+	"homepage_url": "https://app.linkvite.io",
+	"scripts": {
+		"dev": "plasmo dev",
+		"build": "plasmo build",
+		"package": "pnpm run build --zip",
+		"dev:firefox": "plasmo dev --target=firefox-mv3",
+		"build:firefox": "plasmo build --target=firefox-mv3",
+		"package:firefox": "pnpm run build:firefox --zip",
+		"build:safari": "plasmo build --target=safari-mv3",
+		"package:safari": "pnpm run build:safari --zip",
+		"test:safari": "pnpm run build:safari && xcrun safari-web-extension-converter build/safari-mv3-prod",
+		"package:mobile": "pnpm run build:safari && node prepare.js",
+		"lint": "biome lint .",
+		"lint:write": "biome lint . --write",
+		"lint:check": "biome check .",
+		"lint:check:write": "biome check . --write",
+		"lint:format": "biome format .",
+		"lint:format:write": "biome format . --write"
+	},
+	"dependencies": {
+		"@emotion/is-prop-valid": "^1.2.2",
+		"@legendapp/state": "^2.1.8",
+		"@linkvite/js": "^1.0.0",
+		"@plasmohq/messaging": "^0.6.2",
+		"@plasmohq/storage": "^1.9.3",
+		"@radix-ui/react-dialog": "^1.0.5",
+		"@radix-ui/react-dropdown-menu": "^2.0.6",
+		"@radix-ui/react-popover": "^1.0.7",
+		"centrifuge": "5.1.1",
+		"htmlparser2": "^9.1.0",
+		"immer": "^10.0.4",
+		"plasmo": "0.86.3",
+		"polished": "^4.3.1",
+		"qrcode.react": "^3.1.0",
+		"react": "18.2.0",
+		"react-dom": "18.2.0",
+		"react-hot-toast": "^2.4.1",
+		"react-icons": "^5.0.1",
+		"react-spinners-kit": "^1.9.1",
+		"react-use-websocket": "^4.8.1",
+		"styled-components": "^6.1.8",
+		"use-dark-mode": "^2.3.1",
+		"xior": "^0.0.10"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.8.1",
+		"@ianvs/prettier-plugin-sort-imports": "4.1.1",
+		"@types/chrome": "0.0.258",
+		"@types/node": "20.11.5",
+		"@types/react": "18.2.48",
+		"@types/react-dom": "18.2.18",
+		"@types/webextension-polyfill": "^0.10.7",
+		"prettier": "3.2.4",
+		"typescript": "5.3.3",
+		"webextension-polyfill": "^0.10.0"
+	},
+	"manifest": {
+		"omnibox": {
+			"keyword": "lv"
+		},
+		"options_page": "popup.html?page=options",
+		"permissions": ["storage", "activeTab", "scripting", "contextMenus"],
+		"optional_permissions": ["tabs"],
+		"host_permissions": ["<all_urls>"]
+	}
 }

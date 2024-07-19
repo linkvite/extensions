@@ -12,8 +12,12 @@ import type { StyledTextProps } from "./types";
 export function getTextColor(props: StyledTextProps) {
 	const { color, isSubText, theme } = props;
 
-	if (color) { return Colors[color]; }
-	if (isSubText) { return theme?.text_sub; }
+	if (color) {
+		return Colors[color];
+	}
+	if (isSubText) {
+		return theme?.text_sub;
+	}
 
 	return theme?.text || Colors.light;
 }
@@ -30,14 +34,28 @@ export function calculateMargin(props: StyledTextProps) {
 	const { topSpacing } = props;
 	const defaultMarginTop = "0";
 
-	if (topSpacing === "none") { return defaultMarginTop; }
-	if (topSpacing === "xs") { return "0.25rem"; }
-	if (topSpacing === "sm") { return "0.5rem"; }
-	if (topSpacing === "md") { return "1rem"; }
-	if (topSpacing === "lg") { return "1.5rem"; }
-	if (topSpacing === "xl") { return "2rem"; }
+	if (topSpacing === "none") {
+		return defaultMarginTop;
+	}
+	if (topSpacing === "xs") {
+		return "0.25rem";
+	}
+	if (topSpacing === "sm") {
+		return "0.5rem";
+	}
+	if (topSpacing === "md") {
+		return "1rem";
+	}
+	if (topSpacing === "lg") {
+		return "1.5rem";
+	}
+	if (topSpacing === "xl") {
+		return "2rem";
+	}
 
-	if (typeof topSpacing === "string") { return topSpacing; }
+	if (typeof topSpacing === "string") {
+		return topSpacing;
+	}
 
 	return defaultMarginTop;
 }
@@ -51,9 +69,15 @@ export function calculateMargin(props: StyledTextProps) {
 export function calculateTextAlign(props: StyledTextProps) {
 	const { textAlign } = props;
 
-	if (textAlign === "left") { return "left"; }
-	if (textAlign === "center") { return "center"; }
-	if (textAlign === "right") { return "right"; }
+	if (textAlign === "left") {
+		return "left";
+	}
+	if (textAlign === "center") {
+		return "center";
+	}
+	if (textAlign === "right") {
+		return "right";
+	}
 
 	return "left";
 }
@@ -69,8 +93,12 @@ export function calculateTextAlign(props: StyledTextProps) {
 export function calculateTextDecoration(props: StyledTextProps) {
 	const { textDecoration } = props;
 
-	if (textDecoration === "underline") { return "underline"; }
-	if (textDecoration === "line-through") { return "line-through"; }
+	if (textDecoration === "underline") {
+		return "underline";
+	}
+	if (textDecoration === "line-through") {
+		return "line-through";
+	}
 
 	return "none";
 }
@@ -85,9 +113,15 @@ export function calculateTextDecoration(props: StyledTextProps) {
 export function calculateTextTransform(props: StyledTextProps) {
 	const { textTransform } = props;
 
-	if (textTransform === "uppercase") { return "uppercase"; }
-	if (textTransform === "lowercase") { return "lowercase"; }
-	if (textTransform === "capitalize") { return "capitalize"; }
+	if (textTransform === "uppercase") {
+		return "uppercase";
+	}
+	if (textTransform === "lowercase") {
+		return "lowercase";
+	}
+	if (textTransform === "capitalize") {
+		return "capitalize";
+	}
 
 	return "none";
 }
@@ -103,8 +137,12 @@ export function calculateTextTransform(props: StyledTextProps) {
 export function calculateFontSize(props: StyledTextProps) {
 	const { fontSize } = props;
 
-	if (!fontSize) { return Fonts.xs; }
-	if (Object.keys(Fonts).includes(fontSize)) { return Fonts[fontSize]; }
+	if (!fontSize) {
+		return Fonts.xs;
+	}
+	if (Object.keys(Fonts).includes(fontSize)) {
+		return Fonts[fontSize];
+	}
 
 	return Fonts.xs;
 }
@@ -120,11 +158,19 @@ export function calculateFontWeight(props: StyledTextProps) {
 	const { fontWeight } = props;
 	const defaultFontWeight = "500";
 
-	if (!fontWeight) { return defaultFontWeight; }
+	if (!fontWeight) {
+		return defaultFontWeight;
+	}
 
-	if (fontWeight === "normal") { return defaultFontWeight; }
-	if (fontWeight === "bold") { return "600"; }
-	if (typeof fontWeight === "string") { return fontWeight; }
+	if (fontWeight === "normal") {
+		return defaultFontWeight;
+	}
+	if (fontWeight === "bold") {
+		return "600";
+	}
+	if (typeof fontWeight === "string") {
+		return fontWeight;
+	}
 
 	return defaultFontWeight;
 }
@@ -140,14 +186,30 @@ export function calculateLineHeight(props: StyledTextProps) {
 	const { lineHeight } = props;
 	const defaultLineHeight = "1.6";
 
-	if (!lineHeight) { return defaultLineHeight; }
-	if (lineHeight === "none") { return defaultLineHeight; }
-	if (lineHeight === "xs") { return "1.25"; }
-	if (lineHeight === "sm") { return defaultLineHeight; }
-	if (lineHeight === "md") { return "2"; }
-	if (lineHeight === "lg") { return "2.5"; }
-	if (lineHeight === "xl") { return "3"; }
-	if (typeof lineHeight === "string") { return lineHeight; }
+	if (!lineHeight) {
+		return defaultLineHeight;
+	}
+	if (lineHeight === "none") {
+		return defaultLineHeight;
+	}
+	if (lineHeight === "xs") {
+		return "1.25";
+	}
+	if (lineHeight === "sm") {
+		return defaultLineHeight;
+	}
+	if (lineHeight === "md") {
+		return "2";
+	}
+	if (lineHeight === "lg") {
+		return "2.5";
+	}
+	if (lineHeight === "xl") {
+		return "3";
+	}
+	if (typeof lineHeight === "string") {
+		return lineHeight;
+	}
 
 	return defaultLineHeight;
 }
@@ -166,14 +228,30 @@ export function calculateLetterSpacing(props: StyledTextProps) {
 	const { letterSpacing } = props;
 	const defaultLetterSpacing = "0";
 
-	if (!letterSpacing) { return defaultLetterSpacing; }
-	if (letterSpacing === "none") { return defaultLetterSpacing; }
-	if (letterSpacing === "xs") { return "0.05rem"; }
-	if (letterSpacing === "sm") { return "0.1rem"; }
-	if (letterSpacing === "md") { return "0.15rem"; }
-	if (letterSpacing === "lg") { return "0.2rem"; }
-	if (letterSpacing === "xl") { return "0.25rem"; }
-	if (typeof letterSpacing === "string") { return letterSpacing; }
+	if (!letterSpacing) {
+		return defaultLetterSpacing;
+	}
+	if (letterSpacing === "none") {
+		return defaultLetterSpacing;
+	}
+	if (letterSpacing === "xs") {
+		return "0.05rem";
+	}
+	if (letterSpacing === "sm") {
+		return "0.1rem";
+	}
+	if (letterSpacing === "md") {
+		return "0.15rem";
+	}
+	if (letterSpacing === "lg") {
+		return "0.2rem";
+	}
+	if (letterSpacing === "xl") {
+		return "0.25rem";
+	}
+	if (typeof letterSpacing === "string") {
+		return letterSpacing;
+	}
 
 	return defaultLetterSpacing;
 }
@@ -190,8 +268,12 @@ export function calculateWidth(props: StyledTextProps) {
 	const { width } = props;
 	const defaultWidth = "auto";
 
-	if (!width) { return defaultWidth; }
-	if (typeof width === "string") { return width; }
+	if (!width) {
+		return defaultWidth;
+	}
+	if (typeof width === "string") {
+		return width;
+	}
 
 	return defaultWidth;
 }
@@ -207,8 +289,12 @@ export function calculateMaxWidth(props: StyledTextProps) {
 	const { maxWidth } = props;
 	const defaultMaxWidth = "20rem";
 
-	if (!maxWidth) { return defaultMaxWidth; }
-	if (typeof maxWidth === "string") { return maxWidth; }
+	if (!maxWidth) {
+		return defaultMaxWidth;
+	}
+	if (typeof maxWidth === "string") {
+		return maxWidth;
+	}
 
 	return defaultMaxWidth;
 }

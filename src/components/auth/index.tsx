@@ -1,15 +1,18 @@
-import { useState, type ChangeEvent, type SyntheticEvent } from "react";
-import { browser } from "~browser";
-import { FORGOT_PASSWORD_URL, SIGNUP_URL } from "~utils";
-import { Logo } from "~components/header";
-import { RootProvider } from "~components/wrapper";
 import { sendToBackground } from "@plasmohq/messaging";
+import { type ChangeEvent, type SyntheticEvent, useState } from "react";
+import { BsEyeFill, BsEyeSlashFill } from "react-icons/bs";
 import type {
 	AuthMessageRequest,
 	AuthMessageResponse,
 } from "~background/messages/auth";
+import { browser } from "~browser";
+import { Logo } from "~components/header";
+import { Spinner } from "~components/spinner";
 import { AppText } from "~components/text";
-import { BsEyeFill, BsEyeSlashFill } from "react-icons/bs";
+import { RootProvider } from "~components/wrapper";
+import type { OnLogin } from "~components/wrapper/auth";
+import { FORGOT_PASSWORD_URL, SIGNUP_URL } from "~utils";
+import { AuthWithQR } from "./qrAuth";
 import {
 	AuthContainer,
 	AuthDescription,
@@ -24,9 +27,6 @@ import {
 	AuthSubmitButton,
 	AuthTitle,
 } from "./styles";
-import { Spinner } from "~components/spinner";
-import { AuthWithQR } from "./qrAuth";
-import type { OnLogin } from "~components/wrapper/auth";
 
 export function Login({ onLogin }: { onLogin: OnLogin }) {
 	const [view, setView] = useState<"login" | "qr">("login");

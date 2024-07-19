@@ -1,6 +1,6 @@
+import * as RadixDropdownMenu from "@radix-ui/react-dropdown-menu";
 import styled from "styled-components";
 import { Colors, Fonts, type ITheme } from "~utils/styles";
-import * as RadixDropdownMenu from "@radix-ui/react-dropdown-menu";
 
 const menuStyles = `
     width: 100%;

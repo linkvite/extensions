@@ -1,9 +1,9 @@
+import { useSelector } from "@legendapp/state/react";
+import { type ReactNode, useMemo } from "react";
 import { closeTab } from "~router";
-import { useMemo, type ReactNode } from "react";
 import { settingStore } from "~stores";
 import { APP_DOMAIN, FAVICON_URL } from "~utils";
-import { useSelector } from "@legendapp/state/react";
-import { Favicon, LinkviteLogo, HeaderButton, HeaderButtons } from "./styles";
+import { Favicon, HeaderButton, HeaderButtons, LinkviteLogo } from "./styles";
 
 export function Logo({ body }: { body?: ReactNode }) {
 	return (

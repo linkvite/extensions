@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "⏳ Running pre-commit hook..."
+
+yarn lint
+yarn lint:write
+yarn lint:check
+yarn lint:format
+
+echo "✅ Done running pre-commit hook."
+
+exit 0

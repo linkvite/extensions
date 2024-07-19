@@ -1,7 +1,7 @@
-import { settingStore } from "~stores";
-import useDarkMode from "use-dark-mode";
-import { useEffect, useState } from "react";
 import { useSelector } from "@legendapp/state/react";
+import { useEffect, useState } from "react";
+import useDarkMode from "use-dark-mode";
+import { settingStore } from "~stores";
 import { DarkTheme, LightTheme } from "~utils/styles";
 
 /**

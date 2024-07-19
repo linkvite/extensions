@@ -1,6 +1,6 @@
-import { handleUpdateBookmark } from "~api";
 import type { Bookmark } from "@linkvite/js";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
+import { handleUpdateBookmark } from "~api";
 
 export type UpdateMessageRequest = {
 	bookmark: Bookmark;

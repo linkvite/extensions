@@ -1,6 +1,6 @@
+import * as RadixDropdownMenu from "@radix-ui/react-dropdown-menu";
 import type { ReactNode } from "react";
 import { HiOutlineChevronRight } from "react-icons/hi";
-import * as RadixDropdownMenu from "@radix-ui/react-dropdown-menu";
 import {
 	DropdownMenuArrow,
 	DropdownMenuChevron,

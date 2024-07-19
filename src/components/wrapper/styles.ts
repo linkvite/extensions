@@ -1,5 +1,5 @@
-import type { ITheme } from "~utils/styles";
 import styled, { createGlobalStyle } from "styled-components";
+import type { ITheme } from "~utils/styles";
 
 export const GlobalStyle = createGlobalStyle<{ bg: string }>`
     html, body {

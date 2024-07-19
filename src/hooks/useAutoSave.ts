@@ -1,9 +1,5 @@
-import { closeTab } from "~router";
-import { settingStore } from "~stores";
-import type { browser } from "~browser";
-import { storage } from "~utils/storage";
-import type { Bookmark, Collection } from "@linkvite/js";
 import { useSelector } from "@legendapp/state/react";
+import type { Bookmark, Collection } from "@linkvite/js";
 import { sendToBackground } from "@plasmohq/messaging";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type {
@@ -14,6 +10,10 @@ import type {
 	CreateBookmarkRequest,
 	CreateBookmarkResponse,
 } from "~background/messages/link";
+import type { browser } from "~browser";
+import { closeTab } from "~router";
+import { settingStore } from "~stores";
+import { storage } from "~utils/storage";
 
 type Props = {
 	tab: browser.Tabs.Tab;

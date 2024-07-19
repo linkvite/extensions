@@ -1,5 +1,5 @@
+import { type Observable, computed, observable } from "@legendapp/state";
 import { userStore } from "./user";
-import { observable, computed, type Observable } from "@legendapp/state";
 
 export const authStore = observable({
 	accessToken: "",

@@ -1,6 +1,6 @@
 import type { Bookmark } from "@linkvite/js";
-import { handleUpdateBookmarkCover } from "~api";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
+import { handleUpdateBookmarkCover } from "~api";
 
 export type UpdateCoverMessageRequest = {
 	id: string;

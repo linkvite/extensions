@@ -1,7 +1,7 @@
+import type { User } from "@linkvite/js";
+import type { PlasmoMessaging } from "@plasmohq/messaging";
 import { handleAuthentication } from "~api";
 import { persistAuthData } from "~utils/storage";
-import type { PlasmoMessaging } from "@plasmohq/messaging";
-import type { User } from "@linkvite/js";
 
 export type AuthMessageRequest = {
 	password: string;

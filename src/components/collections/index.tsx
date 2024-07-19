@@ -1,10 +1,10 @@
-import toast from "react-hot-toast";
+import { useSelector } from "@legendapp/state/react";
 import type { Collection } from "@linkvite/js";
 import { sendToBackground } from "@plasmohq/messaging";
-import { useDebounceText } from "~hooks/useDebounceText";
-import { AuthInputField } from "~components/auth/styles";
+import * as Dialog from "@radix-ui/react-dialog";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import type React from "react";
+import toast from "react-hot-toast";
 import type {
 	FindCollectionsRequest,
 	FindCollectionsResponse,
@@ -13,26 +13,26 @@ import type {
 	CreateCollectionRequest,
 	CreateCollectionResponse,
 } from "~background/messages/create-collection";
+import { AuthInputField } from "~components/auth/styles";
+import { Spinner } from "~components/spinner";
+import { useTheme } from "~hooks";
+import { useDebounceText } from "~hooks/useDebounceText";
+import { userStore } from "~stores";
+import { storage } from "~utils/storage";
 import {
 	CollectionItem,
-	CollectionItems,
-	CollectionsContainer,
-	EmptyCollectionsText,
 	CollectionItemIcon,
 	CollectionItemName,
+	CollectionItems,
 	CollectionMineOnly,
-	CollectionMineOnlyLabel,
 	CollectionMineOnlyInput,
-	RemoveCollection,
-	NoCollections,
+	CollectionMineOnlyLabel,
+	CollectionsContainer,
 	CreateCollectionButton,
+	EmptyCollectionsText,
+	NoCollections,
+	RemoveCollection,
 } from "./styles";
-import { useTheme } from "~hooks";
-import { userStore } from "~stores";
-import { Spinner } from "~components/spinner";
-import * as Dialog from "@radix-ui/react-dialog";
-import { useSelector } from "@legendapp/state/react";
-import { storage } from "~utils/storage";
 
 type Props = {
 	collection?: Collection;
@@ -65,7 +65,9 @@ export function CollectionsModal({ collection, setCollection }: Props) {
 	}
 
 	const fetchData = useCallback(async () => {
-		if (!query) { return; }
+		if (!query) {
+			return;
+		}
 		setLoading(true);
 		const resp = await sendToBackground<
 			FindCollectionsRequest,
@@ -93,7 +95,9 @@ export function CollectionsModal({ collection, setCollection }: Props) {
 	);
 
 	const onCreate = useCallback(async () => {
-		if (!text) { return; }
+		if (!text) {
+			return;
+		}
 		setCreating(true);
 		const resp = await sendToBackground<
 			CreateCollectionRequest,

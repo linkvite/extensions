@@ -1,6 +1,6 @@
+import { handleFindBookmarks } from "~api";
 import { browser } from "~browser";
 import { APP_DOMAIN } from "~utils";
-import { handleFindBookmarks } from "~api";
 
 async function handleInputEntered(
 	text: string,

@@ -1,63 +1,63 @@
-import { produce } from "immer";
-import { sendToBackground } from "@plasmohq/messaging";
+import { useEffectOnce, useSelector } from "@legendapp/state/react";
 import type { Bookmark, Collection } from "@linkvite/js";
-import { useCallback, useRef, useState, type ChangeEvent, useMemo } from "react";
-import {
-	InputContainer,
-	InputField,
-	InputFieldLine,
-	BookmarkCoverContainer,
-	BookmarkCoverMainContainer,
-	BookmarkNewImage,
-	BookmarkNewImageIcon,
-	BookmarkSubmitButton,
-	BookmarkSubmitButtonText,
-	BookmarkDeleteButton,
-	BookmarkActionsContainer,
-	BookmarkActionsSubContainer,
-	BookmarkAction,
-	BookmarkActionIcon,
-	SelectCollectionImage,
-	BookmarkActionText,
-	BookmarkStarIcon,
-	ViewBookmarkContainer,
-} from "./styles";
-import { Colors } from "~utils/styles";
-import { Spinner } from "~components/spinner";
-import { COVER_URL, convertToTags } from "~utils";
-import { HiCamera } from "react-icons/hi2";
-import { FaHashtag } from "react-icons/fa6";
-import { DropdownMenu } from "~components/primitives/dropdown";
-import { browser } from "~browser";
-import { AppDialog } from "~components/primitives/dialog";
-import { AuthInputField } from "~components/auth/styles";
+import { sendToBackground } from "@plasmohq/messaging";
 import * as Dialog from "@radix-ui/react-dialog";
-import type {
-	UpdateMessageRequest,
-	UpdateMessageResponse,
-} from "~background/messages/update";
-import type {
-	DeleteMessageRequest,
-	DeleteMessageResponse,
-} from "~background/messages/delete";
-import { useTheme } from "~hooks";
-import { closeTab } from "~router";
-import type {
-	UpdateCoverMessageRequest,
-	UpdateCoverMessageResponse,
-} from "~background/messages/cover";
+import { produce } from "immer";
+import { type ChangeEvent, useCallback, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { FaHashtag } from "react-icons/fa6";
+import { HiCamera } from "react-icons/hi2";
 import { IoFolderOpen } from "react-icons/io5";
-import { TagsModal } from "~components/tags";
-import { CollectionsModal } from "~components/collections";
-import { storage } from "~utils/storage";
+import { TbStar, TbStarFilled } from "react-icons/tb";
 import type {
 	FindCollectionRequest,
 	FindCollectionResponse,
 } from "~background/messages/collection";
+import type {
+	UpdateCoverMessageRequest,
+	UpdateCoverMessageResponse,
+} from "~background/messages/cover";
+import type {
+	DeleteMessageRequest,
+	DeleteMessageResponse,
+} from "~background/messages/delete";
+import type {
+	UpdateMessageRequest,
+	UpdateMessageResponse,
+} from "~background/messages/update";
+import { browser } from "~browser";
+import { AuthInputField } from "~components/auth/styles";
+import { CollectionsModal } from "~components/collections";
+import { AppDialog } from "~components/primitives/dialog";
+import { DropdownMenu } from "~components/primitives/dropdown";
+import { Spinner } from "~components/spinner";
+import { TagsModal } from "~components/tags";
+import { useTheme } from "~hooks";
+import { closeTab } from "~router";
 import { settingStore } from "~stores";
-import { TbStar, TbStarFilled } from "react-icons/tb";
-import { useEffectOnce, useSelector } from "@legendapp/state/react";
+import { COVER_URL, convertToTags } from "~utils";
+import { storage } from "~utils/storage";
+import { Colors } from "~utils/styles";
+import {
+	BookmarkAction,
+	BookmarkActionIcon,
+	BookmarkActionText,
+	BookmarkActionsContainer,
+	BookmarkActionsSubContainer,
+	BookmarkCoverContainer,
+	BookmarkCoverMainContainer,
+	BookmarkDeleteButton,
+	BookmarkNewImage,
+	BookmarkNewImageIcon,
+	BookmarkStarIcon,
+	BookmarkSubmitButton,
+	BookmarkSubmitButtonText,
+	InputContainer,
+	InputField,
+	InputFieldLine,
+	SelectCollectionImage,
+	ViewBookmarkContainer,
+} from "./styles";
 
 type BookmarkViewProps = {
 	tabId: number;
@@ -85,7 +85,6 @@ export function BookmarkView({
 	const [deleting, setDeleting] = useState(false);
 	const [collection, setCollection] = useState<Collection>();
 	const { autoClose } = useSelector(settingStore);
-    const tags = useMemo(() => convertToTags(bookmark.tags), [bookmark.tags]);
 	const StarIcon = bookmark.starred ? TbStarFilled : TbStar;
 
 	const onToggleStar = useCallback(() => {
@@ -128,7 +127,9 @@ export function BookmarkView({
 				}),
 			);
 
-			if (!exists) { return; }
+			if (!exists) {
+				return;
+			}
 
 			setLoading(true);
 			const resp = await sendToBackground<
@@ -433,7 +434,9 @@ function BookmarkImageComponent({
 	const handleImageUpload = useCallback(
 		async (e: ChangeEvent<HTMLInputElement>) => {
 			const file = e.target.files?.[0];
-			if (!file) { return; }
+			if (!file) {
+				return;
+			}
 
 			const reader = new FileReader();
 			reader.addEventListener(
@@ -463,7 +466,9 @@ function BookmarkImageComponent({
 
 	const handleScreenshot = useCallback(async () => {
 		const tab = await browser.tabs.get(tabId);
-		if (!tab) { return; }
+		if (!tab) {
+			return;
+		}
 
 		const image = await browser.tabs.captureVisibleTab(tab.windowId, {
 			format: "png",

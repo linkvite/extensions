@@ -1,8 +1,9 @@
-import { Colors } from "~utils/styles";
-import { storage } from "~utils/storage";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { AppText } from "~components/text";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { convertToTags } from "~utils";
+import { storage } from "~utils/storage";
+import { Colors } from "~utils/styles";
 import {
 	RecentTags,
 	RecentTagsClear,
@@ -15,7 +16,6 @@ import {
 	TagsInput,
 	TagsInputContainer,
 } from "./styles";
-import { convertToTags } from "~utils";
 
 type Props = {
 	tags: string;
@@ -56,7 +56,7 @@ export function TagsModal({ tags, setTags }: Props) {
 			return;
 		}
 
-		const newTags = convertToTags(tag)
+		const newTags = convertToTags(tag);
 		const unique = new Set([...uniqueTags, ...newTags]);
 
 		setTags(Array.from(unique));
@@ -64,11 +64,15 @@ export function TagsModal({ tags, setTags }: Props) {
 
 		setTag("");
 
-		for (const t of newTags) { addToRecent(t); }
+		for (const t of newTags) {
+			addToRecent(t);
+		}
 	}
 
 	async function addToRecent(tag: string) {
-		if (!tag || recent.includes(tag)) { return; }
+		if (!tag || recent.includes(tag)) {
+			return;
+		}
 
 		const oldRecent = ((await storage.get<string[]>("recentTags")) ?? []).slice(
 			0,
@@ -82,7 +86,9 @@ export function TagsModal({ tags, setTags }: Props) {
 
 	function onSubmit(e: FormEvent) {
 		e.preventDefault();
-		if (!tag) { return; }
+		if (!tag) {
+			return;
+		}
 
 		onPressTag(tag);
 	}

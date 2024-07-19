@@ -1,50 +1,50 @@
-import { useTabs, useTheme } from "~hooks";
-import { browser } from "~browser";
-import toast from "react-hot-toast";
+import type { Collection } from "@linkvite/js";
+import { sendToBackground } from "@plasmohq/messaging";
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
+import { AiOutlineEdit } from "react-icons/ai";
+import { FcOpenedFolder } from "react-icons/fc";
 import {
 	MdRadioButtonChecked as Checked,
 	MdRadioButtonUnchecked as Unchecked,
 } from "react-icons/md";
-import {
-	TabContainer,
-	TabPermissionText,
-	TabPermissionHeader,
-	TabPermissionButton,
-	TabList,
-	TabListItem,
-	TabListItemCheck,
-	TabListItemInfo,
-	TabListItemTitle,
-	TabListItemUrl,
-	TabListItemDescription,
-	TabAddButton,
-	TabAddButtonContainer,
-	TabSelectCollectionButton,
-	TabEditButton,
-	TabDescriptionInput,
-} from "./styles";
-// import { closeTab } from "~router";
-import { Colors } from "~utils/styles";
-// import { settingStore } from "~stores";
-import { storage } from "~utils/storage";
-import { pluralize, subString } from "~utils";
-import { Spinner } from "~components/spinner";
-import { AiOutlineEdit } from "react-icons/ai";
-import type { Collection } from "@linkvite/js";
-import { FcOpenedFolder } from "react-icons/fc";
-// import { useSelector } from "@legendapp/state/react";
-import { AppDialog } from "~components/primitives/dialog";
-import { CollectionsModal } from "~components/collections";
+import type { CreateTabBookmarkProps } from "~api";
+import type { TabsMessageResponse } from "~background/messages/tabs";
+import { browser } from "~browser";
 import {
 	InputContainer,
 	InputField,
 	InputFieldLine,
 	SelectCollectionImage,
 } from "~components/bookmark/styles";
-import { sendToBackground } from "@plasmohq/messaging";
-import type { TabsMessageResponse } from "~background/messages/tabs";
-import type { CreateTabBookmarkProps } from "~api";
+import { CollectionsModal } from "~components/collections";
+// import { useSelector } from "@legendapp/state/react";
+import { AppDialog } from "~components/primitives/dialog";
+import { Spinner } from "~components/spinner";
+import { useTabs, useTheme } from "~hooks";
+import { pluralize, subString } from "~utils";
+// import { settingStore } from "~stores";
+import { storage } from "~utils/storage";
+// import { closeTab } from "~router";
+import { Colors } from "~utils/styles";
+import {
+	TabAddButton,
+	TabAddButtonContainer,
+	TabContainer,
+	TabDescriptionInput,
+	TabEditButton,
+	TabList,
+	TabListItem,
+	TabListItemCheck,
+	TabListItemDescription,
+	TabListItemInfo,
+	TabListItemTitle,
+	TabListItemUrl,
+	TabPermissionButton,
+	TabPermissionHeader,
+	TabPermissionText,
+	TabSelectCollectionButton,
+} from "./styles";
 
 type Tab = browser.Tabs.Tab & {
 	tags?: string[];
@@ -69,8 +69,12 @@ export function NewTabsPage() {
 	const [hasTabsPermission, setHasTabsPermission] = useState(false);
 
 	const countText = useMemo(() => {
-		if (selected.length === 0) { return "No tabs selected"; }
-		if (selected.length === tabs.length) { return "All tabs selected"; }
+		if (selected.length === 0) {
+			return "No tabs selected";
+		}
+		if (selected.length === tabs.length) {
+			return "All tabs selected";
+		}
 		return `${selected.length} of ${tabs.length} ${pluralize(
 			tabs.length,
 			"tab",
@@ -158,7 +162,9 @@ export function NewTabsPage() {
 	}, [collection?.id, selected, tabs]);
 
 	const requestTabsPermission = useCallback(async () => {
-		if (hasTabsPermission) { return; }
+		if (hasTabsPermission) {
+			return;
+		}
 		try {
 			const granted = await browser.permissions.request({
 				permissions: ["tabs"],

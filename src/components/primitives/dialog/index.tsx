@@ -1,5 +1,6 @@
-import { IoClose } from "react-icons/io5";
 import * as RadixDialog from "@radix-ui/react-dialog";
+import type { ReactNode } from "react";
+import { IoClose } from "react-icons/io5";
 import {
 	DialogClose,
 	DialogCloseContainer,
@@ -10,7 +11,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "./styles";
-import type { ReactNode } from "react";
 
 type Props = {
 	trigger: ReactNode;

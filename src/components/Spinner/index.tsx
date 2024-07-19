@@ -1,6 +1,6 @@
+import { ClassicSpinner } from "react-spinners-kit";
 import styled from "styled-components";
 import { Colors } from "~utils/styles";
-import { ClassicSpinner } from "react-spinners-kit";
 
 interface ISpinnerProps {
 	size?: number;
