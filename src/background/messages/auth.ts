@@ -1,6 +1,6 @@
-import type { User } from "@linkvite/js";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
 import { handleAuthentication } from "~api";
+import type { AuthResponse } from "~types";
 import { persistAuthData } from "~utils/storage";
 
 export type AuthMessageRequest = {
@@ -8,16 +8,11 @@ export type AuthMessageRequest = {
 	identifier: string;
 };
 
-type SuccessResponse = {
-	user: User;
-	token: string;
-};
-
 type ErrorResponse = {
 	error: string;
 };
 
-export type AuthMessageResponse = SuccessResponse | ErrorResponse;
+export type AuthMessageResponse = AuthResponse | ErrorResponse;
 
 const handler: PlasmoMessaging.MessageHandler<
 	AuthMessageRequest,
@@ -27,10 +22,8 @@ const handler: PlasmoMessaging.MessageHandler<
 		const resp = await handleAuthentication({
 			body: req.body,
 		});
-
 		await persistAuthData(resp);
-
-		return res.send({ user: resp.user, token: resp.refreshToken });
+		return res.send(resp);
 	} catch (error) {
 		return res.send({ error: String(error) });
 	}

@@ -45,7 +45,6 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
 	const { autoSave } = useSelector(settingStore);
 	const [apiData, setAPIData] = useState<ParsedLinkData | null>(null);
 	const [localData, setLocalData] = useState<ParsedHTML | null>(null);
-	const [coverType, setCoverType] = useState<"default" | "custom">("default");
 
 	const setAPIView = useCallback(
 		({ title, image, description }: ViewProps) => {
@@ -84,8 +83,7 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
 				v === "local" ? localData?.description : apiData?.description;
 
 			v === "local"
-				? (setLocalView({ title, image, description }),
-					setCoverType(localData?.imageType || "default"))
+				? setLocalView({ title, image, description })
 				: setAPIView({ title, image, description });
 		},
 		[
@@ -94,7 +92,6 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
 			apiData?.title,
 			localData?.description,
 			localData?.image,
-			localData?.imageType,
 			setAPIView,
 			setLocalView,
 			tab?.title,
@@ -125,7 +122,6 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
 					description: data.description,
 				});
 				setLocalData(data);
-				setCoverType(data.imageType);
 			}
 		},
 		[setLocalView],
@@ -191,9 +187,7 @@ export function useViewBookmark({ tab, setBookmark }: Props) {
 		view,
 		exists,
 		loading,
-		coverType,
 		updateView,
 		// loading: loading || !tab,
-		updateCoverType: setCoverType,
 	};
 }

@@ -15,6 +15,38 @@ export const CollectionsContainer = styled.div<{ theme: ITheme }>`
     background-color: ${(p) => p.theme.background_sub};
 `;
 
+export const CollectionsContainerHeader = styled.div<{ theme: ITheme }>`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+`;
+
+export const CollectionsRefresh = styled.button<{ theme: ITheme }>`
+    border: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: 35px;
+    height: 30px;
+    background-color: transparent;
+    margin-left: auto;
+    color: ${(p) => p.theme.text_sub};
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        cursor: pointer;
+        color: ${(p) => p.theme.text};
+    }
+
+    &:focus {
+        outline: none;
+        color: ${(p) => p.theme.text};
+    }
+`;
+
 export const EmptyCollectionsText = styled(AppText)<{ theme: ITheme }>`
     color: ${(p) => p.theme.text_sub};
     text-align: center;
@@ -72,51 +104,6 @@ export const CollectionItemName = styled(AppText)<{ theme: ITheme }>`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-`;
-
-export const CollectionMineOnly = styled.div`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    margin-bottom: 15px;
-    margin-top: 10px;
-    width: 100%;
-`;
-
-export const CollectionMineOnlyLabel = styled.label<{ theme: ITheme }>`
-    color: ${(p) => p.theme.text_sub};
-    font-size: ${Fonts.xs};
-    margin-right: 5px;
-    transition: all 0.3s ease-in-out;
-
-    &:hover {
-        cursor: pointer;
-        color: ${(p) => p.theme.text};
-    }
-`;
-
-export const CollectionMineOnlyInput = styled.input<{ theme: ITheme }>`
-    width: 15px;
-    height: 15px;
-    outline: none;
-    border-radius: 3px;
-    border: 1px solid ${(p) => p.theme.text_sub};
-    background-color: transparent;
-    transition: all 0.3s ease-in-out;
-
-    &:hover {
-        cursor: pointer;
-        border: 1px solid ${Colors.primary};
-    }
-
-    &:focus {
-        border: 1px solid ${Colors.primary};
-    }
-
-    &:checked {
-        border: 1px solid ${Colors.primary};
-    }
 `;
 
 export const RemoveCollection = styled.button<{ theme: ITheme }>`

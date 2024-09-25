@@ -3,13 +3,13 @@ import { Centrifuge, type ServerPublicationContext } from "centrifuge";
 import { QRCodeSVG } from "qrcode.react";
 import { useCallback, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import type {} from "~background/messages/auth";
 import { Spinner } from "~components/spinner";
 import { AppText } from "~components/text";
 import type { OnLogin } from "~components/wrapper/auth";
 import { useTheme } from "~hooks";
 import type { AuthResponse } from "~types";
 import { API_DOMAIN, QR_LOGO_URL, WS_ENDPOINT, parseQRAuth } from "~utils";
-import { persistAuthData } from "~utils/storage";
 import { Colors } from "~utils/styles";
 import {
 	AlreadyRegistered,
@@ -74,7 +74,7 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
 		});
 	}
 
-	function processEvent(ctx: ServerPublicationContext) {
+	async function processEvent(ctx: ServerPublicationContext) {
 		const data = ctx?.data?.data;
 		const event = ctx?.data?.event as string;
 
@@ -104,9 +104,7 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
 				return;
 			}
 
-			const { refreshToken, user } = response;
-			persistAuthData(response);
-			onLogin(user, refreshToken);
+			onLogin(response);
 			toast.success("Logged in successfully.");
 		}
 	}
@@ -171,7 +169,6 @@ export function AuthWithQR({ onLogin }: { onLogin: OnLogin }) {
 		init();
 
 		return () => {
-			ws.current?.disconnect();
 			closeSession();
 		};
 	});

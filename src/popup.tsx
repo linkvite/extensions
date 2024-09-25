@@ -46,8 +46,10 @@ function IndexPopup() {
 	const params = useMemo(() => new URL(window.location.href), []);
 	const { message, exists: autoSaveExists } = useAutoSave({ tab, setBookmark });
 
-	const { view, exists, loading, coverType, updateView, updateCoverType } =
-		useViewBookmark({ tab, setBookmark });
+	const { view, exists, loading, updateView } = useViewBookmark({
+		tab,
+		setBookmark,
+	});
 
 	const bookmarkExists = useMemo(
 		() => exists || autoSaveExists,
@@ -56,7 +58,6 @@ function IndexPopup() {
 
 	const onCreate = useCallback(async () => {
 		const data: CreateBookmarkProps = {
-			coverType,
 			tags: bookmark.tags,
 			url: bookmark.url,
 			title: bookmark.title,
@@ -85,7 +86,7 @@ function IndexPopup() {
 		if (autoClose) {
 			closeTab();
 		}
-	}, [coverType, bookmark, autoClose]);
+	}, [bookmark, autoClose]);
 
 	useLayoutEffect(() => {
 		const page = decodeURIComponent(
@@ -147,7 +148,6 @@ function IndexPopup() {
 								exists={bookmarkExists}
 								onCreate={onCreate}
 								updateBookmark={setBookmark}
-								updateCoverType={updateCoverType}
 							/>
 
 							{bookmarkExists ? null : (
@@ -163,7 +163,7 @@ function IndexPopup() {
 											onClick={() => updateView("api")}
 											$active={view === "api"}
 										>
-											API
+											Server
 										</PopupAction>
 									</PopupActions>
 									<AppText

@@ -28,7 +28,6 @@ export function NewLinkPage({ params }: { params: URL }) {
 	const [exists, setExists] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [bookmark, setBookmark] = useState<Bookmark>(makeBookmark());
-	const [coverType, setCoverType] = useState<"default" | "custom">("default");
 
 	const { autoClose } = useSelector(settingStore);
 	const url = decodeURIComponent(params.searchParams.get("url") || "");
@@ -45,7 +44,6 @@ export function NewLinkPage({ params }: { params: URL }) {
 		}
 
 		const data: CreateBookmarkProps = {
-			coverType,
 			tags: bookmark.tags,
 			url: bookmark.url,
 			title: bookmark.title,
@@ -74,7 +72,7 @@ export function NewLinkPage({ params }: { params: URL }) {
 		if (autoClose) {
 			closeTab();
 		}
-	}, [autoClose, bookmark, coverType, exists]);
+	}, [autoClose, bookmark, exists]);
 
 	const checkExists = useCallback(async (url: string) => {
 		const resp = await sendToBackground<
@@ -146,7 +144,6 @@ export function NewLinkPage({ params }: { params: URL }) {
 					bookmark={bookmark}
 					tabId={Number(tabId)}
 					onCreate={createBookmark}
-					updateCoverType={setCoverType}
 					updateBookmark={updateBookmark}
 				/>
 			)}

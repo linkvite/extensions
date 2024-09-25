@@ -1,14 +1,10 @@
-import { useSelector } from "@legendapp/state/react";
 import type { Collection } from "@linkvite/js";
 import { sendToBackground } from "@plasmohq/messaging";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Fragment, useCallback, useEffect, useState } from "react";
-import type React from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import type {
-	FindCollectionsRequest,
-	FindCollectionsResponse,
-} from "~background/messages/collections";
+import { IoRefresh } from "react-icons/io5";
+import type { FindCollectionsResponse } from "~background/messages/collections";
 import type {
 	CreateCollectionRequest,
 	CreateCollectionResponse,
@@ -17,17 +13,16 @@ import { AuthInputField } from "~components/auth/styles";
 import { Spinner } from "~components/spinner";
 import { useTheme } from "~hooks";
 import { useDebounceText } from "~hooks/useDebounceText";
-import { userStore } from "~stores";
+import { collectionActions, collectionStore } from "~stores";
 import { storage } from "~utils/storage";
 import {
 	CollectionItem,
 	CollectionItemIcon,
 	CollectionItemName,
 	CollectionItems,
-	CollectionMineOnly,
-	CollectionMineOnlyInput,
-	CollectionMineOnlyLabel,
 	CollectionsContainer,
+	CollectionsContainerHeader,
+	CollectionsRefresh,
 	CreateCollectionButton,
 	EmptyCollectionsText,
 	NoCollections,
@@ -41,50 +36,31 @@ type Props = {
 
 export function CollectionsModal({ collection, setCollection }: Props) {
 	const { theme } = useTheme();
-	const onEndReachedThreshold = 0;
-	const { id: uID } = useSelector(userStore);
 	const [loading, setLoading] = useState(false);
 	const [creating, setCreating] = useState(false);
 	const [data, setData] = useState<Collection[]>([]);
 	const { query, text, setText } = useDebounceText("");
-	const [params, setParams] = useState({
-		limit: 10,
-		mineOnly: true,
-	});
 
-	function onEndReached() {
-		setParams((prev) => ({ ...prev, limit: prev.limit + 10 }));
-	}
-
-	function onScroll(event: React.UIEvent<HTMLDivElement, UIEvent>) {
-		const { scrollTop, scrollHeight, clientHeight } = event.currentTarget;
-
-		if (scrollHeight - scrollTop - clientHeight <= onEndReachedThreshold) {
-			onEndReached();
-		}
-	}
+	const filtered = useMemo(() => {
+		return data.filter(
+			(c) =>
+				c.name.toLowerCase().includes(query.toLowerCase()) ||
+				c.id === collection?.id,
+		);
+	}, [data, query, collection]);
 
 	const fetchData = useCallback(async () => {
-		if (!query) {
-			return;
-		}
 		setLoading(true);
-		const resp = await sendToBackground<
-			FindCollectionsRequest,
-			FindCollectionsResponse
-		>({
+		const resp = await sendToBackground<null, FindCollectionsResponse>({
 			name: "collections",
-			body: {
-				query,
-				limit: params.limit,
-				owner: params.mineOnly ? uID : undefined,
-			},
 		});
 
-		"error" in resp ? toast.error(resp.error) : setData(resp.data);
+		"error" in resp
+			? toast.error(resp.error)
+			: (setData(resp.data), collectionActions.initialize(resp.data));
 
 		setLoading(false);
-	}, [query, params.limit, params.mineOnly, uID]);
+	}, []);
 
 	const onSelect = useCallback(
 		async (c?: Collection) => {
@@ -109,74 +85,53 @@ export function CollectionsModal({ collection, setCollection }: Props) {
 
 		"error" in resp
 			? toast.error(resp.error)
-			: (onSelect(resp.data), setText(""));
+			: (onSelect(resp.data), setText(""), collectionActions.add(resp.data));
 
 		setCreating(false);
 	}, [onSelect, setText, text]);
 
 	useEffect(() => {
-		fetchData();
+		async function init() {
+			const collections = collectionStore.data.get();
+			collections.length ? setData(collections) : fetchData();
+		}
+
+		init();
 	}, [fetchData]);
 
 	return (
 		<CollectionsContainer>
-			<AuthInputField
-				required
-				type="text"
-				id="search"
-				name="search"
-				value={text}
-				style={{ margin: 0 }}
-				placeholder='eg: "Articles"'
-				onChange={(e) => setText(e.target.value)}
-			/>
+			<CollectionsContainerHeader>
+				<AuthInputField
+					required
+					type="text"
+					id="search"
+					name="search"
+					value={text}
+					style={{ margin: 0 }}
+					placeholder='eg: "Articles"'
+					onChange={(e) => setText(e.target.value)}
+				/>
 
-			<CollectionItems onScroll={onScroll}>
+				<CollectionsRefresh onClick={loading ? undefined : fetchData}>
+					{loading ? (
+						<Spinner color={theme.text} size={18} />
+					) : (
+						<IoRefresh size={23} style={{ marginRight: -2 }} />
+					)}
+				</CollectionsRefresh>
+			</CollectionsContainerHeader>
+
+			<CollectionItems>
 				{collection?.id && !text ? (
 					<RemoveCollection onClick={() => onSelect(null)}>
 						Remove from {collection.name}
 					</RemoveCollection>
 				) : null}
 
-				{loading ? (
+				{filtered.length ? (
 					<div style={{ marginTop: 15 }}>
-						<Spinner color={theme.text} />
-					</div>
-				) : !text ? (
-					<EmptyCollectionsText>
-						Start typing to search for collections
-					</EmptyCollectionsText>
-				) : !data.length ? (
-					<NoCollections>
-						<EmptyCollectionsText>No collections found</EmptyCollectionsText>
-
-						<CreateCollectionButton onClick={onCreate}>
-							{creating ? (
-								<Spinner color={theme.text} size={15} />
-							) : (
-								`Create ${text}`
-							)}
-						</CreateCollectionButton>
-					</NoCollections>
-				) : null}
-
-				{text && data.length ? (
-					<Fragment>
-						<CollectionMineOnly>
-							<CollectionMineOnlyLabel htmlFor="mineOnly">
-								Mine only
-							</CollectionMineOnlyLabel>
-							<CollectionMineOnlyInput
-								type="checkbox"
-								id="mineOnly"
-								name="mineOnly"
-								checked={params.mineOnly}
-								onChange={(e) =>
-									setParams((prev) => ({ ...prev, mineOnly: e.target.checked }))
-								}
-							/>
-						</CollectionMineOnly>
-						{data.map((c) => (
+						{filtered.map((c) => (
 							<Dialog.Close asChild key={c.id}>
 								<CollectionItem
 									type="button"
@@ -193,8 +148,20 @@ export function CollectionsModal({ collection, setCollection }: Props) {
 								</CollectionItem>
 							</Dialog.Close>
 						))}
-					</Fragment>
-				) : null}
+					</div>
+				) : (
+					<NoCollections>
+						<EmptyCollectionsText>No collections found</EmptyCollectionsText>
+
+						<CreateCollectionButton onClick={onCreate}>
+							{creating ? (
+								<Spinner color={theme.text} size={15} />
+							) : (
+								`Create ${text}`
+							)}
+						</CreateCollectionButton>
+					</NoCollections>
+				)}
 			</CollectionItems>
 		</CollectionsContainer>
 	);

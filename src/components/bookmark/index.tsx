@@ -14,10 +14,6 @@ import type {
 	FindCollectionResponse,
 } from "~background/messages/collection";
 import type {
-	UpdateCoverMessageRequest,
-	UpdateCoverMessageResponse,
-} from "~background/messages/cover";
-import type {
 	DeleteMessageRequest,
 	DeleteMessageResponse,
 } from "~background/messages/delete";
@@ -67,7 +63,6 @@ type BookmarkViewProps = {
 	disabledImage?: boolean;
 	onCreate: () => void;
 	updateBookmark: (data: Bookmark) => void;
-	updateCoverType?: (type: "default" | "custom") => void;
 };
 
 export function BookmarkView({
@@ -78,7 +73,6 @@ export function BookmarkView({
 	disabledImage,
 	onCreate,
 	updateBookmark,
-	updateCoverType,
 }: BookmarkViewProps) {
 	const { theme } = useTheme();
 	const [loading, setLoading] = useState(false);
@@ -119,42 +113,14 @@ export function BookmarkView({
 	);
 
 	const onChangeImage = useCallback(
-		async (src: string, type: "default" | "custom") => {
-			updateCoverType?.(type);
+		async (src: string) => {
 			updateBookmark(
 				produce(bookmark, (draft) => {
 					draft.thumbnail = src;
 				}),
 			);
-
-			if (!exists) {
-				return;
-			}
-
-			setLoading(true);
-			const resp = await sendToBackground<
-				UpdateCoverMessageRequest,
-				UpdateCoverMessageResponse
-			>({
-				name: "cover",
-				body: {
-					type,
-					cover: src,
-					id: bookmark.id,
-				},
-			});
-
-			if ("error" in resp) {
-				toast.error(resp.error);
-				setLoading(false);
-				return;
-			}
-
-			updateBookmark(resp.bookmark);
-			setLoading(false);
-			toast.success("Cover image updated");
 		},
-		[bookmark, exists, updateBookmark, updateCoverType],
+		[bookmark, updateBookmark],
 	);
 
 	const onUpdate = useCallback(async () => {
@@ -180,10 +146,12 @@ export function BookmarkView({
 
 		toast.success(resp.message);
 
+		updateBookmark(resp.bookmark);
+
 		if (autoClose) {
 			closeTab();
 		}
-	}, [autoClose, bookmark, exists]);
+	}, [updateBookmark, autoClose, bookmark, exists]);
 
 	const onDelete = useCallback(async () => {
 		if (!bookmark.id || !exists) {
@@ -212,14 +180,6 @@ export function BookmarkView({
 			closeTab();
 		}
 	}, [autoClose, bookmark.id, exists]);
-
-	const onImageError = useCallback(() => {
-		updateBookmark(
-			produce(bookmark, (draft) => {
-				draft.thumbnail = COVER_URL;
-			}),
-		);
-	}, [bookmark, updateBookmark]);
 
 	const onSubmit = useCallback(async () => {
 		setLoading(true);
@@ -308,10 +268,10 @@ export function BookmarkView({
 				<BookmarkActionsSubContainer $isImage>
 					<BookmarkImageComponent
 						tabId={tabId}
-						onImageError={onImageError}
+						cover={bookmark.thumbnail}
 						disabledImage={disabledImage}
 						onChangeImage={onChangeImage}
-						cover={bookmark.thumbnail}
+						onImageError={() => undefined}
 					/>
 				</BookmarkActionsSubContainer>
 
@@ -405,7 +365,7 @@ type BookmarkImageComponentProps = {
 	cover: string;
 	disabledImage?: boolean;
 	onImageError: () => void;
-	onChangeImage: (src: string, type: "default" | "custom") => void;
+	onChangeImage: (src: string) => void;
 };
 
 function BookmarkImageComponent({
@@ -442,7 +402,7 @@ function BookmarkImageComponent({
 			reader.addEventListener(
 				"load",
 				() => {
-					onChangeImage(reader.result as string, "custom");
+					onChangeImage(reader.result as string);
 				},
 				false,
 			);
@@ -453,7 +413,7 @@ function BookmarkImageComponent({
 	);
 
 	const handleLinkChange = useCallback(() => {
-		onChangeImage(coverURL, "default");
+		onChangeImage(coverURL);
 	}, [coverURL, onChangeImage]);
 
 	const handleLinkClick = useCallback(() => {
@@ -473,11 +433,11 @@ function BookmarkImageComponent({
 		const image = await browser.tabs.captureVisibleTab(tab.windowId, {
 			format: "png",
 		});
-		onChangeImage(image, "custom");
+		onChangeImage(image);
 	}, [onChangeImage, tabId]);
 
 	const handleReset = useCallback(() => {
-		onChangeImage(COVER_URL, "default");
+		onChangeImage(COVER_URL);
 	}, [onChangeImage]);
 
 	const handleMenuClick = useCallback(

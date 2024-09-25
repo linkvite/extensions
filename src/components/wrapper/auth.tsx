@@ -1,5 +1,4 @@
 import { observer } from "@legendapp/state/react";
-import type { User } from "@linkvite/js";
 import { sendToBackground } from "@plasmohq/messaging";
 import {
 	type ReactNode,
@@ -13,9 +12,11 @@ import {
 import type { InitResponse } from "~background/messages/init";
 import { Login } from "~components/auth";
 import { authStore, userActions } from "~stores";
+import type { AuthResponse } from "~types";
 import { extLogout } from "~utils";
+import { persistAuthData } from "~utils/storage";
 
-export type OnLogin = (user: User, token: string) => void;
+export type OnLogin = (data: AuthResponse) => void;
 
 type AuthCtx = {
 	loggedIn: boolean;
@@ -69,10 +70,9 @@ export const AuthProvider = observer(function AuthProvider({
 		init();
 	}, []);
 
-	const onLogin = useCallback((user: User, token: string) => {
+	const onLogin = useCallback((data: AuthResponse) => {
+		persistAuthData(data);
 		setLoggedIn(true);
-		userActions.setData(user);
-		authStore.refreshToken.set(token);
 	}, []);
 
 	const onLogout = useCallback(async () => {

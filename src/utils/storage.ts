@@ -6,9 +6,17 @@ import {
 	configureObservablePersistence,
 	persistObservable,
 } from "@legendapp/state/persist";
-import type { User } from "@linkvite/js";
 import { Storage } from "@plasmohq/storage";
-import { authStore, settingStore, userActions, userStore } from "~stores";
+import { merge } from "xior";
+import { api } from "~api";
+import {
+	authStore,
+	collectionStore,
+	settingStore,
+	userActions,
+	userStore,
+} from "~stores";
+import type { AuthResponse } from "~types";
 
 export const storage = new Storage();
 
@@ -27,25 +35,25 @@ export function persistStateObservers(
 		pluginLocal,
 	});
 
-	persistObservable(settingStore, { local: "settings" });
-	persistObservable(userStore, { local: "user" });
-	persistObservable(authStore.refreshToken, { local: "refreshToken" });
+	persistObservable(userStore, { local: "local_user" });
+	persistObservable(settingStore, { local: "local_settings" });
+	persistObservable(collectionStore, { local: "local_collections" });
+	persistObservable(authStore.refreshToken, { local: "local_token" });
 }
 
-type AuthData = {
-	user: User;
-	refreshToken: string;
-	accessToken?: string;
-};
-
-export async function persistAuthData(data: AuthData) {
-	await storage.set("user", data.user);
-	await storage.set("token", data.refreshToken);
-
+export async function persistAuthData(data: AuthResponse) {
 	userActions.setData(data.user);
-	authStore.refreshToken.set(data.refreshToken);
+	authStore.accessToken.set(data.access_token);
+	authStore.refreshToken.set(data.refresh_token);
 
-	if (data.accessToken) {
-		authStore.accessToken.set(data.accessToken);
-	}
+	await storage.set("user", data.user);
+	await storage.set("token", data.refresh_token);
+
+	api.interceptors.request.use(async (config) => {
+		return merge(config, {
+			headers: {
+				Authorization: `Bearer ${data.access_token}`,
+			},
+		});
+	});
 }

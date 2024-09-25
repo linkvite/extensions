@@ -17,6 +17,6 @@ export class HTTPException<T = HTTPError> extends XiorError {
 
 export type AuthResponse = {
 	user: User;
-	accessToken: string;
-	refreshToken: string;
+	access_token: string;
+	refresh_token: string;
 };

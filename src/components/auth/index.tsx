@@ -110,7 +110,6 @@ function AuthWithCreds({ onLogin }: { onLogin: OnLogin }) {
 			return;
 		}
 
-		const onComplete = () => setIsLoading(false);
 		const onError = (err: string) => setError(err);
 		const resp = await sendToBackground<
 			AuthMessageRequest,
@@ -121,7 +120,7 @@ function AuthWithCreds({ onLogin }: { onLogin: OnLogin }) {
 				identifier: identifier,
 				password: password,
 			},
-		}).finally(onComplete);
+		}).finally(() => setIsLoading(false));
 
 		if ("error" in resp) {
 			onError(resp.error);
@@ -129,7 +128,7 @@ function AuthWithCreds({ onLogin }: { onLogin: OnLogin }) {
 		}
 
 		clear();
-		onLogin(resp.user, resp.token);
+		onLogin(resp);
 	}
 
 	function onClickSignUpButton() {

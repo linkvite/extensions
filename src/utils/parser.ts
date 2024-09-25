@@ -1,11 +1,10 @@
 import * as htmlparser from "htmlparser2";
 import { browser } from "~browser";
-import { COVER_URL, normalize } from "~utils";
+import { normalize } from "~utils";
 
 export type ParsedHTML = {
 	image: string;
 	description: string;
-	imageType: "default" | "custom";
 };
 
 /**
@@ -23,7 +22,6 @@ export async function parseHTML(
 ): Promise<ParsedHTML> {
 	let image = "";
 	let description = "";
-	let imageType: "default" | "custom" = "default";
 
 	const parser = new htmlparser.Parser(
 		{
@@ -52,16 +50,13 @@ export async function parseHTML(
 	if (!image) {
 		try {
 			image = await browser.tabs.captureVisibleTab(windowId, { format: "png" });
-			imageType = "custom";
 		} catch (error) {
 			console.error("Error capturing visible tab: ", error);
-			image = COVER_URL;
 		}
 	}
 
 	return {
 		image,
-		imageType,
 		description: normalize(description),
 	};
 }
