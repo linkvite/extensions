@@ -2,7 +2,7 @@
 
 Easily save and organize bookmarks without leaving the page. This supports any Chronium-based browser, including Chrome, Arc, Edge, Opera, and Brave. Also works on Firefox, and Safari. See Plasmo's [documentation](https://docs.plasmo.com/framework/workflows/faq#what-are-the-officially-supported-browser-targets) for more information.
 
-Currently only available on the [Chrome Web Store](https://chromewebstore.google.com/detail/linkvite/jdkkldhichblefcaiogghmmiijcacadn) and [Apple App Store](https://apps.apple.com/us/app/linkvite-safari-extension/id6479678583).
+Currently only available on the [Chrome Web Store](https://chromewebstore.google.com/detail/linkvite/jdkkldhichblefcaiogghmmiijcacadn)
 
 ## Getting Started
 
