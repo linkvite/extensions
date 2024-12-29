@@ -391,10 +391,28 @@ export async function handleUpdateBookmark({
 		.catch(handleError);
 }
 
-export async function handleGetCollections() {
-	const endpoint = `/collections/all`;
+type FindCollectionsProps = {
+	query: string;
+	limit?: number;
+	owner?: string;
+};
+
+export async function handleFindCollections({
+	query,
+	owner,
+	limit = 10,
+}: FindCollectionsProps) {
+	let endpoint = `/search?q=${query}`;
+	endpoint += `&sort=-updated`;
+	endpoint += `&limit=${limit}`;
+	endpoint += `&public=false`;
+	endpoint += `&path=collections`;
+	if (owner) {
+		endpoint += `&owner=${owner}`;
+	}
+
 	function handleSuccess(res: XiorResponse) {
-		return res.data.data as Collection[];
+		return res.data.data.collections as Collection[];
 	}
 
 	function handleError(err: HTTPException) {
@@ -476,7 +494,7 @@ export async function handleFindBookmarks({
 	limit = 10,
 }: { query: string; limit?: number }) {
 	let endpoint = `/search?q=${query}`;
-	endpoint += `&sort=-updatedAt`;
+	endpoint += `&sort=-updated`;
 	endpoint += `&limit=${limit}`;
 	endpoint += `&path=bookmarks`;
 

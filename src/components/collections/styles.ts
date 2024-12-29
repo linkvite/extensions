@@ -148,3 +148,48 @@ export const CreateCollectionButton = styled.button<{ theme: ITheme }>`
         color: ${(p) => p.theme.text};
     }
 `;
+
+export const CollectionMineOnly = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    margin-bottom: 15px;
+    margin-top: 10px;
+    width: 100%;
+`;
+
+export const CollectionMineOnlyLabel = styled.label<{ theme: ITheme }>`
+    color: ${(p) => p.theme.text_sub};
+    font-size: ${Fonts.xs};
+    margin-right: 5px;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        cursor: pointer;
+        color: ${(p) => p.theme.text};
+    }
+`;
+
+export const CollectionMineOnlyInput = styled.input<{ theme: ITheme }>`
+    width: 15px;
+    height: 15px;
+    outline: none;
+    border-radius: 3px;
+    border: 1px solid ${(p) => p.theme.text_sub};
+    background-color: transparent;
+    transition: all 0.3s ease-in-out;
+
+    &:hover {
+        cursor: pointer;
+        border: 1px solid ${Colors.primary};
+    }
+
+    &:focus {
+        border: 1px solid ${Colors.primary};
+    }
+
+    &:checked {
+        border: 1px solid ${Colors.primary};
+    }
+`;

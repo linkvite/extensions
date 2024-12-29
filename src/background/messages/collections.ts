@@ -1,8 +1,12 @@
 import type { Collection } from "@linkvite/js";
 import type { PlasmoMessaging } from "@plasmohq/messaging";
-import { handleGetCollections } from "~api";
-import { collectionActions } from "~stores";
-import { storage } from "~utils/storage";
+import { handleFindCollections } from "~api";
+
+export type FindCollectionsRequest = {
+	query: string;
+	limit?: number;
+	owner?: string;
+};
 
 export type FindCollectionsResponse =
 	| {
@@ -13,13 +17,15 @@ export type FindCollectionsResponse =
 	  };
 
 const handler: PlasmoMessaging.MessageHandler<
-	undefined,
+	FindCollectionsRequest,
 	FindCollectionsResponse
-> = async (_, res) => {
+> = async (req, res) => {
 	try {
-		const data = await handleGetCollections();
-		collectionActions.initialize(data);
-		await storage.set("collections", data);
+		const data = await handleFindCollections({
+			query: req.body.query,
+			limit: req.body.limit,
+			owner: req.body.owner,
+		});
 		return res.send({ data });
 	} catch (error) {
 		return res.send({ error: String(error) });

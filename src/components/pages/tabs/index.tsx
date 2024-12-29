@@ -1,3 +1,4 @@
+import { useSelector } from "@legendapp/state/react";
 import type { Collection } from "@linkvite/js";
 import { sendToBackground } from "@plasmohq/messaging";
 import { useCallback, useLayoutEffect, useMemo, useState } from "react";
@@ -18,14 +19,13 @@ import {
 	SelectCollectionImage,
 } from "~components/bookmark/styles";
 import { CollectionsModal } from "~components/collections";
-// import { useSelector } from "@legendapp/state/react";
 import { AppDialog } from "~components/primitives/dialog";
 import { Spinner } from "~components/spinner";
 import { useTabs, useTheme } from "~hooks";
+import { closeTab } from "~router";
+import { settingStore } from "~stores";
 import { pluralize, subString } from "~utils";
-// import { settingStore } from "~stores";
 import { storage } from "~utils/storage";
-// import { closeTab } from "~router";
 import { Colors } from "~utils/styles";
 import {
 	TabAddButton,
@@ -60,9 +60,7 @@ export function NewTabsPage() {
 		tabHovered: null as number | null,
 	});
 
-	// const {
-	//     autoClose,
-	// } = useSelector(settingStore);
+	const { autoClose } = useSelector(settingStore);
 	const [tabs, setTabs] = useState<Tab[]>([]);
 	const [selected, setSelected] = useState([] as number[]);
 	const [collection, setCollection] = useState<Collection>();
@@ -156,10 +154,10 @@ export function NewTabsPage() {
 		}
 
 		toast.success(resp.message);
-		// if (autoClose) {
-		//     closeTab();
-		// }
-	}, [collection?.id, selected, tabs]);
+		if (autoClose) {
+			closeTab();
+		}
+	}, [collection?.id, selected, tabs, autoClose]);
 
 	const requestTabsPermission = useCallback(async () => {
 		if (hasTabsPermission) {

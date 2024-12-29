@@ -1,7 +1,7 @@
 {
 	"name": "linkvite-extension",
 	"displayName": "Linkvite",
-	"version": "0.1.4",
+	"version": "0.1.5",
 	"description": "The easiest way to save and organize your bookmarks.",
 	"author": "Linkvite <support@linkvite.io>",
 	"homepage_url": "https://app.linkvite.io",
@@ -15,7 +15,6 @@
 		"build:safari": "plasmo build --target=safari-mv3",
 		"package:safari": "pnpm run build:safari --zip",
 		"test:safari": "pnpm run build:safari && xcrun safari-web-extension-converter build/safari-mv3-prod",
-		"package:mobile": "pnpm run build:safari && node prepare.js",
 		"lint": "biome lint .",
 		"lint:write": "biome lint . --write",
 		"lint:check": "biome check .",
@@ -35,7 +34,7 @@
 		"centrifuge": "5.2.2",
 		"htmlparser2": "^9.1.0",
 		"immer": "^10.0.4",
-		"plasmo": "0.86.3",
+		"plasmo": "0.89.4",
 		"polished": "^4.3.1",
 		"qrcode.react": "^3.1.0",
 		"react": "18.2.0",
@@ -56,6 +55,7 @@
 		"@types/react": "18.2.48",
 		"@types/react-dom": "18.2.18",
 		"@types/webextension-polyfill": "^0.10.7",
+		"crypto-browserify": "^3.12.1",
 		"prettier": "3.2.4",
 		"typescript": "5.3.3",
 		"webextension-polyfill": "^0.10.0"

@@ -9,13 +9,7 @@ import {
 import { Storage } from "@plasmohq/storage";
 import { merge } from "xior";
 import { api } from "~api";
-import {
-	authStore,
-	collectionStore,
-	settingStore,
-	userActions,
-	userStore,
-} from "~stores";
+import { authStore, settingStore, userActions, userStore } from "~stores";
 import type { AuthResponse } from "~types";
 
 export const storage = new Storage();
@@ -37,7 +31,6 @@ export function persistStateObservers(
 
 	persistObservable(userStore, { local: "local_user" });
 	persistObservable(settingStore, { local: "local_settings" });
-	persistObservable(collectionStore, { local: "local_collections" });
 	persistObservable(authStore.refreshToken, { local: "local_token" });
 }
 
