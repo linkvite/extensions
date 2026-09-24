@@ -7,8 +7,6 @@ import {
 	persistObservable,
 } from "@legendapp/state/persist";
 import { Storage } from "@plasmohq/storage";
-import { merge } from "xior";
-import { api } from "~api";
 import { authStore, settingStore, userActions, userStore } from "~stores";
 import type { AuthResponse } from "~types";
 
@@ -31,22 +29,17 @@ export function persistStateObservers(
 
 	persistObservable(userStore, { local: "local_user" });
 	persistObservable(settingStore, { local: "local_settings" });
-	persistObservable(authStore.refreshToken, { local: "local_token" });
+	// The refresh token is persisted only in chrome.storage ("token"), shared
+	// by popup and worker. A second copy in popup localStorage went stale on
+	// every rotation.
 }
 
 export async function persistAuthData(data: AuthResponse) {
+	// Persist first: the old refresh token is already dead server-side.
+	await storage.set("token", data.refresh_token);
+	await storage.set("user", data.user);
+
 	userActions.setData(data.user);
 	authStore.accessToken.set(data.access_token);
 	authStore.refreshToken.set(data.refresh_token);
-
-	await storage.set("user", data.user);
-	await storage.set("token", data.refresh_token);
-
-	api.interceptors.request.use(async (config) => {
-		return merge(config, {
-			headers: {
-				Authorization: `Bearer ${data.access_token}`,
-			},
-		});
-	});
 }

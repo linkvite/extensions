@@ -10,54 +10,84 @@ export const api = xior.create({
 	baseURL: API_DOMAIN,
 });
 
+/**
+ * Refresh tokens are single-use: each refresh returns a new pair and the old
+ * refresh token dies (replaying it >30s later revokes the whole session).
+ * The popup and the background worker are separate JS contexts with their own
+ * in-memory stores, and MV3 restarts the worker at will, so:
+ *   - refresh with the latest token from chrome.storage, not memory;
+ *   - run at most one refresh per context at a time;
+ *   - persist the new token before anything else can use the old one.
+ */
+let refreshInFlight: Promise<string> | null = null;
+
+function refreshAccessToken(): Promise<string> {
+	if (!refreshInFlight) {
+		refreshInFlight = (async () => {
+			const latest =
+				(await storage.get<string>("token")) || authStore.refreshToken.get();
+			if (!latest) {
+				throw new Error("Session expired: Please log in again.");
+			}
+			const data = await handleRefreshToken(latest);
+			return data.access_token;
+		})().finally(() => {
+			refreshInFlight = null;
+		});
+	}
+	return refreshInFlight;
+}
+
 api.interceptors.response.use(
 	(resp) => resp,
 	async (error: XiorError) => {
-		const isInAuth = error.response.config.url?.includes("/auth");
-		if (error.response && error.response.status === 401 && !isInAuth) {
-			const originalRequest = error.request;
+		const status = error?.response?.status;
+		const url = error?.request?.url ?? error?.response?.config?.url ?? "";
+		const isAuthCall = url.includes("/auth/");
+		const request = error?.request as
+			| (XiorError["request"] & { _retry?: boolean })
+			| undefined;
 
-			if (!originalRequest["_retry"]) {
-				originalRequest["_retry"] = true;
-
-				let accessToken = "";
-				const refreshToken =
-					authStore.refreshToken.get() || (await storage.get("token"));
-
-				await handleRefreshToken(refreshToken)
-					.then(async (resp) => {
-						await persistAuthData(resp);
-						accessToken = resp.access_token;
-					})
-					.catch(() => {
-						return Promise.reject("Session expired: Please log in again.");
-					});
-
-				const request = merge(originalRequest, {
-					headers: {
-						Authorization: `Bearer ${accessToken}`,
-					},
-				});
-
-				return api.request(request);
-			}
+		if (status !== 401 || isAuthCall || !request || request._retry) {
+			return Promise.reject(error);
 		}
 
-		return Promise.reject(error);
+		request._retry = true;
+
+		let accessToken: string;
+		try {
+			accessToken = await refreshAccessToken();
+		} catch (refreshError) {
+			return Promise.reject(refreshError);
+		}
+
+		return api.request(
+			merge(request, {
+				headers: { Authorization: `Bearer ${accessToken}` },
+			}),
+		);
 	},
 );
 
+// Read the token at request time (never capture it in a closure: that is how
+// stale tokens were being re-applied after every refresh).
 api.interceptors.request.use(async (config) => {
 	if (
 		config.url?.includes("/auth/login") ||
-		config.url?.includes("/auth/token/refresh")
+		config.url?.includes("/auth/token/refresh") ||
+		config.headers?.Authorization
 	) {
+		return config;
+	}
+
+	const accessToken = authStore.accessToken.get();
+	if (!accessToken) {
 		return config;
 	}
 
 	return merge(config, {
 		headers: {
-			Authorization: authStore.bearerToken.get(),
+			Authorization: `Bearer ${accessToken}`,
 		},
 	});
 });
@@ -137,7 +167,14 @@ export async function handleAuthentication({ body }: HandleAuthProps) {
 }
 
 export async function handleRefreshToken(token?: string) {
-	function handleError(err: HTTPException) {
+	async function handleError(err: HTTPException) {
+		const status = err?.response?.status;
+		// 4xx = token dead (expired, revoked, or reused): end the local
+		// session. Network/5xx errors keep it; a retry within 30s gets the
+		// same rotated pair from the server.
+		if (status !== undefined && status < 500) {
+			await clearLocalSession();
+		}
 		const error = handleServerError(err);
 		return Promise.reject(error);
 	}
@@ -149,12 +186,12 @@ export async function handleRefreshToken(token?: string) {
 	}
 
 	return await api
-		.post(`auth/token/refresh`, { refresh_token: token })
+		.post(`/auth/token/refresh`, { refresh_token: token })
 		.then(handleSuccess)
 		.catch(handleError);
 }
 
-export async function handleLogout() {
+async function clearLocalSession() {
 	await storage.clear();
 	await storage.clear(true);
 	await storage.removeAll();
@@ -162,14 +199,36 @@ export async function handleLogout() {
 	userActions.clearData();
 	authStore.accessToken.set("");
 	authStore.refreshToken.set("");
+}
+
+export async function handleLogout() {
+	// Capture before clearing: the server revokes the session these tokens
+	// belong to, so they must be sent, not wiped first.
+	const accessToken = authStore.accessToken.get();
+	const refreshToken =
+		(await storage.get<string>("token")) || authStore.refreshToken.get();
+
+	await clearLocalSession();
+
+	if (!accessToken && !refreshToken) {
+		return;
+	}
 
 	return await api
-		.post(`${API_DOMAIN}/auth/logout`, {})
+		.post(
+			`/auth/logout`,
+			{ refresh_token: refreshToken },
+			{
+				headers: accessToken
+					? { Authorization: `Bearer ${accessToken}` }
+					: undefined,
+			},
+		)
 		.catch(handleServerError);
 }
 
 export async function handleParseLink({ url }: { url: string }) {
-	const endpoint = `/parser?link=${url}`;
+	const endpoint = `/parser?link=${encodeURIComponent(url)}`;
 
 	function handleSuccess(res: XiorResponse) {
 		return res.data.data as ParsedLinkData;
@@ -246,7 +305,6 @@ export async function handleCreateBookmark({
 	const collection = c !== null ? c : undefined;
 
 	const formData = new FormData();
-	formData.append("cover", cover);
 
 	if (tags) {
 		formData.append("tags", tags);
@@ -402,13 +460,13 @@ export async function handleFindCollections({
 	owner,
 	limit = 10,
 }: FindCollectionsProps) {
-	let endpoint = `/search?q=${query}`;
+	let endpoint = `/search?q=${encodeURIComponent(query)}`;
 	endpoint += `&sort=-updated`;
 	endpoint += `&limit=${limit}`;
 	endpoint += `&public=false`;
 	endpoint += `&path=collections`;
 	if (owner) {
-		endpoint += `&owner=${owner}`;
+		endpoint += `&owner=${encodeURIComponent(owner)}`;
 	}
 
 	function handleSuccess(res: XiorResponse) {
@@ -493,7 +551,7 @@ export async function handleFindBookmarks({
 	query,
 	limit = 10,
 }: { query: string; limit?: number }) {
-	let endpoint = `/search?q=${query}`;
+	let endpoint = `/search?q=${encodeURIComponent(query)}`;
 	endpoint += `&sort=-updated`;
 	endpoint += `&limit=${limit}`;
 	endpoint += `&path=bookmarks`;
