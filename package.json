@@ -8,6 +8,8 @@
 	"scripts": {
 		"dev": "plasmo dev",
 		"build": "plasmo build",
+		"dev:staging": "plasmo dev --env=.env.staging",
+		"build:staging": "plasmo build --env=.env.staging",
 		"package": "pnpm run build --zip",
 		"dev:firefox": "plasmo dev --target=firefox-mv3",
 		"build:firefox": "plasmo build --target=firefox-mv3",
