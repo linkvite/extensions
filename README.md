@@ -1,65 +1,55 @@
-## Browser Extensions for Linkvite
+# Linkvite browser extension
 
-Easily save and organize bookmarks without leaving the page. This supports any Chronium-based browser, including Chrome, Arc, Edge, Opera, and Brave. Also works on Firefox, and Safari. See Plasmo's [documentation](https://docs.plasmo.com/framework/workflows/faq#what-are-the-officially-supported-browser-targets) for more information.
+Save and organize bookmarks without leaving the page. Built with [WXT](https://wxt.dev), React 19 and Tailwind, on [`@linkvite/js`](https://github.com/linkvite/js). One codebase for Chrome (and other Chromium browsers: Edge, Brave, Arc, Opera), Firefox and Safari, all Manifest V3.
 
-Currently only available on the [Chrome Web Store](https://chromewebstore.google.com/detail/linkvite/jdkkldhichblefcaiogghmmiijcacadn)
+## What it does
 
-## Getting Started
+- **Popup**: save the current page with its title, description, cover, tags, star and collection. Pages you've already saved open in edit mode (update, delete, open in Linkvite).
+- **Page details**: read from the page itself (works behind logins) or fetched by Linkvite.
+- **Context menus**: save the page, a link, or an image (uploaded as a file); from the toolbar icon: save all tabs, options, open Linkvite.
+- **Save all tabs**: pick which open tabs to save, into one collection. Asks for the optional `tabs` permission first.
+- **Address bar**: type `lv` and a space to search your bookmarks.
+- **Shortcut**: <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> opens the popup.
+- **Options**: default collection, save when the popup opens, close after saving, page details source, theme, sign out.
+- **Sign in**: email or username and password, a QR code scanned with the mobile app, or "Continue with Linkvite" (OAuth with PKCE) where the browser supports it and a client ID is configured.
 
-First, run the development server:
-
-```bash
-pnpm dev
-```
-
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, use: `build/chrome-mv3-dev`. 
-
-<!-- note -->
-> **Note**: NB: We use the `mv3` manifest version, which is the latest and recommended version for all new extensions.
-
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. If you import some module and do some logic, then reload the extension on your browser.
-
-> **Note**: The development build is not optimized for performance, and the size might look bloated. Use the production build for a better experience and performance.
-
-To test the extension of Safari, you need to build the extension and load it manually. To do this, run the following:
+## Develop
 
 ```bash
-pnpm test:safari
+pnpm install
+pnpm dev              # Chrome, with hot reload
+pnpm dev:firefox
 ```
 
-This will create a production build for the Safari browser. You can then load the extension manually by following the instructions [on Apple's documentation [1]](https://developer.apple.com/documentation/safariservices/safari_app_extensions/building_a_safari_app_extension).
+The SDK comes from `../js` (a pnpm override) until `@linkvite/js` v4 is on npm. `pnpm dev`/`build` build it there first if needed (`scripts/ensure-sdk.mjs`); after changing the SDK, rebuild it with `pnpm sdk:build`. Once v4 is published, remove the override, `scripts/ensure-sdk.mjs` and its calls in `package.json`.
 
-This works by converting the extension to a Safari App Extension, which can be loaded manually on the browser. Read more about this on [Apple's documentation [2]](https://developer.apple.com/documentation/safariservices/safari_web_extensions/converting_a_web_extension_for_safari).
-
-
-For further guidance, [visit Plasmo's Documentation](https://docs.plasmo.com/)
-
-## Making production build
-
-Run the following:
+## Build
 
 ```bash
-pnpm build:all
+pnpm build            # .output/chrome-mv3
+pnpm build:firefox    # .output/firefox-mv3
+pnpm build:safari     # .output/safari-mv3, then convert with:
+xcrun safari-web-extension-converter .output/safari-mv3
+pnpm zip              # store-ready zip (pnpm zip:firefox for AMO)
 ```
 
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
+| Variable | |
+| --- | --- |
+| `WXT_API_ENV=staging` | Use the staging API and web app (`pnpm build:staging`) |
+| `WXT_OAUTH_CLIENT_ID` | Enables "Continue with Linkvite". Register a **public** OAuth app whose redirect URIs include the browser's identity URL: `https://<extension-id>.chromiumapp.org/` for Chrome, and the URL `browser.identity.getRedirectURL()` returns in Firefox. Safari has no identity API, so it always uses password and QR sign-in. |
 
-## Building for a specific browser
+## How it's put together
 
-To build for a specific browser, run the following:
+| Path | |
+| --- | --- |
+| `entrypoints/background.ts` | Context menus, omnibox, and the only place tokens are refreshed |
+| `entrypoints/popup`, `entrypoints/options` | The UI (`components/app.tsx` picks the page from `?page=`) |
+| `lib/auth.ts` | Sign-in, single-flight refresh, sign-out |
+| `lib/messages.ts` | Typed messages from the UI to the background |
+| `lib/page.ts` | Reads a tab's title, description, image and icon |
+
+Refresh tokens are single-use, and reusing one signs the session out, so the popup and options page never refresh themselves: they ask the background worker, which runs one refresh at a time.
 
 ```bash
-pnpm build:<target>
+pnpm typecheck && pnpm lint
 ```
-
-Where `<target>` is the target browser. For example, to build for Chrome, run:
-
-```bash
-pnpm build:chrome
-```
-
-This will create a production build for the Chrome browser.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

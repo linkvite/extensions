@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+/* Linkvite: coral (#FA5A5F) as the single accent, dark-first like the web app. */
+@theme {
+	--font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+	--color-coral: #fa5a5f;
+	--color-coral-bright: #ff6d6d;
+	--color-coral-wash: rgba(250, 90, 95, 0.12);
+	--color-background: var(--bg);
+	--color-foreground: var(--fg);
+	--color-muted: var(--muted);
+	--color-line: var(--line);
+	--color-surface: var(--surface);
+	--color-elevated: var(--elevated);
+	--radius-card: 12px;
+}
+
+:root {
+	--bg: #0c0d11;
+	--fg: #f5f6f8;
+	--muted: #9a9ca5;
+	--line: rgba(255, 255, 255, 0.09);
+	--surface: #13141a;
+	--elevated: #1a1b21;
+	color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+	--bg: #fcfcfd;
+	--fg: #212121;
+	--muted: #5b5f66;
+	--line: #e6e7eb;
+	--surface: #f4f5f7;
+	--elevated: #ffffff;
+	color-scheme: light;
+}
+
+html,
+body {
+	background: var(--bg);
+	color: var(--fg);
+	font-family: var(--font-sans);
+	font-size: 14px;
+}
+
+body {
+	margin: 0;
+}
+
+:focus-visible {
+	outline: 2px solid var(--color-coral);
+	outline-offset: 2px;
+}
+
+/* text fields show focus with their own border */
+input:focus-visible,
+textarea:focus-visible {
+	outline: none;
+}

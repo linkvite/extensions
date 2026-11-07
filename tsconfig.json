@@ -1,12 +1,8 @@
 {
-	"extends": "plasmo/templates/tsconfig.base",
-	"exclude": ["build", "node_modules"],
-	"include": [".plasmo/index.d.ts", "./**/*.ts", "./**/*.tsx"],
+	"extends": "./.wxt/tsconfig.json",
 	"compilerOptions": {
-		"paths": {
-			"~*": ["./src/*"]
-		},
-		"baseUrl": "."
-	},
-	"noImplicitAny": true
+		"jsx": "react-jsx",
+		"strict": true,
+		"noUncheckedIndexedAccess": true
+	}
 }
