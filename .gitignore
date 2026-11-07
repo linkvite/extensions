@@ -36,3 +36,7 @@ dist/
 .vscode
 
 Linkvite
+# wxt
+.output
+.wxt
+output/
