@@ -40,3 +40,6 @@ Linkvite
 .output
 .wxt
 output/
+
+# Built Extensions
+linkvite-extension-*.zip
