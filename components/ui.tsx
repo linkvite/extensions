@@ -1,4 +1,3 @@
-import {openTab} from '@/lib/tabs';
 import {Loader2} from 'lucide-react';
 import type {
 	AnchorHTMLAttributes,
@@ -7,6 +6,7 @@ import type {
 	ReactNode,
 	TextareaHTMLAttributes,
 } from 'react';
+import {openTab} from '@/lib/tabs';
 
 export function cn(...c: (string | false | null | undefined)[]) {
 	return c.filter(Boolean).join(' ');
@@ -77,7 +77,11 @@ export function Field({
 	label,
 	children,
 	hint,
-}: {label: string; children: ReactNode; hint?: ReactNode}) {
+}: {
+	label: string;
+	children: ReactNode;
+	hint?: ReactNode;
+}) {
 	return (
 		// biome-ignore lint/a11y/noLabelWithoutControl: the control is the child
 		<label className="flex flex-col gap-1.5">

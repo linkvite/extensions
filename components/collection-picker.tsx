@@ -3,7 +3,7 @@ import {Check, ChevronDown, FolderOpen, Inbox, Plus} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {toast} from 'sonner';
 import {errorMessage, useClient} from './hooks';
-import {Input, Spinner, cn} from './ui';
+import {cn, Input, Spinner} from './ui';
 
 export type CollectionRef = {id: string; name: string} | null;
 
@@ -15,7 +15,10 @@ let cache: Collection[] | null = null;
 export function CollectionPicker({
 	value,
 	onChange,
-}: {value: CollectionRef; onChange: (c: CollectionRef) => void}) {
+}: {
+	value: CollectionRef;
+	onChange: (c: CollectionRef) => void;
+}) {
 	const lv = useClient();
 	const [open, setOpen] = useState(false);
 	const [q, setQ] = useState('');

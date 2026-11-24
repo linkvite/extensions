@@ -1,15 +1,19 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-	"files": { "ignore": [".output/**", ".wxt/**", "node_modules/**"] },
-	"organizeImports": { "enabled": true },
+	"$schema": "https://biomejs.dev/schemas/2.6.6/schema.json",
+	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+	"files": {
+		"includes": ["**", "!**/.output", "!**/.wxt", "!**/node_modules"]
+	},
+	"assist": { "actions": { "source": { "organizeImports": "on" } } },
 	"formatter": { "indentStyle": "tab" },
+	"css": { "parser": { "tailwindDirectives": true } },
 	"javascript": {
 		"formatter": { "quoteStyle": "single", "bracketSpacing": false }
 	},
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true,
+			"preset": "recommended",
 			"a11y": { "noSvgWithoutTitle": "off" },
 			"style": { "noNonNullAssertion": "off" }
 		}

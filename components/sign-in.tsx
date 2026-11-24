@@ -1,3 +1,7 @@
+import {Centrifuge} from 'centrifuge';
+import {QrCode, RefreshCw} from 'lucide-react';
+import {QRCodeSVG} from 'qrcode.react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {
 	API_BASE,
 	CLIENT_HEADERS,
@@ -8,12 +12,8 @@ import {
 } from '@/lib/env';
 import {send} from '@/lib/messages';
 import type {Session} from '@/lib/storage';
-import {Centrifuge} from 'centrifuge';
-import {QrCode, RefreshCw} from 'lucide-react';
-import {QRCodeSVG} from 'qrcode.react';
-import {useCallback, useEffect, useRef, useState} from 'react';
 import {errorMessage} from './hooks';
-import {Button, Field, Input, Spinner, TabLink, cn} from './ui';
+import {Button, cn, Field, Input, Spinner, TabLink} from './ui';
 
 const oauthAvailable =
 	!!OAUTH_CLIENT_ID && !!browser.identity?.launchWebAuthFlow;
@@ -314,7 +314,9 @@ function QRSignIn() {
 /** The scanning account's picture, or its initial when it has none or it fails to load. */
 function Avatar({
 	owner,
-}: {owner: {name: string; username: string; avatar: string}}) {
+}: {
+	owner: {name: string; username: string; avatar: string};
+}) {
 	const [failed, setFailed] = useState(false);
 	if (owner.avatar && !failed) {
 		return (

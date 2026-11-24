@@ -1,11 +1,11 @@
-import {APP_URL} from '@/lib/env';
 import {Settings2} from 'lucide-react';
 import {Toaster} from 'sonner';
+import {APP_URL} from '@/lib/env';
 import {useSession, useSettings, useTheme} from './hooks';
 import {OptionsPage} from './options';
 import {ImagePage, LinkPage, SavePage, TabsPage} from './pages';
 import {SignIn} from './sign-in';
-import {Center, Spinner, TabLink, cn} from './ui';
+import {Center, cn, Spinner, TabLink} from './ui';
 
 export type Page = 'save' | 'link' | 'image' | 'tabs' | 'options';
 
@@ -22,7 +22,11 @@ export function App({
 	page,
 	params,
 	fullPage,
-}: {page: Page; params: URLSearchParams; fullPage?: boolean}) {
+}: {
+	page: Page;
+	params: URLSearchParams;
+	fullPage?: boolean;
+}) {
 	const session = useSession();
 	const [settings, setSettings] = useSettings();
 	useTheme(settings?.theme);

@@ -1,7 +1,3 @@
-import {APP_URL} from '@/lib/env';
-import {activeTab, isSavable, pageInfo} from '@/lib/page';
-import type {Settings} from '@/lib/storage';
-import {openTab} from '@/lib/tabs';
 import type {Schemas} from '@linkvite/js';
 import {
 	Check,
@@ -13,10 +9,14 @@ import {
 } from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {toast} from 'sonner';
+import {APP_URL} from '@/lib/env';
+import {activeTab, isSavable, pageInfo} from '@/lib/page';
+import type {Settings} from '@/lib/storage';
+import {openTab} from '@/lib/tabs';
 import {BookmarkForm, type Draft, emptyDraft} from './bookmark-form';
 import {CollectionPicker, type CollectionRef} from './collection-picker';
 import {errorMessage, useClient} from './hooks';
-import {Button, Center, Spinner, cn} from './ui';
+import {Button, Center, cn, Spinner} from './ui';
 
 type Bookmark = Schemas['BookmarkResponse'];
 
@@ -324,7 +324,11 @@ export function LinkPage({
 	url,
 	text,
 	settings,
-}: {url: string; text: string; settings: Settings}) {
+}: {
+	url: string;
+	text: string;
+	settings: Settings;
+}) {
 	const lv = useClient();
 	const [draft, setDraft] = useState<Draft | null>(null);
 	const [busy, setBusy] = useState(false);
@@ -397,7 +401,11 @@ export function ImagePage({
 	url,
 	from,
 	settings,
-}: {url: string; from: string; settings: Settings}) {
+}: {
+	url: string;
+	from: string;
+	settings: Settings;
+}) {
 	const lv = useClient();
 	const name = decodeURIComponent(
 		url.split('?')[0]?.split('/').pop() || 'image',
