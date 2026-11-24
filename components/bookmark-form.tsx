@@ -1,7 +1,7 @@
 import {Star, X} from 'lucide-react';
 import {useState} from 'react';
 import {CollectionPicker, type CollectionRef} from './collection-picker';
-import {Field, Input, Textarea, cn} from './ui';
+import {cn, Field, Input, Textarea} from './ui';
 
 export type Draft = {
 	url: string;
@@ -32,7 +32,11 @@ export function BookmarkForm({
 	draft,
 	onChange,
 	hideUrl,
-}: {draft: Draft; onChange: (d: Draft) => void; hideUrl?: boolean}) {
+}: {
+	draft: Draft;
+	onChange: (d: Draft) => void;
+	hideUrl?: boolean;
+}) {
 	const set = (p: Partial<Draft>) => onChange({...draft, ...p});
 	return (
 		<div className="flex flex-col gap-3">
@@ -108,7 +112,10 @@ export function BookmarkForm({
 function TagInput({
 	value,
 	onChange,
-}: {value: string; onChange: (v: string) => void}) {
+}: {
+	value: string;
+	onChange: (v: string) => void;
+}) {
 	const tags = value
 		.split(',')
 		.map((t) => t.trim())

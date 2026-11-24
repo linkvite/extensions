@@ -14,6 +14,7 @@ const dir = realpathSync(link);
 if (existsSync(path.join(dir, 'dist/index.js'))) process.exit(0);
 
 console.log(`@linkvite/js is linked from ${dir} but not built; building it…`);
-const run = cmd => execSync(cmd, {cwd: dir, stdio: 'inherit'});
-if (!existsSync(path.join(dir, 'node_modules'))) run('pnpm install --frozen-lockfile');
+const run = (cmd) => execSync(cmd, {cwd: dir, stdio: 'inherit'});
+if (!existsSync(path.join(dir, 'node_modules')))
+	run('pnpm install --frozen-lockfile');
 run('pnpm build');

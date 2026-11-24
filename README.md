@@ -33,20 +33,20 @@ xcrun safari-web-extension-converter .output/safari-mv3
 pnpm zip              # store-ready zip (pnpm zip:firefox for AMO)
 ```
 
-| Variable | |
-| --- | --- |
-| `WXT_API_ENV=staging` | Use the staging API and web app (`pnpm build:staging`) |
+| Variable              |                                                                                                                                                                                                                                                                                                                            |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WXT_API_ENV=staging` | Use the staging API and web app (`pnpm build:staging`)                                                                                                                                                                                                                                                                     |
 | `WXT_OAUTH_CLIENT_ID` | Enables "Continue with Linkvite". Register a **public** OAuth app whose redirect URIs include the browser's identity URL: `https://<extension-id>.chromiumapp.org/` for Chrome, and the URL `browser.identity.getRedirectURL()` returns in Firefox. Safari has no identity API, so it always uses password and QR sign-in. |
 
 ## How it's put together
 
-| Path | |
-| --- | --- |
-| `entrypoints/background.ts` | Context menus, omnibox, and the only place tokens are refreshed |
-| `entrypoints/popup`, `entrypoints/options` | The UI (`components/app.tsx` picks the page from `?page=`) |
-| `lib/auth.ts` | Sign-in, single-flight refresh, sign-out |
-| `lib/messages.ts` | Typed messages from the UI to the background |
-| `lib/page.ts` | Reads a tab's title, description, image and icon |
+| Path                                       |                                                                 |
+| ------------------------------------------ | --------------------------------------------------------------- |
+| `entrypoints/background.ts`                | Context menus, omnibox, and the only place tokens are refreshed |
+| `entrypoints/popup`, `entrypoints/options` | The UI (`components/app.tsx` picks the page from `?page=`)      |
+| `lib/auth.ts`                              | Sign-in, single-flight refresh, sign-out                        |
+| `lib/messages.ts`                          | Typed messages from the UI to the background                    |
+| `lib/page.ts`                              | Reads a tab's title, description, image and icon                |
 
 Refresh tokens are single-use, and reusing one signs the session out, so the popup and options page never refresh themselves: they ask the background worker, which runs one refresh at a time.
 

@@ -1,9 +1,9 @@
-import {send} from '@/lib/messages';
-import type {Session, Settings, Theme} from '@/lib/storage';
 import {LogOut} from 'lucide-react';
 import {useState} from 'react';
+import {send} from '@/lib/messages';
+import type {Session, Settings, Theme} from '@/lib/storage';
 import {CollectionPicker} from './collection-picker';
-import {Button, Field, Switch, cn} from './ui';
+import {Button, cn, Field, Switch} from './ui';
 
 export function OptionsPage({
 	session,
@@ -84,6 +84,7 @@ export function OptionsPage({
 
 			<Field label="Theme">
 				<div
+					role="group"
 					className="flex rounded-lg border border-line p-0.5 text-xs"
 					aria-label="Theme"
 				>

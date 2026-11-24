@@ -1,13 +1,13 @@
+import {useEffect, useMemo, useState} from 'react';
 import {pageClient} from '@/lib/api';
 import {
+	getSettings,
 	type Session,
 	type Settings,
-	getSettings,
 	sessionItem,
 	settingsItem,
 	updateSettings,
 } from '@/lib/storage';
-import {useEffect, useMemo, useState} from 'react';
 
 /** The signed-in account (undefined while loading), kept in sync with storage. */
 export function useSession(): Session | null | undefined {
