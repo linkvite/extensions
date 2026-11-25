@@ -38,6 +38,16 @@ pnpm zip              # store-ready zip (pnpm zip:firefox for AMO)
 | `WXT_API_ENV=staging` | Use the staging API and web app (`pnpm build:staging`)                                                                                                                                                                                                                                                                     |
 | `WXT_OAUTH_CLIENT_ID` | Enables "Continue with Linkvite". Register a **public** OAuth app whose redirect URIs include the browser's identity URL: `https://<extension-id>.chromiumapp.org/` for Chrome, and the URL `browser.identity.getRedirectURL()` returns in Firefox. Safari has no identity API, so it always uses password and QR sign-in. |
 
+## Tests and CI
+
+```sh
+pnpm build && pnpm test   # loads .output/chrome-mv3 in Chromium with the API mocked
+```
+
+`tests/smoke.mjs` signs in, saves a page through the context-menu window and opens the saved bookmark. First run on a machine: `pnpm exec playwright install chromium`.
+
+CI (`.github/workflows/ci.yml`) lints, typechecks, builds Chrome, Firefox and Safari, runs the smoke test and uploads the store zips. Pushing a `v*` tag that matches `package.json` runs `release.yml`, which attaches the zips to a GitHub release.
+
 ## How it's put together
 
 | Path                                       |                                                                 |

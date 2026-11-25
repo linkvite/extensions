@@ -1,0 +1,72 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: CI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      # While package.json links @linkvite/js from ../js (pnpm.overrides), the
+      # SDK has to sit next to this checkout. scripts/ensure-sdk.mjs builds it.
+      # Delete this step with the override once @linkvite/js v4 is on npm.
+      - name: Check out the SDK next to the extension
+        env:
+          SDK_REF: feat/v4-openapi
+        run: |
+          if grep -q '"link:../js"' package.json; then
+            git clone --depth 1 --branch "$SDK_REF" https://github.com/linkvite/js ../js \
+              || git clone --depth 1 https://github.com/linkvite/js ../js
+          fi
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint and format
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      # zip builds first: .output/chrome-mv3 is what the tests load
+      - name: Build Chrome
+        run: pnpm zip
+
+      - name: Build Firefox
+        run: pnpm zip:firefox
+
+      - name: Build Safari
+        run: pnpm build:safari
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Test
+        run: pnpm test
+
+      - name: Upload builds
+        uses: actions/upload-artifact@v4
+        with:
+          name: linkvite-extension-${{ github.sha }}
+          path: |
+            .output/*.zip
+          if-no-files-found: error

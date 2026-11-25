@@ -83,9 +83,8 @@ export function OptionsPage({
 			</div>
 
 			<Field label="Theme">
-				<div
-					role="group"
-					className="flex rounded-lg border border-line p-0.5 text-xs"
+				<fieldset
+					className="m-0 flex min-w-0 rounded-lg border border-line p-0.5 text-xs"
 					aria-label="Theme"
 				>
 					{(['system', 'light', 'dark'] as Theme[]).map((t) => (
@@ -102,7 +101,7 @@ export function OptionsPage({
 							{t}
 						</button>
 					))}
-				</div>
+				</fieldset>
 			</Field>
 
 			<p className="text-xs text-muted">

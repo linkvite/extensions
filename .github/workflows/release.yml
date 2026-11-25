@@ -1,0 +1,48 @@
+name: Release
+
+# Push a tag (v1.2.0) after bumping "version" in package.json: this builds the
+# store zips and attaches them to a GitHub release, ready to upload to the
+# Chrome Web Store, Edge Add-ons and Firefox Add-ons.
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish the release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Tag matches package.json
+        run: |
+          v=$(node -p "require('./package.json').version")
+          [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "::error::tag $GITHUB_REF_NAME but package.json is $v"; exit 1; }
+
+      # remove with the pnpm.overrides link once @linkvite/js v4 is on npm
+      - name: Check out the SDK next to the extension
+        run: |
+          if grep -q '"link:../js"' package.json; then
+            git clone --depth 1 --branch feat/v4-openapi https://github.com/linkvite/js ../js \
+              || git clone --depth 1 https://github.com/linkvite/js ../js
+          fi
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint && pnpm typecheck
+      - run: pnpm zip && pnpm zip:firefox
+
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" .output/*.zip --title "$GITHUB_REF_NAME" --generate-notes
