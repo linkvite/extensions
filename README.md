@@ -21,8 +21,6 @@ pnpm dev              # Chrome, with hot reload
 pnpm dev:firefox
 ```
 
-The SDK comes from `../js` (a pnpm override) until `@linkvite/js` v4 is on npm. `pnpm dev`/`build` build it there first if needed (`scripts/ensure-sdk.mjs`); after changing the SDK, rebuild it with `pnpm sdk:build`. Once v4 is published, remove the override, `scripts/ensure-sdk.mjs` and its calls in `package.json`.
-
 ## Build
 
 ```bash
