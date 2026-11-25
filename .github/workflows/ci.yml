@@ -19,18 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      # While package.json links @linkvite/js from ../js (pnpm.overrides), the
-      # SDK has to sit next to this checkout. scripts/ensure-sdk.mjs builds it.
-      # Delete this step with the override once @linkvite/js v4 is on npm.
-      - name: Check out the SDK next to the extension
-        env:
-          SDK_REF: feat/v4-openapi
-        run: |
-          if grep -q '"link:../js"' package.json; then
-            git clone --depth 1 --branch "$SDK_REF" https://github.com/linkvite/js ../js \
-              || git clone --depth 1 https://github.com/linkvite/js ../js
-          fi
-
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v6

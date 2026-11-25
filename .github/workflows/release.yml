@@ -23,14 +23,6 @@ jobs:
           v=$(node -p "require('./package.json').version")
           [ "v$v" = "$GITHUB_REF_NAME" ] || { echo "::error::tag $GITHUB_REF_NAME but package.json is $v"; exit 1; }
 
-      # remove with the pnpm.overrides link once @linkvite/js v4 is on npm
-      - name: Check out the SDK next to the extension
-        run: |
-          if grep -q '"link:../js"' package.json; then
-            git clone --depth 1 --branch feat/v4-openapi https://github.com/linkvite/js ../js \
-              || git clone --depth 1 https://github.com/linkvite/js ../js
-          fi
-
       - uses: pnpm/action-setup@v6
 
       - uses: actions/setup-node@v6
