@@ -64,9 +64,10 @@ jobs:
         run: pnpm test
 
       - name: Upload builds
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: linkvite-extension-${{ github.sha }}
-          path: |
-            .output/*.zip
+          path: .output/*.zip
+          # .output is a dot-folder, which upload-artifact skips by default
+          include-hidden-files: true
           if-no-files-found: error
